@@ -112,10 +112,8 @@ int main()
 	// ANIMAZIONE
 
 	// "cancello" vettori vecchi
-	line(screen, pos0xlato, pos0ylato, pos0xlato+round(OAy), pos0ylato+round(OAz), colbck); // linea OA
-	line(screen, pos0xlato+round(OAy), pos0ylato+round(OAz), pos0xlato+round(OAy+APy), pos0ylato+round(OAz+APz), colbck); // linea AP
-	line(screen, pos0xalto, pos0yalto, pos0xalto + round(OAy), pos0yalto + round(OAx), colbck); // linea OA
-	line(screen, pos0xalto + round(OAy), pos0yalto+round(OAx), pos0xalto + round(OAy+APy), pos0yalto + round(OAx+APx), colbck); // linea AP
+	rectfill(screen, x1rett3 +1, y1rett3 +1, x2rett3 -1, y2rett3 -1, colbck); //cancello vista lato
+	rectfill(screen, x1rett4 +1, y1rett4 +1, x2rett4 -1, y2rett4 -1, colbck); //cancello vista alto
 	
 	// update vettori OA, AP, OP
 	alpharad = alpha/180 *PI; thetarad = theta/180 *PI;
@@ -125,11 +123,11 @@ int main()
 
 	// Vista Lato
 	line(screen, pos0xlato, pos0ylato, pos0xlato + round(OAy), pos0ylato + round(OAz), colmdl); // linea OA
-	line(screen, pos0xlato+round(OAy), pos0ylato + round(OAz), pos0xlato + round(OAy+APy), pos0ylato + round(OAz+APz), colmdl2); // linea AP
+	line(screen, pos0xlato + round(OAy), pos0ylato + round(OAz), pos0xlato + round(OAy+APy), pos0ylato + round(OAz+APz), colmdl2); // linea AP
 	
 	// Vista Alto
 	line(screen, pos0xalto, pos0yalto, pos0xalto + round(OAy), pos0yalto + round(OAx), colmdl); // linea OA
-	line(screen, pos0xalto + round(OAy), pos0yalto+round(OAx), pos0xalto + round(OAy+APy), pos0yalto + round(OAx+APx), colmdl2); // linea AP
+	line(screen, pos0xalto + round(OAy), pos0yalto + round(OAx), pos0xalto + round(OAy+APy), pos0yalto + round(OAx-APx), colmdl2); // linea AP
 	
 
 
