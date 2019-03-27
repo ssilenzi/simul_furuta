@@ -4,13 +4,16 @@ project(simul_furuta)
 
 set(CMAKE_C_FLAGS "-Wall")
 
+# Carica pthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+# Carica Allegro
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 find_package(Allegro REQUIRED)
 include_directories(${ALLEGRO_INCLUDE_DIR})
 
+# Carica ptask
 add_library(ptask STATIC IMPORTED)
 set_property(TARGET ptask APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(ptask PROPERTIES
@@ -19,12 +22,7 @@ set_target_properties(ptask PROPERTIES
 )
 include_directories("${CMAKE_CURRENT_LIST_DIR}/ptask")
 
-#file(GLOB SRC
-#	"${CMAKE_CURRENT_LIST_DIR}/src/*.h"
-#	"${CMAKE_CURRENT_LIST_DIR}/src/*.c"
-#	"${CMAKE_CURRENT_LIST_DIR}/src/*.cpp"
-#)
+# Compila main.c
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
-
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/src/main.c")
 target_link_libraries(${PROJECT_NAME} Threads::Threads ${ALLEGRO_LIBRARY} m rt ptask)
