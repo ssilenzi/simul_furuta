@@ -19,12 +19,12 @@ set_target_properties(ptask PROPERTIES
 )
 include_directories("${CMAKE_CURRENT_LIST_DIR}/ptask")
 
-file(GLOB SRC
-	"${CMAKE_CURRENT_LIST_DIR}/src/*.h"
-	"${CMAKE_CURRENT_LIST_DIR}/src/*.c"
-	"${CMAKE_CURRENT_LIST_DIR}/src/*.cpp"
-)
+#file(GLOB SRC
+#	"${CMAKE_CURRENT_LIST_DIR}/src/*.h"
+#	"${CMAKE_CURRENT_LIST_DIR}/src/*.c"
+#	"${CMAKE_CURRENT_LIST_DIR}/src/*.cpp"
+#)
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 
-add_executable(${PROJECT_NAME} ${SRC})
+add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/src/main.c")
 target_link_libraries(${PROJECT_NAME} Threads::Threads ${ALLEGRO_LIBRARY} m rt ptask)
