@@ -13,7 +13,7 @@ int main()
 
 	//Def variabili
 	float alpha = 0, theta = 0; // Angoli
-	float bu = 3.000;	//boh, variabile a caso
+	float bu = 3;	//boh, variabile a caso
 
 	do {
 		gui(&alpha, &theta, &bu); //aggiorna grafica
