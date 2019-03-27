@@ -28,10 +28,10 @@ void gui(float *alpha, float *theta, float *bu){
 		sprintf(bustr, "bu = %5.2f, a/z +-0.1", *bu);
 		textout_ex(screen, font, bustr, dist*1.5, dist*2, colscr, colbck);
 		//alpha
-		sprintf(alphastr, "alpha = %5.2f, i/o +-5", alpha);
+		sprintf(alphastr, "alpha = %5.2f, i/o +-5", *alpha);
 		textout_ex(screen, font, alphastr, dist*1.5, dist*3, colscr, colbck);
 		//theta
-		sprintf(thetastr, "theta = %5.2f, k/l +-5", theta);
+		sprintf(thetastr, "theta = %5.2f, k/l +-5", *theta);
 		textout_ex(screen, font, thetastr, dist*1.5, dist*4, colscr, colbck);
 
 		// ANIMAZIONE
