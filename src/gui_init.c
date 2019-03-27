@@ -2,37 +2,6 @@
 #include <math.h>
 #include <allegro.h>
 
-void get_keycodes(char *scan, char *ascii)
-{
-	//The following function waits for a key pressed and extracts
-	//the corresponding ASCII code and scan code:
-	int k;
-	k = readkey(); // block until a key is pressed
-	*ascii = k; // get ASCII code
-	*scan = k >> 8; // get scan code
-}
-
-// get_string
-void get_string(char *str, int x, int y, int c, int b)
-{
-	// The following function reads a string from the keyboard and displays
-	// the echo in graphic mode at position (x,y), color c and background b:
-	char ascii, scan, s[2];
-	int i = 0;
-	do {
-		get_keycodes(&scan, &ascii);
-		if (scan != KEY_ENTER) {
-			s[0] = ascii; // put ascii in s for echoing
-			s[1] = '\0';
-			textout_ex(screen, font, s, x, y, c, b); // echo
-			x = x + 8;
-			str[i++] = ascii; // insert character in string
-		}
-	} while (scan != KEY_ENTER);
-	
-		str[i] = '\0';
-}
-
 //Static GUI
 void gui_init()
 {
