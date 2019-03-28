@@ -14,10 +14,16 @@ int main()
 	//Def variabili
 	float alpha = 0, theta = 0; // Angoli
 	float bu = 3;	//boh, variabile a caso
+	float alphaold=1, thetaold=1;
 
 	do {
-		gui(&alpha, &theta, &bu); //aggiorna grafica
+
+		if( thetaold != theta || alphaold != alpha){
+			gui(&alpha, &theta, &bu); //aggiorna grafica
+		}
+		alphaold=alpha; thetaold=theta;
 		keys(&alpha, &theta, &bu); //interazione con la tastiera
+
 	}while (!key[KEY_ESC]);
 
 allegro_exit();
