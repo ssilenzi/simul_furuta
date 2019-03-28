@@ -24,7 +24,7 @@ void gui(float *alpha, float *theta, float *bu){
 		int pos0xasso = 876, pos0yasso = 238;	// posizione centrale rettangolo v.asson
 		int pos0xlato = 1094, pos0ylato = 675;	// posizione centrale rettangolo v.lato
 		int pos0xalto = 658, pos0yalto = 675;	// posizione centrale rettangolo v.alto
-		double OAx, OAy, OAz = 0, APx, APy, APz, APylato, APzlato;
+		double OAx, OAy, APx, APy, APylato, APzlato;
 
 	// SCRITTE
 		// bu
@@ -45,19 +45,26 @@ void gui(float *alpha, float *theta, float *bu){
 
 		// update vettori OA, AP
 		OAx = l1 * cos(alpharad); OAy = l1 * sin(alpharad);
-		APx = -l2 * sin(alpharad) * sin(thetarad); APy = -l2 * cos(alpharad) * sin(thetarad); APz = l2 * cos(thetarad);
-		APylato = - l2 * sin(thetarad); APzlato =  l2 * cos(thetarad);
+		APx = -l2 * sin(alpharad) * sin(thetarad); APy = -l2 * cos(alpharad) * sin(thetarad); // APz = l2 * cos(thetarad);
+		APylato = l2 * sin(thetarad); APzlato =  l2 * cos(thetarad);
+
+		int OAxasso, OAyasso, APxasso, APyasso;
+		OAxasso = l1*sin(alpharad)/sqrt(2) - l1*cos(alpharad)/sqrt(2);
+		OAyasso = - l1*cos(alpharad)/sqrt(6) - l1*sin(alpharad)/sqrt(6);
+		APxasso = (l1*sin(alpharad) + l2*cos(alpharad)* sin(thetarad))/sqrt(2) - (l1*cos(alpharad) - l2*sin(alpharad)*sin(thetarad))/sqrt(2) - OAxasso;
+		APyasso =  sqrt(6)*l2*cos(thetarad)/3 - (l1*cos(alpharad) - l2*sin(alpharad)*sin(thetarad))/sqrt(6) - (l1*sin(alpharad) + l2*cos(alpharad)*sin(thetarad))/sqrt(6) - OAyasso;
 
 		// Vista Asson - DA FARE
-		line(screen, pos0xasso, pos0yasso, pos0xasso + round(OAy), pos0yasso + round(OAz), colmdl); // linea OA
-		line(screen, pos0xasso + round(OAy), pos0yasso + round(OAz), pos0xasso + round(OAy+APy), pos0yasso + round(OAz+APz), colmdl2); // linea AP
+		line(screen, pos0xasso, pos0yasso, pos0xasso + OAxasso, pos0yasso + OAyasso, colmdl); // linea OA
+		line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxasso , pos0yasso + OAyasso + APyasso, colmdl2); // linea AP
+		line(screen, pos0xasso, pos0yasso + 0.6 * l1, pos0xasso, pos0yasso - 0.6 * l1, colscr); //asse verticale
 
 		// Vista Lato
 		line(screen, pos0xlato, pos0ylato, pos0xlato + round(APylato), pos0ylato + round(APzlato), colmdl2); // linea AP
 
 		// Vista Alto
-		line(screen, pos0xalto, pos0yalto, pos0xalto + round(OAy), pos0yalto + round(OAx), colmdl); // linea OA
-		line(screen, pos0xalto + round(OAy), pos0yalto + round(OAx), pos0xalto + round(OAy+APy), pos0yalto + round(OAx-APx), colmdl2); // linea AP
+		line(screen, pos0xalto, pos0yalto, pos0xalto + round(OAy), pos0yalto - round(OAx), colmdl); // linea OA
+		line(screen, pos0xalto + round(OAy), pos0yalto - round(OAx), pos0xalto + round(OAy + APy), pos0yalto - round(OAx - APx), colmdl2); // linea AP
 
 }
 
