@@ -55,18 +55,18 @@ void keys(float *alpha, float *theta, float *bu){
 			if(key[KEY_Z]){
 				*bu += -0.1;
 			}
-			//alpha i/o
-			if(key[KEY_I]) {
-				*alpha +=  5;
-			}
-			if(key[KEY_O]){
-				*alpha += -5;
-			}
 			//alpha k/l
 			if(key[KEY_K]) {
-				*theta +=  5;
+				*alpha +=  5;
 			}
 			if(key[KEY_L]){
+				*alpha += -5;
+			}
+			//theta i/o
+			if(key[KEY_I]) {
+				*theta +=  5;
+			}
+			if(key[KEY_O]){
 				*theta += -5;
 			}
 		} // end keypressed
