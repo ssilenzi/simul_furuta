@@ -49,12 +49,12 @@ void gui_init()
 		textout_ex(screen, font, latostr,  round( dist + wrett1 + dist + wrett3  +  wrett4/2 -2.1*dist )  , dist + hrett2 + dist, colscr, colbck);
 	//rett5 help, basso destra
 	rect(screen, dist + wrett1 + dist , dist + hrett2 + hrett3 + dist , dist + wrett1 + dist + wrett5,  dist + hrett2 + hrett3 + dist + hrett5, colrett);
-		char exit[50], reset[50], resetvis[50];
+		char exit[50], reset[50], resetvis[65];
 		sprintf(exit, "Premere Esc per uscire.");
 		textout_ex(screen, font, exit, 3*dist + wrett1 , 3*dist + hrett2 + hrett3, colscr, colbck);
 		sprintf(reset, "R per resettare.");
 		textout_ex(screen, font, reset, 3*dist + wrett1, 4*dist + hrett2 + hrett3, colscr, colbck);
-		sprintf(resetvis, "T per resettare la vista.");
+		sprintf(resetvis, "Up, down, left right per modificare e T per resettare la vista.");
 		textout_ex(screen, font, resetvis, 15*dist + wrett1, 3*dist + hrett2 + hrett3, colscr, colbck);
 
 }

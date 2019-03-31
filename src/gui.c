@@ -9,17 +9,52 @@
 
 #define PI 3.14159265
 
+///////////
+//ThickLine
+void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color){
+	float dx = x - x_;
+	float dy = y - y_;
+	float d = sqrtf(dx * dx + dy * dy);
+	if (!d)
+		return;
+	int v[4 * 2];
 
-void ellisse_par(int *xc, int *yc, float *a, float *b, float *angl1, float *angl2, int *color){
-	//xc xcentro, yc ycentro, a semiasse x, b semiasse y, angl angolo di rotazione, color colore
-	float A, B, t; //passo di disegno
-	int x,y;
-	A = *a * cos(*angl1);
-	B = *b * sin(*angl1);
-	for(t=0; t < 2*PI; t = t + 2*PI/1000){  // mi fermo dopo aver fatto un giro, disegno 1000 punti.
-		x =  *xc + ( A * cos(t) );
-		y =  *yc + ( B * sin(t) );
-		putpixel(screen, x, y, *color);
+	/* left up */
+	v[0] = x - thickness * dy / d;
+	v[1] = y + thickness * dx / d;
+	/* right up */
+	v[2] = x + thickness * dy / d;
+	v[3] = y - thickness * dx / d;
+	/* right down */
+	v[4] = x_ + thickness * dy / d;
+	v[5] = y_ - thickness * dx / d;
+	/* left down */
+	v[6] = x_ - thickness * dy / d;
+	v[7] = y_ + thickness * dx / d;
+
+	polygon(bmp, 4, v, color);
+
+}
+
+
+///////////
+//Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
+void circle_rifalpha(BITMAP *bmp, int xc, int yc, int r, float *alpharad, float *lonrad, float *latrad, int color){
+	//bmp, xc xcentro, yc ycentro, raggio cerchio, lonrad angolo long vista asson, latrad " ", color colore
+
+	float anglim = 0, d_ang; //angolo limite
+	anglim = *alpharad;
+	d_ang = 2*PI/1000;
+	if(*alpharad < 0){
+		d_ang = - d_ang;
+
+	} //end if
+
+	for(float t=0; t < anglim; t = t + d_ang){  //Mi fermo raggiunto alpharad in un giro disegno 1000 punti.
+		float x,y;
+		x =  xc -r*sin(*lonrad - t);
+		y =  yc + r*cos(*lonrad - t)*sin(*latrad);
+		putpixel(bmp, x, y, color);
 	} //end for
 
 }
@@ -30,23 +65,23 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	//alpha angolo con il link orizzontale (gradi), theta angolo con il link verticale (gradi)
 	//lon angolo vista asson longitudinale (gradi), lat angolo vista asson laterale (gradi)
 
-	//
-	//Par fissi animazione
+	//Costanti per disegno
+	int colscr = 15, colbck = 0, colmdl = 13, colmdl2 = 5, colrif = 15; //colori scritte, background, modello, rif
+	int dist = 20; //distanza "utile"
+	float rifscala = 1.15; //fattore di scala per rappresentare assi di rif
+	char bustr[30], alphastr[30], thetastr[30];	//stringhe di comunicazione che vengono aggiornate
+	float thick = 1; //Spessore linee spesse, non e` in pixel
+
+	//Angoli e grandezze fisiche
 	float alpharad, thetarad, lonrad, latrad;	// Porta gli angoli in rad
 	alpharad = *alpha/180 *PI; thetarad = *theta /180 *PI;
 	lonrad = *lon/180 * PI; latrad = *lat/180 * PI;
-
-	float rifscala = 1.15;
-
 	float cosal, sinal, costh, sinth;	//calcolo sin e cos
 	cosal = cos(alpharad); sinal = sin(alpharad);
 	costh = cos(thetarad); sinth = sin(thetarad);
-
-	char bustr[30], alphastr[30], thetastr[30];	//stringhe di comunicazione che vengono aggiornate
 	float l1 = 100, l2 = 80;	//lunghezze aste
 
-	int colscr = 15, colbck = 0, colmdl = 13, colmdl2 = 5, colrif = 15; //colori scritte, background, modello, rif
-	int dist = 20;
+
 
 	//
 	// SCRITTE
@@ -87,10 +122,10 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 		//APyasso = sqrt(6)/6 * (APy + APx - 2*APz);
 	//Riferimenti ( da disegnare prima )
 	int OAxassorif, OAyassorif, APxassorif, APyassorif;
-	OAxassorif = rifscala * l1*sin( -lonrad);
+	OAxassorif = - rifscala * l1*sin(lonrad);
 	OAyassorif = rifscala * l1*sin(latrad)*cos(lonrad);
 	APxassorif = 0;
-	APyassorif = rifscala * ( -l2*cos(latrad) );
+	APyassorif = - rifscala * l2*cos(latrad);
 	//Link
 	int OAxasso, OAyasso, APxasso, APyasso;
 	OAxasso = l1*sin(alpharad - lonrad);
@@ -101,10 +136,13 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	//Disegno Riferimenti
 	line(screen, pos0xasso, pos0yasso + 0.6*l1*cos(latrad), pos0xasso, pos0yasso-2, colrif);	//asse verticale
 	line(screen, pos0xasso, pos0yasso, pos0xasso + OAxassorif, pos0yasso + OAyassorif, colrif);	// linea OA
-	line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxassorif , pos0yasso + OAyasso + APyassorif, colrif);	// linea AP
+	line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxassorif , pos0yasso + OAyasso + APyassorif, colrif);
+
+	circle_rifalpha(screen, pos0xasso, pos0yasso, l1, &alpharad, &lonrad, &latrad, colrif);
+
 	//Disegno Link
-	line(screen, pos0xasso, pos0yasso, pos0xasso + OAxasso, pos0yasso + OAyasso, colmdl);	// linea OA
-	line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxasso , pos0yasso + OAyasso + APyasso, colmdl2);	// linea AP
+	thick_line(screen, pos0xasso, pos0yasso, pos0xasso + OAxasso, pos0yasso + OAyasso, thick, colmdl);	// linea OA
+	thick_line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxasso , pos0yasso + OAyasso + APyasso, thick, colmdl2);	// linea AP
 
 	// Vista Lato
 	int APxlato, APylato, APxlatorif, APylatorif;
@@ -112,7 +150,7 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	APxlato = l2 * sinth;
 	APylato = - APz;
 	line(screen, pos0xlato, pos0ylato, pos0xlato + APxlatorif, pos0ylato + APylatorif, colrif); //riferimento
-	line(screen, pos0xlato, pos0ylato, pos0xlato + APxlato, pos0ylato + APylato, colmdl2); // linea AP
+	thick_line(screen, pos0xlato, pos0ylato, pos0xlato + APxlato, pos0ylato + APylato, thick, colmdl2); // linea AP
 
 
 	// Vista Alto
@@ -127,8 +165,11 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	line(screen, pos0xalto, pos0yalto, pos0xalto + OAxaltorif, pos0yalto + OAyaltorif, colrif); // linea OA rif
 	line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + 0, pos0yalto + OAyalto + 0, colrif);// linea AP
 	//link
-	line(screen, pos0xalto, pos0yalto, pos0xalto + OAxalto, pos0yalto + OAyalto, colmdl); // linea OA
-	line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + APxalto, pos0yalto + OAyalto + APyalto, colmdl2);// linea AP
+	thick_line(screen, pos0xalto, pos0yalto, pos0xalto + OAxalto, pos0yalto + OAyalto, thick, colmdl); // linea OA
+	thick_line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + APxalto, pos0yalto + OAyalto + APyalto, thick, colmdl2);// linea AP
 
 
+
+
+	// Ellissi
 }
