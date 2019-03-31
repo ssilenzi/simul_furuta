@@ -38,9 +38,9 @@ void get_string(char *str, int x, int y, int c, int b)
 		str[i] = '\0';
 }
 
-void keys(float *alpha, float *theta, float *bu){
+void keys(float *alpha, float *theta, float *lon, float *lat, float *bu){
 	char ascii, scan; // output di get_keycodes(&scan, &ascii)
-		if(keypressed() ){  //importante altrimenti readkey blocca l'esecuzione
+		if( keypressed() ){  //importante altrimenti readkey blocca l'esecuzione
 			get_keycodes(&scan, &ascii);
 			//reset
 			if(key[KEY_R]){
@@ -48,26 +48,46 @@ void keys(float *alpha, float *theta, float *bu){
 				*alpha = 0;
 				*theta = 0;
 			}
-			//bu a/z
+			//reset vista
+			if(key[KEY_T]){
+				*lon = 45;
+				*lat = 35.26439;
+			}
+
+			//BU a/z
 			if(key[KEY_A]) {
 				*bu +=  0.1;
 			}
 			if(key[KEY_Z]){
 				*bu += -0.1;
 			}
-			//alpha k/l
+			//ALPHA k/l
 			if(key[KEY_K]) {
 				*alpha +=  5;
 			}
 			if(key[KEY_L]){
 				*alpha += -5;
 			}
-			//theta i/o
+			//THETA i/o
 			if(key[KEY_I]) {
 				*theta +=  5;
 			}
 			if(key[KEY_O]){
 				*theta += -5;
+			}
+			//LAT up down
+			if(key[KEY_UP]){
+				*lat += 5;
+			}
+			if(key[KEY_DOWN]){
+				*lat += -5;
+			}
+			//LON left right
+			if(key[KEY_LEFT]){
+				*lon += -5;
+			}
+			if(key[KEY_RIGHT]){
+				*lon += +5;
 			}
 		} // end keypressed
 
