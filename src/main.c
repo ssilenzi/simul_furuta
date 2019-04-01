@@ -5,7 +5,6 @@
 #include "gui.c"
 #include "keys.c"
 
-
 // MAIN
 int main()
 {
@@ -24,6 +23,10 @@ int main()
 		}
 		alphaold=alpha; thetaold=theta; lonold = lon; latold = lat;
 		keys(&alpha, &theta, &lon, &lat, &bu); //interazione con la tastiera
+
+		//soluzione temporanea
+		alpha = ( (int) alpha)%360;
+		theta = ( (int) theta)%360;
 
 	}while (!key[KEY_ESC]);
 

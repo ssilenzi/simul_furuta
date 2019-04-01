@@ -39,18 +39,17 @@ void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickne
 
 ///////////
 //Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
-void circle_rifalpha(BITMAP *bmp, int xc, int yc, int r, float *alpharad, float *lonrad, float *latrad, int color){
-	//bmp, xc xcentro, yc ycentro, raggio cerchio, lonrad angolo long vista asson, latrad " ", color colore
+void circlerif_alpha(BITMAP *bmp, int xc, int yc, int r, float *alpharad, float *lonrad, float *latrad, int color){
+	//bmp, xc xcentro, yc ycentro, raggio cerchio, alpharad, lonrad angolo long vista asson, latrad " ", color colore
 
 	float anglim = 0, d_ang; //angolo limite
 	anglim = *alpharad;
 	d_ang = 2*PI/1000;
 	if(*alpharad < 0){
 		d_ang = - d_ang;
-
 	} //end if
 
-	for(float t=0; t < anglim; t = t + d_ang){  //Mi fermo raggiunto alpharad in un giro disegno 1000 punti.
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  //Mi fermo raggiunto alpharad in un giro disegno 1000 punti.
 		float x,y;
 		x =  xc -r*sin(*lonrad - t);
 		y =  yc + r*cos(*lonrad - t)*sin(*latrad);
@@ -58,8 +57,60 @@ void circle_rifalpha(BITMAP *bmp, int xc, int yc, int r, float *alpharad, float 
 	} //end for
 
 }
+//circlerif_theta: disegna un arco di circonf in prospettiva per visualizzare theta
+void circlerif_theta(BITMAP *bmp, int xc, int yc, int r, int l1, float *alpharad, float *thetarad, float *lonrad, float *latrad, int color){
+	//bmp, xc xcentro, yc ycentro, raggio cerchio, dimensione link1, alpharad, thetarad, lonrad angolo long vista asson, latrad " ", color colore
+	float anglim = 0, d_ang; //angolo limite
+	anglim = *thetarad;
+	d_ang = 2*PI/1000;
+	if(*thetarad < 0){
+		d_ang = - d_ang;
+	} //end if
 
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  //Mi fermo raggiunto thetarad in un giro disegno 1000 punti.
+		float x,y;
+		x = xc + cos(*lonrad)*(l1*sin(*alpharad) + r*cos(*alpharad)*sin(t)) - sin(*lonrad)*(l1*cos(*alpharad) - r*sin(*alpharad)*sin(t));
+		y = yc + cos(*lonrad)*sin(*latrad)*(l1*cos(*alpharad) - r*sin(*alpharad)*sin(t)) - r*cos(*latrad)*cos(t) + sin(*latrad)*sin(*lonrad)*(l1*sin(*alpharad) + r*cos(*alpharad)*sin(t));
+		putpixel(bmp, x, y, color);
+	} //end for
+}
+//circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
+void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float *ang, int color){
+	//bmp, xc xcentro, yc ycentro, raggio cerchio, ang angolo a cui fermarsi, color colores
+	float anglim = 0, d_ang; //angolo limite
+	anglim = *ang;
+	d_ang = 2*PI/1000;
+	if(*ang < 0){
+		d_ang = - d_ang;
+	} //end if
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  //Mi fermo raggiunto ang, in un giro disegno 1000 punti.
+		float x,y;
+		x = xc + r*sin(t);
+		y = yc - r*cos(t);
+		putpixel(bmp, x, y, color);
+	} //end for
 
+}
+//circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
+void circlerif_pardown(BITMAP *bmp, int xc, int yc, int r, float *ang, int color){
+	//bmp, xc xcentro, yc ycentro, raggio cerchio, ang angolo a cui fermarsi, color colores
+	float anglim = 0, d_ang; //angolo limite
+	anglim = *ang;
+	d_ang = 2*PI/1000;
+	if(*ang < 0){
+		d_ang = - d_ang;
+	} //end if
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  //Mi fermo raggiunto ang, in un giro disegno 1000 punti.
+		float x,y;
+		x = xc + r*sin(t);
+		y = yc + r*cos(t);
+		putpixel(bmp, x, y, color);
+	} //end for
+
+}
+
+////////////
+// GUI
 void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 
 	//alpha angolo con il link orizzontale (gradi), theta angolo con il link verticale (gradi)
@@ -137,8 +188,8 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	line(screen, pos0xasso, pos0yasso + 0.6*l1*cos(latrad), pos0xasso, pos0yasso-2, colrif);	//asse verticale
 	line(screen, pos0xasso, pos0yasso, pos0xasso + OAxassorif, pos0yasso + OAyassorif, colrif);	// linea OA
 	line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxassorif , pos0yasso + OAyasso + APyassorif, colrif);
-
-	circle_rifalpha(screen, pos0xasso, pos0yasso, l1, &alpharad, &lonrad, &latrad, colrif);
+	circlerif_alpha(screen, pos0xasso, pos0yasso, l1/rifscala, &alpharad, &lonrad, &latrad, colrif);
+	circlerif_theta(screen, pos0xasso, pos0yasso, l2/rifscala, l1, &alpharad, &thetarad, &lonrad, &latrad, colrif);
 
 	//Disegno Link
 	thick_line(screen, pos0xasso, pos0yasso, pos0xasso + OAxasso, pos0yasso + OAyasso, thick, colmdl);	// linea OA
@@ -150,6 +201,7 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	APxlato = l2 * sinth;
 	APylato = - APz;
 	line(screen, pos0xlato, pos0ylato, pos0xlato + APxlatorif, pos0ylato + APylatorif, colrif); //riferimento
+	circlerif_parup(screen, pos0xlato, pos0ylato, l2/rifscala, &thetarad, colrif); //rif angolo theta
 	thick_line(screen, pos0xlato, pos0ylato, pos0xlato + APxlato, pos0ylato + APylato, thick, colmdl2); // linea AP
 
 
@@ -164,6 +216,7 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	//riferimento
 	line(screen, pos0xalto, pos0yalto, pos0xalto + OAxaltorif, pos0yalto + OAyaltorif, colrif); // linea OA rif
 	line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + 0, pos0yalto + OAyalto + 0, colrif);// linea AP
+	circlerif_pardown(screen, pos0xalto, pos0yalto, l1/rifscala, &alpharad, colrif); //rif angolo alpha
 	//link
 	thick_line(screen, pos0xalto, pos0yalto, pos0xalto + OAxalto, pos0yalto + OAyalto, thick, colmdl); // linea OA
 	thick_line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + APxalto, pos0yalto + OAyalto + APyalto, thick, colmdl2);// linea AP
