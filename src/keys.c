@@ -63,17 +63,17 @@ void keys(float *alpha, float *theta, float *lon, float *lat, float *bu){
 			}
 			//ALPHA k/l
 			if(key[KEY_K]) {
-				*alpha +=  5;
+				*alpha +=  -5;
 			}
 			if(key[KEY_L]){
-				*alpha += -5;
+				*alpha += 5;
 			}
 			//THETA i/o
 			if(key[KEY_I]) {
-				*theta +=  5;
+				*theta +=  -5;
 			}
 			if(key[KEY_O]){
-				*theta += -5;
+				*theta += 5;
 			}
 			//LAT up down
 			if(key[KEY_UP]){
