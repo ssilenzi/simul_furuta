@@ -5,7 +5,7 @@
 //Static GUI
 void gui_init()
 {
-	int hscreen = 1000, wscreen = 1333; //dimensioni schermo
+	int hscreen = 1000, wscreen = 1336; //dimensioni schermo
 	//dimensioni rettangoli height and width
 	int hrett1, wrett1, hrett2, wrett2, hrett3, wrett3, hrett4, wrett4, hrett5, wrett5, dist = 20; 	hrett1 = hscreen - 2 * dist; // altezza rettangolo 1
 	wrett1 = 400;
@@ -18,14 +18,14 @@ void gui_init()
 	wrett4 = wrett3+1;
 	hrett5 = hscreen - 3 * dist - hrett2 - hrett3;
 
-	//colori rettangoli, scritte, background, modello
-	int colrett = 14, colscr = 15, colbck = 0;
+    // Init allegro
+    allegro_init(); 	//inizializza Allegro
+    install_keyboard();	//posso usare la tastiera
+    set_color_depth(16); 	// VGA mode (8 bits)
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED,wscreen,hscreen,0,0); // apre screen
 
-	// Init allegro
-	allegro_init(); 	//inizializza Allegro
-	install_keyboard();	//posso usare la tastiera
-	set_color_depth(8); 	// VGA mode (8 bits)
-	set_gfx_mode(GFX_AUTODETECT_WINDOWED,wscreen,hscreen,0,0); // apre screen
+	//colori rettangoli, scritte, background, modello
+	int colrett = makecol(255, 0, 0), colscr = makecol(0, 0, 0), colbck = makecol(255, 255, 255);
 	clear_to_color(screen, colbck); // black background
 
 	// Disegno rettangoli e cose statiche

@@ -12,18 +12,19 @@ IF (ALLEGRO_INCLUDE_DIR)
 ENDIF (ALLEGRO_INCLUDE_DIR)
 
 FIND_PATH(ALLEGRO_INCLUDE_DIR allegro.h
-/usr/local/include
-/usr/include
-$ENV{MINGDIR}/include
+        /usr/local/include
+        /usr/include
+        $ENV{MINGDIR}/include
+        C:/allegro/include
 )
 
 if(UNIX AND NOT CYGWIN)
     exec_program(allegro-config ARGS --libs OUTPUT_VARIABLE ALLEGRO_LIBRARY)
 else(UNIX AND NOT CYGWIN)
-    SET(ALLEGRO_NAMES alleg alleglib alleg41 alleg42 allegdll)
+    SET(ALLEGRO_NAMES alleg alleglib alleg41 alleg42 alleg44 allegdll)
     FIND_LIBRARY(ALLEGRO_LIBRARY
         NAMES ${ALLEGRO_NAMES}
-        PATHS /usr/lib /usr/local/lib $ENV{MINGDIR}/lib)
+        PATHS /usr/lib /usr/local/lib $ENV{MINGDIR}/lib C:/allegro/lib)
 endif(UNIX AND NOT CYGWIN)
 
 IF (ALLEGRO_INCLUDE_DIR AND ALLEGRO_LIBRARY)

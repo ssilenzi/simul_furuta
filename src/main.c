@@ -12,7 +12,7 @@ int main()
 
 	//Variabili
 	float alpha = 0, theta = 0; // Angoli
-	float lon = 45, lat = 35.26439;
+	float lon = 45, lat = 35;
 	float bu = 3;	//boh, variabile a caso
 	float alphaold=1, thetaold=1, lonold = 0, latold = 0; //vecchie variabili
 
@@ -33,3 +33,4 @@ int main()
 allegro_exit();
 return 0;
 }
+END_OF_MAIN()

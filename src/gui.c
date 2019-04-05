@@ -117,7 +117,9 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	//lon angolo vista asson longitudinale (gradi), lat angolo vista asson laterale (gradi)
 
 	//Costanti per disegno
-	int colscr = 15, colbck = 0, colmdl = 13, colmdl2 = 5, colrif = 15; //colori scritte, background, modello, rif
+	int colscr = makecol(0, 0, 0), colbck = makecol(255, 255, 255);
+	int colmdl = makecol(255, 0, 255), colmdl2 = makecol(0, 255, 255);
+	int colrif = makecol(0, 0, 0); //colori scritte, background, modello, rif
 	int dist = 20; //distanza "utile"
 	float rifscala = 1.15; //fattore di scala per rappresentare assi di rif
 	char bustr[30], alphastr[30], thetastr[30];	//stringhe di comunicazione che vengono aggiornate

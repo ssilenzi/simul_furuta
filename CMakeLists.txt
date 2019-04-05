@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(simul_furuta)
 
-set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
 # Carica pthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -23,6 +24,7 @@ set_target_properties(ptask PROPERTIES
 include_directories("${CMAKE_CURRENT_LIST_DIR}/ptask")
 
 # Compila main.c
+add_compile_definitions(ALLEGRO_STATICLINK)
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/src/main.c")
 target_link_libraries(${PROJECT_NAME} Threads::Threads ${ALLEGRO_LIBRARY} m rt ptask)
