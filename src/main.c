@@ -30,7 +30,7 @@ int main()
 
 	}while (!key[KEY_ESC]);
 
-allegro_exit();
-return 0;
+	allegro_exit();
+	return 0;
 }
 END_OF_MAIN()

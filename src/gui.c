@@ -117,9 +117,9 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	//lon angolo vista asson longitudinale (gradi), lat angolo vista asson laterale (gradi)
 
 	//Costanti per disegno
-	int colscr = makecol(0, 0, 0), colbck = makecol(255, 255, 255);
-	int colmdl = makecol(255, 0, 255), colmdl2 = makecol(0, 255, 255);
-	int colrif = makecol(0, 0, 0); //colori scritte, background, modello, rif
+	int colscr = makecol(0, 0, 0), colbck = makecol(190, 190, 190);
+	int colmdl = makecol(255, 0, 0), colmdl2 = makecol(255, 204, 0);
+	int colrif = makecol(128, 128, 128); //colori scritte, background, modello, rif
 	int dist = 20; //distanza "utile"
 	float rifscala = 1.15; //fattore di scala per rappresentare assi di rif
 	char bustr[30], alphastr[30], thetastr[30];	//stringhe di comunicazione che vengono aggiornate
@@ -132,7 +132,7 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	float cosal, sinal, costh, sinth;	//calcolo sin e cos
 	cosal = cos(alpharad); sinal = sin(alpharad);
 	costh = cos(thetarad); sinth = sin(thetarad);
-	float l1 = 100, l2 = 80;	//lunghezze aste
+	float l1 = 150, l2 = 100;	//lunghezze aste
 
 
 
@@ -154,17 +154,17 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	int pos0xlato = 1094, pos0ylato = 675;	//posizione centrale rettangolo v.lato
 	int pos0xalto = 658, pos0yalto = 675;	//posizione centrale rettangolo v.alto
 	// Reset viste
-	rectfill(screen, 441, 50, 1333 -20 -1, 455, colbck);	//cancello vista asson
-	rectfill(screen, 878, 490, 1333 -20 -1, 890, colbck);	//cancello vista lato
+	rectfill(screen, 441, 50, 1333 -20 , 455, colbck);	//cancello vista asson
+	rectfill(screen, 879, 490, 1333 -20 , 890, colbck);	//cancello vista lato
 	rectfill(screen, 445, 490, 874, 890, colbck); 	//cancello vista alto
 
 	// update vettori OA, AP, coordinate "vere"
-	float OAx, OAy, APx, APy, APz;
+	float OAx, OAy, APz; //APy, APx
 	OAx = l1 * cosal;
 	OAy = l1 * sinal;
-	//OAz = 0;
-	APx = -l2 * sinal * sinth;
-	APy = l2 * cosal * sinth;
+	// OAz = 0;
+	// APx = -l2 * sinal * sinth;
+	// APy = l2 * cosal * sinth;
 	APz = l2 * costh;
 
 	// Vista Assonometrica
@@ -187,7 +187,7 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 	APyasso = -l2*(cos(latrad)*costh - cosal*sin(latrad)*sin(lonrad)*sinth +
 				cos(lonrad)*sinal*sin(latrad)*sinth);
 	//Disegno Riferimenti
-	line(screen, pos0xasso, pos0yasso + 0.6*l1*cos(latrad), pos0xasso, pos0yasso-2, colrif);	//asse verticale
+	thick_line(screen, pos0xasso, pos0yasso + 0.6*l1*cos(latrad), pos0xasso, pos0yasso-2, thick, makecol(0,0,0));	//asse verticale
 	line(screen, pos0xasso, pos0yasso, pos0xasso + OAxassorif, pos0yasso + OAyassorif, colrif);	// linea OA
 	line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxassorif , pos0yasso + OAyasso + APyassorif, colrif);
 	circlerif_alpha(screen, pos0xasso, pos0yasso, l1/rifscala, &alpharad, &lonrad, &latrad, colrif);
@@ -208,20 +208,20 @@ void gui(float *alpha, float *theta, float *lon , float *lat, float *bu){
 
 
 	// Vista Alto
-	int OAxalto, OAyalto, APxalto, APyalto, OAxaltorif, OAyaltorif; //  APxaltorif, APyaltorif;
+	int OAxalto, OAyalto,  OAxaltorif, OAyaltorif; // APxalto, APyalto, APxaltorif, APyaltorif;
 	OAxaltorif = 0; OAyaltorif = l1 * rifscala;
 	// APxaltorif = 0 ; APyaltorif = 0; //inutile
 	OAxalto = OAy;
 	OAyalto = OAx;
-	APxalto = APy;
-	APyalto = APx;
+	// APxalto = APy;
+	// APyalto = APx;
 	//riferimento
 	line(screen, pos0xalto, pos0yalto, pos0xalto + OAxaltorif, pos0yalto + OAyaltorif, colrif); // linea OA rif
-	line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + 0, pos0yalto + OAyalto + 0, colrif);// linea AP
+	// line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + 0, pos0yalto + OAyalto + 0, colrif);// linea AP
 	circlerif_pardown(screen, pos0xalto, pos0yalto, l1/rifscala, &alpharad, colrif); //rif angolo alpha
 	//link
 	thick_line(screen, pos0xalto, pos0yalto, pos0xalto + OAxalto, pos0yalto + OAyalto, thick, colmdl); // linea OA
-	thick_line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + APxalto, pos0yalto + OAyalto + APyalto, thick, colmdl2);// linea AP
+	// thick_line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + APxalto, pos0yalto + OAyalto + APyalto, thick, colmdl2);// linea AP
 
 
 

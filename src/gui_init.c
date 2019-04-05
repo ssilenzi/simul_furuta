@@ -21,11 +21,11 @@ void gui_init()
     // Init allegro
     allegro_init(); 	//inizializza Allegro
     install_keyboard();	//posso usare la tastiera
-    set_color_depth(16); 	// VGA mode (8 bits)
+    set_color_depth(16); 	// RGB mode (16 bits)
     set_gfx_mode(GFX_AUTODETECT_WINDOWED,wscreen,hscreen,0,0); // apre screen
 
 	//colori rettangoli, scritte, background, modello
-	int colrett = makecol(255, 0, 0), colscr = makecol(0, 0, 0), colbck = makecol(255, 255, 255);
+	int colrett = makecol(0, 0, 179), colscr = makecol(0, 0, 0),  colbck = makecol(190, 190, 190);
 	clear_to_color(screen, colbck); // black background
 
 	// Disegno rettangoli e cose statiche
@@ -43,7 +43,7 @@ void gui_init()
 		sprintf(altostr, "Vista Alto");
 		textout_ex(screen, font, altostr, round( dist + wrett1 + dist  + wrett3 /2 -2.1*dist )  , dist + hrett2 + dist, colscr, colbck);
 	//rett4 - vista Lato
-	rect(screen, dist + wrett1 + dist + wrett3 , dist + hrett2 , dist + wrett1 + dist + wrett3 + wrett4,  dist + hrett2 + hrett4, colrett);
+	rect(screen, dist + wrett1 + dist + wrett3 , dist + hrett2 , dist + wrett1 + dist + wrett3 + wrett4 -1,  dist + hrett2 + hrett4, colrett);
 		char latostr[50];
 		sprintf(latostr, "Vista Lato");
 		textout_ex(screen, font, latostr,  round( dist + wrett1 + dist + wrett3  +  wrett4/2 -2.1*dist )  , dist + hrett2 + dist, colscr, colbck);

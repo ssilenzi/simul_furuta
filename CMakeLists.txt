@@ -24,7 +24,7 @@ set_target_properties(ptask PROPERTIES
 include_directories("${CMAKE_CURRENT_LIST_DIR}/ptask")
 
 # Compila main.c
-add_compile_definitions(ALLEGRO_STATICLINK)
+
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/src/main.c")
 target_link_libraries(${PROJECT_NAME} Threads::Threads ${ALLEGRO_LIBRARY} m rt ptask)
