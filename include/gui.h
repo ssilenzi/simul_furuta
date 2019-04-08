@@ -5,12 +5,24 @@
 #ifndef SIMUL_FURUTA_GUI_H
 #define SIMUL_FURUTA_GUI_H
 
-#include <stdio.h>
-#include <math.h>
 #include <allegro.h>
 #include "defines.h"
-#include "shared.h"
-#include "types.h"
+#include "os.h"
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+typedef struct {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+} TwoPoints;
+
+//Static GUI
+int gui_init();
 
 // GUI
 void gui(float *alpha, float *theta, int *lon , int *lat, float *bu);

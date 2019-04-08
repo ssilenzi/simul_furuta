@@ -5,8 +5,6 @@
 #ifndef SIMUL_FURUTA_KEYS_H
 #define SIMUL_FURUTA_KEYS_H
 
-#include <stdio.h>
-#include <math.h>
 #include <allegro.h>
 
 void keys(float *alpha, float *theta, int *lon, int *lat, float *bu);

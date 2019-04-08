@@ -1,4 +1,6 @@
 #include "keys.h"
+#include <stdio.h>
+#include <math.h>
 
 void keys(float *alpha, float *theta, int *lon, int *lat, float *bu){
 	char ascii, scan; // output di get_keycodes(&scan, &ascii)
