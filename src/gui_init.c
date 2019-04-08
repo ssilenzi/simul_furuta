@@ -4,9 +4,8 @@
 int colscr, colbck;
 int pos0xasso, pos0yasso, pos0xlato, pos0ylato, pos0xalto, pos0yalto;
 TwoPoints resetasso;
-//int resetasso1x, resetasso1y, resetasso2x, resetasso2y;
-int resetlato1x, resetlato1y, resetlato2x, resetlato2y;
-int resetalto1x, resetalto1y, resetalto2x, resetalto2y;
+TwoPoints resetlato;
+TwoPoints resetalto;
 int colmdl, colmdl2, colrif;
 
 //Static GUI
@@ -18,11 +17,7 @@ int gui_init()
 	set_color_depth(color_depth); 	// RGB mode (32 bits)
 	install_keyboard();		//posso usare la tastiera
 
-	// dimensioni schermo
-	//int wscreen = 1024, hscreen = 768;
-
 	// dimensioni dei rettangoli
-	//dist = 20; //distanza tra i rettangoli
 	int hrett1 = hscreen - 2 * dist; // altezza rettangolo 1
 	//int wrett1 = 400;
 	int wrett5 = wscreen - 3 * dist - wrett1;
@@ -30,10 +25,8 @@ int gui_init()
 	int wrett3 = wrett5 / 2;
 	int hrett4 = hrett3;
 	int wrett4 = wrett3;
-	//int hrett2 = wrett5 / 2;
 	int hrett2 = hscreen - 2 * dist - hrett3;
 	int wrett2 = wrett5;
-	//int hrett5 = hscreen - 3 * dist - hrett2 - hrett3;
 
 	if (set_gfx_mode(GRAFICA,wscreen,hscreen,0,0) != 0) {	// apre screen
 		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
@@ -104,16 +97,16 @@ int gui_init()
 	resetasso.y1 += 2*dist;					// per fare spazio alla scritta
 	resetasso.x2 = wrett1 + wrett2 + 2*dist - 1;
 	resetasso.y2 = hrett2 + dist - 1;
-	resetalto1x = wrett1 + 2*dist + 1;
-	resetalto1y = hrett2 + dist + 1;
-	resetalto1y += 2*dist;
-	resetalto2x = wrett1 + wrett3 + 2*dist - 1;
-	resetalto2y = hrett2 + hrett3 + dist - 1;
-	resetlato1x = wrett1 + wrett3 + 2*dist + 1;
-	resetlato1y = hrett2 + dist + 1;
-	resetlato1y += 2*dist;
-	resetlato2x = wrett1 + wrett3 + wrett4 + 2*dist - 1;
-	resetlato2y = hrett2 + hrett4 + dist - 1;
+	resetalto.x1 = wrett1 + 2*dist + 1;
+	resetalto.y1 = hrett2 + dist + 1;
+	resetalto.y1 += 2*dist;
+	resetalto.x2 = wrett1 + wrett3 + 2*dist - 1;
+	resetalto.y2 = hrett2 + hrett3 + dist - 1;
+	resetlato.x1 = wrett1 + wrett3 + 2*dist + 1;
+	resetlato.y1 = hrett2 + dist + 1;
+	resetlato.y1 += 2*dist;
+	resetlato.x2 = wrett1 + wrett3 + wrett4 + 2*dist - 1;
+	resetlato.y2 = hrett2 + hrett4 + dist - 1;
 	// colori modello, rif
 	colmdl = makecol(255, 0, 0);
 	colmdl2 = makecol(255, 204, 0);

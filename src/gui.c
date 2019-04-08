@@ -3,12 +3,10 @@
 ////////////
 // GUI
 void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
-
 	// alpha angolo con il link orizzontale (gradi), theta angolo con il link verticale (gradi)
 	// lon angolo vista asson longitudinale (gradi), lat angolo vista asson laterale (gradi)
 
-	// Costanti per disegno
-
+	//--------------------
 	char bustr[30], alphastr[30], thetastr[30];					// stringhe di comunicazione che vengono aggiornate
 	float thick = 1; 											// spessore linee spesse, non e` in pixel
 
@@ -20,8 +18,8 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	cosal = cos(alpharad); sinal = sin(alpharad);
 	costh = cos(thetarad); sinth = sin(thetarad);
 
+	//--------------------
 	// SCRITTE
-
 	// bu
 	sprintf(bustr, "bu = %5.2f, a/z +-0.1  ", *bu);
 	textout_ex(screen, font, bustr, dist*2, dist*2, colscr, colbck);
@@ -32,82 +30,72 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	sprintf(thetastr, "theta = %5.2f, i/o +-5  ", *theta);
 	textout_ex(screen, font, thetastr, dist*2, dist*4, colscr, colbck);
 
+	//--------------------
 	// ANIMAZIONE
-
 	// Reset viste
 	rectfill(screen, resetasso.x1, resetasso.y1, resetasso.x2, resetasso.y2, colbck);	// cancello vista asson
-	rectfill(screen, resetlato1x, resetlato1y, resetlato2x, resetlato2y, colbck);	// cancello vista lato
-	rectfill(screen, resetalto1x, resetalto1y, resetalto2x, resetalto2y, colbck); 	// cancello vista alto
+	rectfill(screen, resetlato.x1, resetlato.y1, resetlato.x2, resetlato.y2, colbck);	// cancello vista lato
+	rectfill(screen, resetalto.x1, resetalto.y1, resetalto.x2, resetalto.y2, colbck); 	// cancello vista alto
 
-/*	// update vettori OA, AP, coordinate "vere"
-	float OAx, OAy, APz, APy, APx;
-	OAx = l1 * cosal;
-	OAy = l1 * sinal;
-	OAz = 0;
-	APx = -l2 * sinal * sinth;
-	APy = l2 * cosal * sinth;
-	APz = l2 * costh;*/
-
+	//--------------------
 	// Vista Assonometrica
 	int l1 = L1_ASSO, l2 = L2_ASSO;	//lunghezze aste
-/*	//ISOMETRICA commentata non si sa mai
-		OAxasso = sqrt(2)/2 * (OAy - OAx);
-		OAyasso = sqrt(6)/6 * (OAy + OAx);
-		APxasso = sqrt(2)/2 * (APy - APx);
-		APyasso = sqrt(6)/6 * (APy + APx - 2*APz);*/
 
-	// Riferimenti (da disegnare prima)
-	int OAxassorif, OAyassorif, APxassorif, APyassorif;
-	OAxassorif = - l1*sin(lonrad);
-	OAyassorif = l1*sin(latrad)*cos(lonrad);
-	APxassorif = 0;
-	APyassorif = - l2*cos(latrad);
+	TwoPoints riflink1ass, riflink2ass; //riferimenti link vista assonometrica
+	riflink1ass.x1 = pos0xasso;
+	riflink1ass.y1 = pos0yasso;
+	riflink1ass.x2 = pos0xasso - l1*sin(lonrad);
+	riflink1ass.y2 = pos0yasso + l1*sin(latrad)*cos(lonrad);
+	riflink2ass.x1 = pos0xasso + l1*sin(alpharad - lonrad);
+	riflink2ass.y1 = pos0yasso + l1*sin(latrad)*cos(alpharad - lonrad);
+	riflink2ass.x2 = pos0xasso + l1*sin(alpharad - lonrad);
+	riflink2ass.y2 = pos0yasso + l1*sin(latrad)*cos(alpharad - lonrad) - l2*cos(latrad);
 
-	// Link
-	int OAxasso, OAyasso, APxasso, APyasso;
-	OAxasso = l1*sin(alpharad - lonrad);
-	OAyasso = l1*sin(latrad)*cos(alpharad - lonrad);
-	APxasso = l2*sinth*cos(alpharad - lonrad);
-	APyasso = -l2*(cos(latrad)*costh - cosal*sin(latrad)*sin(lonrad)*sinth +
-				   cos(lonrad)*sinal*sin(latrad)*sinth);
+	TwoPoints link1ass, link2ass; //link vista assonometrica
+	link1ass.x1 = pos0xasso;
+	link1ass.y1 = pos0yasso;
+	link1ass.x2 = pos0xasso + l1*sin(alpharad - lonrad);
+	link1ass.y2 = pos0yasso + l1*sin(latrad)*cos(alpharad - lonrad);
+	link2ass.x1 = pos0xasso + l1*sin(alpharad - lonrad);
+	link2ass.y1 = pos0yasso + l1*sin(latrad)*cos(alpharad - lonrad);
+	link2ass.x2 = pos0xasso + l1*sin(alpharad - lonrad) + l2*sinth*cos(alpharad - lonrad);
+	link2ass.y2 = pos0yasso + l1*sin(latrad)*cos(alpharad - lonrad) -l2*(cos(latrad)*costh - cosal*sin(latrad)*sin(lonrad)*sinth +
+			   cos(lonrad)*sinal*sin(latrad)*sinth);
 
 	// Disegno riferimenti
-	thick_line(screen, pos0xasso, pos0yasso + l1*cos(latrad), pos0xasso, pos0yasso, thick, makecol(0,0,0));	//a sse verticale
-	line(screen, pos0xasso, pos0yasso, pos0xasso + OAxassorif, pos0yasso + OAyassorif, colrif);	// linea OA
-	line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxassorif , pos0yasso + OAyasso + APyassorif, colrif);
-	circlerif_alpha(screen, pos0xasso, pos0yasso, l1, &alpharad, &lonrad, &latrad, colrif);
-	circlerif_theta(screen, pos0xasso, pos0yasso, l2, l1, &alpharad, &thetarad, &lonrad, &latrad, colrif);
-
+	thick_line(screen, pos0xasso, pos0yasso + l1*cos(latrad), pos0xasso, pos0yasso, thick, makecol(0,0,0));	//asse verticale
+	line(screen, riflink1ass.x1, riflink1ass.y1, riflink1ass.x2, riflink1ass.y2, colrif); //rif link1
+	line(screen, riflink2ass.x1, riflink2ass.y1, riflink2ass.x2, riflink2ass.y2, colrif); //rif link2
+	circlerif_alpha(screen, pos0xasso, pos0yasso, l1, &alpharad, &lonrad, &latrad, colrif); //rif alpha
+	circlerif_theta(screen, pos0xasso, pos0yasso, l2, l1, &alpharad, &thetarad, &lonrad, &latrad, colrif); //rif theta
 	// Disegno link
-	thick_line(screen, pos0xasso, pos0yasso, pos0xasso + OAxasso, pos0yasso + OAyasso, thick, colmdl);	// linea OA
-	thick_line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxasso , pos0yasso + OAyasso + APyasso, thick, colmdl2);	// linea AP
+	thick_line(screen, link1ass.x1, link1ass.y1, link1ass.x2, link1ass.y2, thick, colmdl); //link1
+	thick_line(screen, link2ass.x1, link2ass.y1, link2ass.x2, link2ass.y2, thick, colmdl2); //link2
 
+
+	//--------------------
 	// Vista lato
 	l2 = L2_LATO;
-	int APxlato, APylato, APxlatorif, APylatorif;
-	APxlatorif = 0; APylatorif = -l2;
-	APxlato = l2 * sinth;
-	APylato = - l2 * costh;
-	line(screen, pos0xlato, pos0ylato, pos0xlato + APxlatorif, pos0ylato + APylatorif, colrif); // riferimento
+	TwoPoints link2lato;
+	link2lato.x1 = pos0xlato;
+	link2lato.y1 = pos0ylato;
+	link2lato.x2 = pos0xlato + l2 * sinth;
+	link2lato.y2 = pos0ylato - l2 * costh;
+	line(screen, link2lato.x1, link2lato.y1, link2lato.x1, link2lato.y1 -l2, colrif); // rif link lato
 	circlerif_parup(screen, pos0xlato, pos0ylato, l2, &thetarad, colrif); // rif angolo theta
-	thick_line(screen, pos0xlato, pos0ylato, pos0xlato + APxlato, pos0ylato + APylato, thick, colmdl2); // linea AP
+	thick_line(screen, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, thick, colmdl2); // link lato
 
+	//--------------------
 	// Vista alto
 	l1 = L1_ALTO;
-	int OAxalto, OAyalto,  OAxaltorif, OAyaltorif; // APxalto, APyalto, APxaltorif, APyaltorif;
-	OAxaltorif = 0; OAyaltorif = l1;
-	// APxaltorif = 0 ; APyaltorif = 0; //inutile
-	OAxalto = l1 * sinal;
-	OAyalto = l1 * cosal;
-	// APxalto = APy;
-	// APyalto = APx;
-	// riferimento
-	line(screen, pos0xalto, pos0yalto, pos0xalto + OAxaltorif, pos0yalto + OAyaltorif, colrif); // linea OA rif
-	// line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + 0, pos0yalto + OAyalto + 0, colrif);// linea AP
+	TwoPoints link1alto;
+	link1alto.x1 = pos0xalto;
+	link1alto.y1 = pos0yalto;
+	link1alto.x2 = pos0xalto + l1 * sinal;
+	link1alto.y2 = pos0yalto + l1 * cosal;
+	line(screen, link1alto.x1, link1alto.y1, link1alto.x1, link1alto.y1 + l1, colrif); // rif link alto
 	circlerif_pardown(screen, pos0xalto, pos0yalto, l1, &alpharad, colrif); // rif angolo alpha
-	// link
-	thick_line(screen, pos0xalto, pos0yalto, pos0xalto + OAxalto, pos0yalto + OAyalto, thick, colmdl); // linea OA
-	// thick_line(screen, pos0xalto + OAxalto, pos0yalto + OAyalto, pos0xalto + OAxalto + APxalto, pos0yalto + OAyalto + APyalto, thick, colmdl2);// linea AP
+	thick_line(screen, link1alto.x1, link1alto.y1, link1alto.x2, link1alto.y2, thick, colmdl); // link alto
 }
 
 ///////////
