@@ -2,29 +2,40 @@ cmake_minimum_required(VERSION 2.8)
 
 project(simul_furuta)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-
 # Carica pthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 # Carica Allegro
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 find_package(Allegro REQUIRED)
-include_directories(${ALLEGRO_INCLUDE_DIR})
+include_directories("${ALLEGRO_INCLUDE_DIR}")
 
+#[[
 # Carica ptask
 add_library(ptask STATIC IMPORTED)
 set_property(TARGET ptask APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
 set_target_properties(ptask PROPERTIES
 	IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "C"
-	IMPORTED_LOCATION_NOCONFIG "${CMAKE_CURRENT_LIST_DIR}/ptask/libptask.a"
+	IMPORTED_LOCATION_NOCONFIG "${PROJECT_SOURCE_DIR}/ptask/libptask.a"
 )
-include_directories("${CMAKE_CURRENT_LIST_DIR}/ptask")
+include_directories("${PROJECT_SOURCE_DIR}/ptask")
+]]
 
-# Compila main.c
+# Varianti per diversi sistemi operativi
+if(WIN32)
+	set(GRAFICA GRAFICA_WIN32)
+	file(COPY "${ALLEGRO_SHARED}" DESTINATION "${PROJECT_BINARY_DIR}")
+    install(FILES "${ALLEGRO_SHARED}" DESTINATION "${PROJECT_SOURCE_DIR}/bin")
+else(WIN32)
+	set(GRAFICA GRAFICA_LINUX)
+endif(WIN32)
+configure_file("${PROJECT_SOURCE_DIR}/include/os.h.in" "${PROJECT_BINARY_DIR}/include/os.h")
 
-include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
-add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/src/main.c")
-target_link_libraries(${PROJECT_NAME} Threads::Threads ${ALLEGRO_LIBRARY} m rt ptask)
+# Compila e genera eseguibile
+include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
+file(GLOB SRC "${PROJECT_SOURCE_DIR}/src/*.c" "${PROJECT_SOURCE_DIR}/src/*.cpp")
+add_executable(${PROJECT_NAME} ${SRC})
+target_compile_options(${PROJECT_NAME} PUBLIC -Werror -Wall -Wextra)
+target_link_libraries(${PROJECT_NAME} Threads::Threads "${ALLEGRO_LIBRARY}" m) # rt ptask
+install(TARGETS ${PROJECT_NAME} DESTINATION "${PROJECT_SOURCE_DIR}/bin")

@@ -1,34 +1,31 @@
-#include <stdio.h>
-#include <math.h>
-#include <allegro.h>
-#include "gui_init.c"
-#include "gui.c"
-#include "keys.c"
+#include "main.h"
 
 // MAIN
 int main()
 {
-	gui_init(); //inizializza allegro
-
+	if (gui_init() != 0)	// inizializza allegro
+		return 1;
 	//Variabili
-	float alpha = 0, theta = 0; // Angoli
-	float lon = 45, lat = 35;
-	float bu = 3;	//boh, variabile a caso
-	float alphaold=1, thetaold=1, lonold = 0, latold = 0; //vecchie variabili
+	float alpha = 0, theta = 0; // angoli
+	int lon = 45, lat = 35;
+	float bu = 3;	// boh, variabile a caso
+	float alphaold=1, thetaold=1; // vecchie variabili
+	int lonold = 0, latold = 0;
 
 	do {
 
 		if( thetaold != theta || alphaold != alpha || latold != lat || lonold != lon){
-			gui(&alpha, &theta, &lon, &lat, &bu); //aggiorna grafica solo se cambia qualcosa
+			gui(&alpha, &theta, &lon, &lat, &bu); // aggiorna grafica solo se cambia qualcosa
 		}
 		alphaold=alpha; thetaold=theta; lonold = lon; latold = lat;
-		keys(&alpha, &theta, &lon, &lat, &bu); //interazione con la tastiera
+		keys(&alpha, &theta, &lon, &lat, &bu); // interazione con la tastiera
 
-		//soluzione temporanea
-		alpha = ( (int) alpha)%360;
-		theta = ( (int) theta)%360;
-
-	}while (!key[KEY_ESC]);
+		// Soluzione temporanea
+		//alpha = ( (int) alpha)%360;
+		//theta = ( (int) theta)%360;
+		alpha = atan2f(sinf(alpha/180*M_PI), cosf(alpha/180*M_PI))*180/M_PI;
+		theta = atan2f(sinf(theta/180*M_PI), cosf(theta/180*M_PI))*180/M_PI;
+	} while (!key[KEY_ESC]);
 
 	allegro_exit();
 	return 0;

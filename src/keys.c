@@ -1,23 +1,75 @@
-//
-// Funzione che legge i tasti premuti e li assoccia alle rispettive azioni
-//
+#include "keys.h"
 
-#include <stdio.h>
-#include <math.h>
-#include <allegro.h>
+void keys(float *alpha, float *theta, int *lon, int *lat, float *bu){
+	char ascii, scan; // output di get_keycodes(&scan, &ascii)
+	if( keypressed() ){  // importante altrimenti readkey blocca l'esecuzione
+		get_keycodes(&scan, &ascii);
+		// reset
+		if(key[KEY_R]){
+			*bu = 3.000;
+			*alpha = 0;
+			*theta = 0;
+		}
+		// reset vista
+		if(key[KEY_T]){
+			*lon = 45;
+			*lat = 35;
+		}
 
-//get_keycodes
+		// BU a/z
+		if(key[KEY_A]) {
+			*bu +=  0.1;
+		}
+		if(key[KEY_Z]){
+			*bu += -0.1;
+		}
+		// ALPHA k/l
+		if(key[KEY_K]) {
+			*alpha +=  -5;
+		}
+		if(key[KEY_L]){
+			*alpha += 5;
+		}
+		// THETA i/o
+		if(key[KEY_I]) {
+			*theta +=  -5;
+		}
+		if(key[KEY_O]){
+			*theta += 5;
+		}
+		// LAT up down
+		if(key[KEY_UP]){
+			if (*lat + 5 <= 90) {
+				*lat += 5;
+			}
+		}
+		if(key[KEY_DOWN]){
+			if (*lat + -5 >= -90) {
+				*lat += -5;
+			}
+		}
+		// LON left right
+		if(key[KEY_LEFT]){
+			*lon += -5;
+		}
+		if(key[KEY_RIGHT]){
+			*lon += +5;
+		}
+	} // end keypressed
+}
+
+// get_keycodes
 void get_keycodes(char *scan, char *ascii)
 {
-	//The following function waits for a key pressed and extracts
-	//the corresponding ASCII code and scan code:
+	// The following function waits for a key pressed and extracts
+	// the corresponding ASCII code and scan code:
 	int k;
 	k = readkey(); // block until a key is pressed
 	*ascii = k; // get ASCII code
 	*scan = k >> 8; // get scan code
 }
 
-// get_string
+/*// get_string
 void get_string(char *str, int x, int y, int c, int b)
 {
 	// The following function reads a string from the keyboard and displays
@@ -36,59 +88,4 @@ void get_string(char *str, int x, int y, int c, int b)
 	} while (scan != KEY_ENTER);
 
 		str[i] = '\0';
-}
-
-void keys(float *alpha, float *theta, float *lon, float *lat, float *bu){
-	char ascii, scan; // output di get_keycodes(&scan, &ascii)
-		if( keypressed() ){  //importante altrimenti readkey blocca l'esecuzione
-			get_keycodes(&scan, &ascii);
-			//reset
-			if(key[KEY_R]){
-				*bu = 3.000;
-				*alpha = 0;
-				*theta = 0;
-			}
-			//reset vista
-			if(key[KEY_T]){
-				*lon = 45;
-				*lat = 35.26439;
-			}
-
-			//BU a/z
-			if(key[KEY_A]) {
-				*bu +=  0.1;
-			}
-			if(key[KEY_Z]){
-				*bu += -0.1;
-			}
-			//ALPHA k/l
-			if(key[KEY_K]) {
-				*alpha +=  -5;
-			}
-			if(key[KEY_L]){
-				*alpha += 5;
-			}
-			//THETA i/o
-			if(key[KEY_I]) {
-				*theta +=  -5;
-			}
-			if(key[KEY_O]){
-				*theta += 5;
-			}
-			//LAT up down
-			if(key[KEY_UP]){
-				*lat += 5;
-			}
-			if(key[KEY_DOWN]){
-				*lat += -5;
-			}
-			//LON left right
-			if(key[KEY_LEFT]){
-				*lon += -5;
-			}
-			if(key[KEY_RIGHT]){
-				*lon += +5;
-			}
-		} // end keypressed
-
-}
+}*/

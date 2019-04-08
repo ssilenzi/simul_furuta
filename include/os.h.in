@@ -1,0 +1,10 @@
+//
+// Impostazioni dipendenti dal sistema operativo
+//
+
+#ifndef SIMUL_FURUTA_OS_H
+#define SIMUL_FURUTA_OS_H
+
+#define GRAFICA @GRAFICA@
+
+#endif //SIMUL_FURUTA_OS_H
