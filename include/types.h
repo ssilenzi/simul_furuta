@@ -6,12 +6,6 @@
 #define SIMUL_FURUTA_TYPES_H
 
 typedef struct {
-    float x;
-    float y;
-    float z;
-} Vect;
-
-typedef struct {
     int x;
     int y;
 } Point;

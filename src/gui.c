@@ -49,7 +49,7 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	APz = l2 * costh;*/
 
 	// Vista Assonometrica
-	int l1 = 133, l2 = 100;	//lunghezze aste
+	int l1 = L1_ASSO, l2 = L2_ASSO;	//lunghezze aste
 /*	//ISOMETRICA commentata non si sa mai
 		OAxasso = sqrt(2)/2 * (OAy - OAx);
 		OAyasso = sqrt(6)/6 * (OAy + OAx);
@@ -83,7 +83,7 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	thick_line(screen, pos0xasso + OAxasso, pos0yasso + OAyasso, pos0xasso + OAxasso + APxasso , pos0yasso + OAyasso + APyasso, thick, colmdl2);	// linea AP
 
 	// Vista lato
-	l2 = 100;
+	l2 = L2_LATO;
 	int APxlato, APylato, APxlatorif, APylatorif;
 	APxlatorif = 0; APylatorif = -l2;
 	APxlato = l2 * sinth;
@@ -93,7 +93,7 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	thick_line(screen, pos0xlato, pos0ylato, pos0xlato + APxlato, pos0ylato + APylato, thick, colmdl2); // linea AP
 
 	// Vista alto
-	l1 = 100;
+	l1 = L1_ALTO;
 	int OAxalto, OAyalto,  OAxaltorif, OAyaltorif; // APxalto, APyalto, APxaltorif, APyaltorif;
 	OAxaltorif = 0; OAyaltorif = l1;
 	// APxaltorif = 0 ; APyaltorif = 0; //inutile
@@ -206,5 +206,4 @@ void circlerif_pardown(BITMAP *bmp, int xc, int yc, int r, float *ang, int color
 		y = yc + r*cos(t);
 		putpixel(bmp, x, y, color);
 	} // end for
-
 }
