@@ -21,6 +21,13 @@ typedef struct {
     int y2;
 } TwoPoints;
 
+typedef struct {
+	int x;
+	int y;
+	int z;
+} Vect;
+
+
 //Static GUI
 int gui_init();
 
@@ -42,5 +49,11 @@ void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float *ang, int color);
 
 // circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
 void circlerif_pardown(BITMAP *bmp, int xc, int yc, int r, float *ang, int color);
+
+// proiez_ass proietto coordinate spaziali in coordinate di disegno secondo una proiezione assonometrica
+Point proiez_ass(Vect P, float *lonrad, float *latrad);
+
+// disegna griglia in assonometria
+void grid(Vect P1, Vect P2, int q, int posx, int posy, float lonrad, float latrad, int col);
 
 #endif //SIMUL_FURUTA_GUI_H

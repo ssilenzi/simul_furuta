@@ -16,5 +16,7 @@
 #define L2_ASSO             100
 #define L1_ALTO             100
 #define L2_LATO             100
+#define LX_GRID				180
+#define LY_GRID				200
 
 #endif //SIMUL_FURUTA_DEFINES_H

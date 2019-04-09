@@ -70,9 +70,10 @@ int gui_init()
 	char latostr[50];
 	sprintf(latostr, "Vista Lato");
 	textout_ex(screen, font, latostr,  round( dist + wrett1 + dist + wrett3  +  wrett4/2 -2.1*dist )  , dist + hrett2 + dist, colscr, colbck);
-	//rett5 help, basso destra
+
+/*	//rett5 help, basso destra
 	//rect(screen, dist + wrett1 + dist , dist + hrett2 + hrett3 + dist , dist + wrett1 + dist + wrett5,  dist + hrett2 + hrett3 + dist + hrett5, colrett);
-/*		char exit[50], reset[50], resetvis[65];
+		char exit[50], reset[50], resetvis[65];
 		sprintf(exit, "Premere Esc per uscire.");
 		textout_ex(screen, font, exit, 3*dist + wrett1 , 3*dist + hrett2 + hrett3, colscr, colbck);
 		sprintf(reset, "R per resettare.");
@@ -84,7 +85,7 @@ int gui_init()
 	// centri dei disegni
 	pos0xasso = wrett1 + wrett2/2 + 2*dist;
 	pos0yasso = hrett2/2 + dist;			// posizione centrale rettangolo v.asson
-	pos0yasso += dist;						// per fare spazio alla scritta
+	//pos0yasso += dist;						// per fare spazio alla scritta
 	pos0xlato = wrett1 + wrett3 + wrett4/2 + 2*dist;
 	pos0ylato = hrett2 + hrett3/2 + dist;	// posizione centrale rettangolo v.lato
 	pos0ylato += dist;
@@ -177,12 +178,21 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	link2ass.y2 = pos0yasso + l1*sin(latrad)*cos(alpharad - lonrad) -l2*(cos(latrad)*costh - cosal*sin(latrad)*sin(lonrad)*sinth +
 			   cos(lonrad)*sinal*sin(latrad)*sinth);
 
-	// Disegno riferimenti
-	thick_line(screen, pos0xasso, pos0yasso + l1*cos(latrad), pos0xasso, pos0yasso, thick, makecol(0,0,0));	//asse verticale
+	// Disegno riferimenti e oggeti
+
+	//Griglia
+	Vect A, B;
+	A.x = -LX_GRID/2; A.y = -LY_GRID/2; A.z = -l1;
+	B.x = +LX_GRID/2; B.y = +LY_GRID/2; B.z = -l1;
+	int q = 10; //quante righe nella griglia vogliamo
+	grid(A, B, q, pos0xasso, pos0yasso, lonrad, latrad, colrif);
+	//asse verticale
+	thick_line(screen, pos0xasso, pos0yasso + l1*cos(latrad), pos0xasso, pos0yasso, thick+1, makecol(0,0,0));
 	line(screen, riflink1ass.x1, riflink1ass.y1, riflink1ass.x2, riflink1ass.y2, colrif); //rif link1
 	line(screen, riflink2ass.x1, riflink2ass.y1, riflink2ass.x2, riflink2ass.y2, colrif); //rif link2
 	circlerif_alpha(screen, pos0xasso, pos0yasso, l1, &alpharad, &lonrad, &latrad, colrif); //rif alpha
 	circlerif_theta(screen, pos0xasso, pos0yasso, l2, l1, &alpharad, &thetarad, &lonrad, &latrad, colrif); //rif theta
+
 	// Disegno link
 	thick_line(screen, link1ass.x1, link1ass.y1, link1ass.x2, link1ass.y2, thick, colmdl); //link1
 	thick_line(screen, link2ass.x1, link2ass.y1, link2ass.x2, link2ass.y2, thick, colmdl2); //link2
@@ -310,3 +320,72 @@ void circlerif_pardown(BITMAP *bmp, int xc, int yc, int r, float *ang, int color
 		putpixel(bmp, x, y, color);
 	} // end for
 }
+
+// proiez_ass proietto coordinate spaziali in coordinate di disegno secondo una proiezione assonometrica
+Point proiez_ass(Vect P, float *lonrad, float *latrad){
+	// P vettore x y z
+	Point PAlleg;
+	PAlleg.x = P.y*cos(*lonrad) - P.x*sin(*lonrad);
+	PAlleg.y = P.x*cos(*lonrad)*sin(*latrad) - P.z*cos(*latrad) + P.y*sin(*latrad)*sin(*lonrad);
+	return PAlleg;
+}
+
+// disegna griglia in assonometria
+void grid(Vect P1, Vect P2, int q, int posx, int posy, float lonrad, float latrad, int col){
+	int lx, ly;
+	lx = fabsf( P1.x - P2.x );
+	ly = fabsf( P1.y - P2.y );
+	int dx, dy;
+	dx = lx / q;
+	dy = ly / q;
+
+	Vect A, B;
+	A = P1;
+	B = P1; B.y += ly;
+	Point a, b;
+
+	//Parte X
+	if(P1.x < P2.x){
+		for(int t=P1.x; t <=  P2.x; t = t + dx ){
+			A.x = t;
+			B.x = t;
+			a = proiez_ass(A, &lonrad, &latrad); a.x += posx; a.y += posy;
+			b = proiez_ass(B, &lonrad, &latrad); b.x += posx; b.y += posy;
+			line(screen, a.x, a.y, b.x, b.y, col);
+		} // end for
+	}// end if
+	if(P1.x > P2.x){
+		for(int t=P2.x; t <=  P1.x; t = t + dx ){
+			A.x = t;
+			B.x = t;
+			a = proiez_ass(A, &lonrad, &latrad); a.x += posx; a.y += posy;
+			b = proiez_ass(B, &lonrad, &latrad); b.x += posx; b.y += posy;
+			line(screen, a.x, a.y, b.x, b.y, col);
+		} // end for
+	}// end if
+
+	//Parte Y
+	A = P1;
+	B = P1; B.x += lx;
+	if(P1.y < P2.y){
+		for(int t=P1.y; t <=  P2.y; t = t + dy ){
+			A.y = t;
+			B.y = t;
+			a = proiez_ass(A, &lonrad, &latrad); a.x += posx; a.y += posy;
+			b = proiez_ass(B, &lonrad, &latrad); b.x += posx; b.y += posy;
+			line(screen, a.x, a.y, b.x, b.y, col);
+		} // end for
+	}// end if
+	if(P1.y > P2.y){
+		for(int t=P2.y; t <=  P1.y; t = t + dy ){
+			A.y = t;
+			B.y = t;
+			a = proiez_ass(A, &lonrad, &latrad); a.x += posx; a.y += posy;
+			b = proiez_ass(B, &lonrad, &latrad); b.x += posx; b.y += posy;
+			line(screen, a.x, a.y, b.x, b.y, col);
+		} // end for
+	}// end if
+
+}
+
+
