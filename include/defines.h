@@ -5,6 +5,7 @@
 #ifndef SIMUL_FURUTA_DEFINES_H
 #define SIMUL_FURUTA_DEFINES_H
 
+//Grafica
 #define GRAFICA_WIN32       GFX_GDI
 #define GRAFICA_LINUX       GFX_AUTODETECT_WINDOWED
 #define wscreen             1024
@@ -20,6 +21,7 @@
 #define LY_GRID				200
 #define NUM_GRID			5
 #define NUM_POINTS			800
+#define THICK				1
 
 
 #endif //SIMUL_FURUTA_DEFINES_H

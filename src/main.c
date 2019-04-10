@@ -17,7 +17,7 @@ int main()
 	do {
 
 		if( thetaold != theta || alphaold != alpha || latold != lat || lonold != lon){
-			gui(&alpha, &theta, &lon, &lat, &bu); // aggiorna grafica solo se cambia qualcosa
+			gui(alpha, theta, lon, lat, bu); // aggiorna grafica solo se cambia qualcosa
 		}
 		alphaold=alpha; thetaold=theta; lonold = lon; latold = lat;
 		keys(&alpha, &theta, &lon, &lat, &bu); // interazione con la tastiera
