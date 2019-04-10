@@ -18,5 +18,8 @@
 #define L2_LATO             100
 #define LX_GRID				180
 #define LY_GRID				200
+#define NUM_GRID			5
+#define NUM_POINTS			800
+
 
 #endif //SIMUL_FURUTA_DEFINES_H

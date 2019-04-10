@@ -184,8 +184,7 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	Vect A, B;
 	A.x = -LX_GRID/2; A.y = -LY_GRID/2; A.z = -l1;
 	B.x = +LX_GRID/2; B.y = +LY_GRID/2; B.z = -l1;
-	int q = 10; //quante righe nella griglia vogliamo
-	grid(A, B, q, pos0xasso, pos0yasso, lonrad, latrad, colrif);
+	grid(A, B, NUM_GRID, pos0xasso, pos0yasso, lonrad, latrad, colrif);
 	//asse verticale
 	thick_line(screen, pos0xasso, pos0yasso + l1*cos(latrad), pos0xasso, pos0yasso, thick+1, makecol(0,0,0));
 	line(screen, riflink1ass.x1, riflink1ass.y1, riflink1ass.x2, riflink1ass.y2, colrif); //rif link1
@@ -217,9 +216,9 @@ void gui(float *alpha, float *theta, int *lon , int *lat, float *bu){
 	link1alto.x1 = pos0xalto;
 	link1alto.y1 = pos0yalto;
 	link1alto.x2 = pos0xalto + l1 * sinal;
-	link1alto.y2 = pos0yalto + l1 * cosal;
-	line(screen, link1alto.x1, link1alto.y1, link1alto.x1, link1alto.y1 + l1, colrif); // rif link alto
-	circlerif_pardown(screen, pos0xalto, pos0yalto, l1, &alpharad, colrif); // rif angolo alpha
+	link1alto.y2 = pos0yalto - l1 * cosal;
+	line(screen, link1alto.x1, link1alto.y1, link1alto.x1, link1alto.y1 - l1, colrif); // rif link alto
+	circlerif_parup(screen, pos0xalto, pos0yalto, l1, &alpharad, colrif); // rif angolo alpha
 	thick_line(screen, link1alto.x1, link1alto.y1, link1alto.x2, link1alto.y2, thick, colmdl); // link alto
 }
 
@@ -257,12 +256,12 @@ void circlerif_alpha(BITMAP *bmp, int xc, int yc, int r, float *alpharad, float 
 
 	float anglim = 0, d_ang; // angolo limite
 	anglim = *alpharad;
-	d_ang = 2*M_PI/1000;
+	d_ang = 2*M_PI/NUM_POINTS;
 	if(*alpharad < 0){
 		d_ang = - d_ang;
 	} // end if
 
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto alpharad in un giro disegno 1000 punti.
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto alpharad in un giro disegno NUM_POINTS punti.
 		float x,y;
 		x =  xc -r*sin(*lonrad - t);
 		y =  yc + r*cos(*lonrad - t)*sin(*latrad);
@@ -275,12 +274,12 @@ void circlerif_theta(BITMAP *bmp, int xc, int yc, int r, int l1, float *alpharad
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, dimensione link1, alpharad, thetarad, lonrad angolo long vista asson, latrad " ", color colore
 	float anglim = 0, d_ang; // angolo limite
 	anglim = *thetarad;
-	d_ang = 2*M_PI/1000;
+	d_ang = 2*M_PI/NUM_POINTS;
 	if(*thetarad < 0){
 		d_ang = - d_ang;
 	} // end if
 
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto thetarad in un giro disegno 1000 punti.
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto thetarad in un giro disegno NUM_POINTS punti.
 		float x,y;
 		x = xc + cos(*lonrad)*(l1*sin(*alpharad) + r*cos(*alpharad)*sin(t)) - sin(*lonrad)*(l1*cos(*alpharad) - r*sin(*alpharad)*sin(t));
 		y = yc + cos(*lonrad)*sin(*latrad)*(l1*cos(*alpharad) - r*sin(*alpharad)*sin(t)) - r*cos(*latrad)*cos(t) + sin(*latrad)*sin(*lonrad)*(l1*sin(*alpharad) + r*cos(*alpharad)*sin(t));
@@ -292,11 +291,11 @@ void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float *ang, int color){
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, ang angolo a cui fermarsi, color colores
 	float anglim = 0, d_ang; // angolo limite
 	anglim = *ang;
-	d_ang = 2*M_PI/1000;
+	d_ang = 2*M_PI/NUM_POINTS;
 	if(*ang < 0){
 		d_ang = - d_ang;
 	} // end if
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto ang, in un giro disegno 1000 punti
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto ang, in un giro disegno NUM_POINTS punti
 		float x,y;
 		x = xc + r*sin(t);
 		y = yc - r*cos(t);
@@ -304,22 +303,22 @@ void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float *ang, int color){
 	} // end for
 
 }
-// circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
+/*/// circlerif_pardown: disegna un cerchio parametrico che inizia dalla verticale
 void circlerif_pardown(BITMAP *bmp, int xc, int yc, int r, float *ang, int color){
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, ang angolo a cui fermarsi, color colores
 	float anglim = 0, d_ang; // angolo limite
 	anglim = *ang;
-	d_ang = 2*M_PI/1000;
+	d_ang = 2*M_PI/NUM_POINTS;
 	if(*ang < 0){
 		d_ang = - d_ang;
 	} // end if
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto ang, in un giro disegno 1000 punti
+	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto ang, in un giro disegno NUM_POINTS punti
 		float x,y;
 		x = xc + r*sin(t);
 		y = yc + r*cos(t);
 		putpixel(bmp, x, y, color);
 	} // end for
-}
+}*/
 
 // proiez_ass proietto coordinate spaziali in coordinate di disegno secondo una proiezione assonometrica
 Point proiez_ass(Vect P, float *lonrad, float *latrad){
