@@ -20,7 +20,7 @@ void keys(Par *par_new){
 
 		// BU a/z
 		if(key[KEY_A]) {
-			par_new->bu +=  0.1;
+			par_new->bu += 0.1;
 		}
 		if(key[KEY_Z]){
 			par_new->bu += -0.1;

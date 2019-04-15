@@ -13,8 +13,8 @@
 #define color_depth         32
 #define dist                20
 #define wrett1              400
-#define L1_ASSO             133
-#define L2_ASSO             100
+#define L1_ASSON			133
+#define L2_ASSON			100
 #define L1_ALTO             100
 #define L2_LATO             100
 #define LX_GRID				180
@@ -48,11 +48,11 @@ typedef struct {
 }AngleSinCos;
 
 typedef struct {
-		float alpha;
-		float theta;
-		float lon;
-		float lat;
-		float bu;
+	float alpha;
+	float theta;
+	float lon;
+	float lat;
+	float bu;
 }Par;
 
 
