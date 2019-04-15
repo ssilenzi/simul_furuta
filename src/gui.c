@@ -14,9 +14,12 @@ static struct {
 	int rett;	//colore rettangoli
 } col; //struttura con i colori
 
-static Point scritte[(int)(hscreen/dist - 2)]; // array per scrivere "parametricamente" le scritte dopo
+static struct{
+	int x;
+	int y[(int)(hscreen/dist - 2)];
+}scritte; // array per scrivere "parametricamente" le scritte
 
-//Static GUI
+// init gui
 int gui_init()
 {
 	// Init allegro
@@ -37,9 +40,9 @@ int gui_init()
 	int wrett2 = wrett5;
 
 	int qdistvert = (hscreen)/ dist - 2; // quante dist entrano dentro il mio schermo, dimensione dell'array scritte
+	scritte.x = 2*dist;
 	for(int i = 0; i < qdistvert; i++){
-		scritte[i].x = 2*dist;
-		scritte[i].y = dist * (i+1);
+		scritte.y[i] = dist * (i+1);
 	} //popolo l'array scritte con le posizioni xy delle scritte
 
 	if (set_gfx_mode(GRAFICA,wscreen,hscreen,0,0) != 0) {	// apre screen
@@ -65,16 +68,16 @@ int gui_init()
 	rect(screen, dist, dist, dist + wrett1, dist + hrett1, col.rett);
 	char exit[50], reset1[50], reset2[50], reset3[50];
 	sprintf(exit, "Premere Esc per uscire");
-	textout_ex(screen, font, exit, scritte[qdistvert-1].x, scritte[qdistvert-1].y, col.scr, col.bck);
+	textout_ex(screen, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
 
 	sprintf(reset1, "R per resettare");
-	textout_ex(screen, font, reset1, scritte[qdistvert-2].x, scritte[qdistvert-2].y, col.scr, col.bck);
+	textout_ex(screen, font, reset1, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
 
 	sprintf(reset2, "Up, down, left right per modificare la vista");
-	textout_ex(screen, font, reset2, scritte[qdistvert-3].x, scritte[qdistvert-3].y, col.scr, col.bck);
+	textout_ex(screen, font, reset2, scritte.x, scritte.y[qdistvert-3], col.scr, col.bck);
 
 	sprintf(reset3, "T per resettare la vista");
-	textout_ex(screen, font, reset3, scritte[qdistvert-4].x, scritte[qdistvert-4].y, col.scr, col.bck);
+	textout_ex(screen, font, reset3, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
 
 	//rett2 - Vista assonometrica
 	rect(screen, dist + wrett1 + dist, dist, dist + wrett1 + dist + wrett2 , dist + hrett2, col.rett);
@@ -166,13 +169,13 @@ void gui(Par par_old, Par par_new){
 	if(flag_scritte == 1){
 		// bu
 		sprintf(bustr, "bu = %5.2f, a/z +-0.1  ", par_new.bu);
-		textout_ex(screen, font, bustr, scritte[1].x, scritte[1].y, col.scr, col.bck);
+		textout_ex(screen, font, bustr, scritte.x, scritte.y[1], col.scr, col.bck);
 		// alpha
 		sprintf(alphastr, "alpha = %5.2f, k/l +-5  ", par_new.alpha);
-		textout_ex(screen, font, alphastr, scritte[2].x, scritte[2].y, col.scr, col.bck);
+		textout_ex(screen, font, alphastr, scritte.x, scritte.y[2], col.scr, col.bck);
 		// theta
 		sprintf(thetastr, "theta = %5.2f, i/o +-5  ", par_new.theta);
-		textout_ex(screen, font, thetastr,scritte[3].x, scritte[3].y, col.scr, col.bck);
+		textout_ex(screen, font, thetastr,scritte.x, scritte.y[3], col.scr, col.bck);
 	}
 
 	// ANIMAZIONE
