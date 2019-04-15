@@ -9,35 +9,12 @@
 #include "defines.h"
 #include "os.h"
 
-typedef struct {
-    int x;
-    int y;
-} Point;
-
-typedef struct {
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-} TwoPoints;
-
-typedef struct {
-	int x;
-	int y;
-	int z;
-} Vect;
-
-typedef struct {
-	float sin;
-	float cos;
-}AngleSinCos;
-
 
 //Static GUI
 int gui_init();
 
 // GUI
-void gui(float alpha, float theta, int lon , int lat, float bu);
+void gui(Par par_old, Par par_new);
 
 // ThickLine
 void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color);
@@ -60,5 +37,13 @@ Point proiez_ass(Vect P, AngleSinCos Lon, AngleSinCos Lat);
 
 // disegna griglia in assonometria
 void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSinCos Lat, int col);
+
+// disegno le viste
+void vista_assonometrica(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon,  AngleSinCos Lat, float alpharad, float thetarad, float lonrad, float latrad );
+
+void vista_lato(AngleSinCos Theta, float thetarad);
+
+void vista_alto(AngleSinCos Alpha, float alpharad);
+
 
 #endif //SIMUL_FURUTA_GUI_H

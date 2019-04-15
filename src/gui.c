@@ -111,7 +111,7 @@ int gui_init()
 
 ////////////
 // GUI
-void gui(float alpha, float theta, int lon , int lat, float bu){
+void gui(Par par_old, Par par_new){
 	// alpha angolo con il link orizzontale (gradi), theta angolo con il link verticale (gradi)
 	// lon angolo vista asson longitudinale (gradi), lat angolo vista asson laterale (gradi)
 
@@ -120,10 +120,17 @@ void gui(float alpha, float theta, int lon , int lat, float bu){
 
 	//Angoli e grandezze fisiche
 	float alpharad, thetarad, lonrad, latrad;					// porta gli angoli in rad
-	alpharad = (float)alpha/180 *M_PI;
-	thetarad = (float)theta /180 *M_PI;
-	lonrad = (float)lon/180 * M_PI;
-	latrad = (float)lat/180 * M_PI;
+
+	// Potremmo fare delle flag per far calcolare i seni e i coseni solo nel caso cambiassero quegli angoli. Messo qui li calcola ogni volta anche se non cambia niente.
+	// Al momento funziona cosi`:
+	// Se non cambia niente calcolo una volta ma per niente
+	// Se cambia una cosa sola calcolo una volta sola tutto
+	// Se cambia tutto calcolo una volta sola tutto
+	// ci penso se complicare il codice o meno
+	alpharad = (float)par_new.alpha/180 *M_PI;
+	thetarad = (float)par_new.theta /180 *M_PI;
+	lonrad = (float)par_new.lon/180 * M_PI;
+	latrad = (float)par_new.lat/180 * M_PI;
 
 	AngleSinCos Alpha, Theta, Lon, Lat;
 	Alpha.sin = sin(alpharad);	Alpha.cos = cos(alpharad);
@@ -133,105 +140,30 @@ void gui(float alpha, float theta, int lon , int lat, float bu){
 
 	//--------------------
 	// SCRITTE
-	// bu
-	sprintf(bustr, "bu = %5.2f, a/z +-0.1  ", bu);
-	textout_ex(screen, font, bustr, dist*2, dist*2, colscr, colbck);
-	// alpha
-	sprintf(alphastr, "alpha = %5.2f, k/l +-5  ", alpha);
-	textout_ex(screen, font, alphastr, dist*2, dist*3, colscr, colbck);
-	// theta
-	sprintf(thetastr, "theta = %5.2f, i/o +-5  ", theta);
-	textout_ex(screen, font, thetastr, dist*2, dist*4, colscr, colbck);
+	if(par_new.alpha != par_old.alpha ||  par_new.theta != par_old.theta || par_new.lon != par_old.lon || par_new.lat != par_old.lat || par_new.bu != par_old.bu){
+		// bu
+		sprintf(bustr, "bu = %5.2f, a/z +-0.1  ", par_new.bu);
+		textout_ex(screen, font, bustr, dist*2, dist*2, colscr, colbck);
+		// alpha
+		sprintf(alphastr, "alpha = %5.2f, k/l +-5  ", par_new.alpha);
+		textout_ex(screen, font, alphastr, dist*2, dist*3, colscr, colbck);
+		// theta
+		sprintf(thetastr, "theta = %5.2f, i/o +-5  ", par_new.theta);
+		textout_ex(screen, font, thetastr, dist*2, dist*4, colscr, colbck);
+	}
 
 	//--------------------
 	// ANIMAZIONE
+	if(par_new.alpha != par_old.alpha ||  par_new.theta != par_old.theta || par_new.lon != par_old.lon || par_new.lat != par_old.lat ){
+		vista_assonometrica( Alpha,  Theta,  Lon,  Lat, alpharad,  thetarad, lonrad, latrad );
+	}
+	if( par_new.theta != par_old.theta){
+		vista_lato(Theta, thetarad);
+	}
+	if(par_new.alpha != par_old.alpha ){
+		vista_alto(Alpha, alpharad);
+	}
 
-	//--------------------
-	// Vista Assonometrica
-	rectfill(screen, resetasso.x1, resetasso.y1, resetasso.x2, resetasso.y2, colbck);	// reset
-	int l1 = L1_ASSO, l2 = L2_ASSO;	//lunghezze aste
-
-	Vect Arif, Prif;
-	Arif.x = l1;
-	Arif.y = 0;
-	Arif.z = 0;
-	Prif.x = l1*Alpha.cos;
-	Prif.y = l1*Alpha.sin;
-	Prif.z = l2;
-	Vect A0, P0; // 0 indica il sistema di riferimento
-	A0.x = l1*Alpha.cos;
-	A0.y = l1*Alpha.sin;
-	A0.z = 0;
-	P0.x = l1*Alpha.cos - l2*Alpha.sin*Theta.sin;
-	P0.y = l1*Alpha.sin + l2*Alpha.cos*Theta.sin;
-	P0.z = l2*Theta.cos;
-
-	TwoPoints riflink1ass, riflink2ass; //riferimenti link vista assonometrica
-	riflink1ass.x1 = pos0xasso;
-	riflink1ass.y1 = pos0yasso;
-	riflink1ass.x1 = pos0xasso;
-	riflink1ass.y1 = pos0yasso;
-	riflink1ass.x2 = pos0xasso + proiez_ass(Arif, Lon, Lat).x;
-	riflink1ass.y2 = pos0yasso + proiez_ass(Arif, Lon, Lat).y;
-	riflink2ass.x1 = pos0xasso + proiez_ass(A0, Lon, Lat).x;
-	riflink2ass.y1 = pos0yasso + proiez_ass(A0, Lon, Lat).y;
-	riflink2ass.x2 = pos0xasso + proiez_ass(Prif, Lon, Lat).x;
-	riflink2ass.y2 = pos0yasso + proiez_ass(Prif, Lon, Lat).y;
-
-	TwoPoints link1ass, link2ass; //link vista assonometrica
-	link1ass.x1 = pos0xasso;
-	link1ass.y1 = pos0yasso;
-	link1ass.x2 = pos0xasso + proiez_ass(A0, Lon, Lat).x;
-	link1ass.y2 = pos0yasso + proiez_ass(A0, Lon, Lat).y;
-	link2ass.x1 = pos0xasso + proiez_ass(A0, Lon, Lat).x;
-	link2ass.y1 = pos0yasso + proiez_ass(A0, Lon, Lat).y;
-	link2ass.x2 = pos0xasso + proiez_ass(P0, Lon, Lat).x;
-	link2ass.y2 = pos0yasso + proiez_ass(P0, Lon, Lat).y;
-
-	// Disegno riferimenti e oggeti
-
-	//Griglia
-	Vect P1, P2;
-	P1.x = -LX_GRID/2; P1.y = -LY_GRID/2; P1.z = -l1;
-	P2.x = +LX_GRID/2; P2.y = +LY_GRID/2; P2.z = -l1;
-	grid(P1, P2, NUM_GRID, pos0xasso, pos0yasso, Lon, Lat, colrif);
-	//asse verticale
-	thick_line(screen, pos0xasso, pos0yasso + l1*Lat.cos, pos0xasso, pos0yasso, THICK+1, makecol(0,0,0));
-	line(screen, riflink1ass.x1, riflink1ass.y1, riflink1ass.x2, riflink1ass.y2, colrif); //rif link1
-	line(screen, riflink2ass.x1, riflink2ass.y1, riflink2ass.x2, riflink2ass.y2, colrif); //rif link2
-	circlerif_alpha(screen, pos0xasso, pos0yasso, l1, alpharad, lonrad, latrad, colrif); //rif alpha
-	circlerif_theta(screen, pos0xasso, pos0yasso, l2, l1, alpharad, thetarad, lonrad, latrad, colrif); //rif theta
-
-	// Disegno link
-	thick_line(screen, link1ass.x1, link1ass.y1, link1ass.x2, link1ass.y2, THICK, colmdl); //link1
-	thick_line(screen, link2ass.x1, link2ass.y1, link2ass.x2, link2ass.y2, THICK, colmdl2); //link2
-
-
-	//--------------------
-	// Vista lato
-	rectfill(screen, resetlato.x1, resetlato.y1, resetlato.x2, resetlato.y2, colbck);	// reset
-	l2 = L2_LATO;
-	TwoPoints link2lato;
-	link2lato.x1 = pos0xlato;
-	link2lato.y1 = pos0ylato;
-	link2lato.x2 = pos0xlato + l2 * Theta.sin;
-	link2lato.y2 = pos0ylato - l2 * Theta.cos;
-	line(screen, link2lato.x1, link2lato.y1, link2lato.x1, link2lato.y1 -l2, colrif); // rif link lato
-	circlerif_parup(screen, pos0xlato, pos0ylato, l2, thetarad, colrif); // rif angolo theta
-	thick_line(screen, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, THICK, colmdl2); // link lato
-
-	//--------------------
-	// Vista alto
-	rectfill(screen, resetalto.x1, resetalto.y1, resetalto.x2, resetalto.y2, colbck); 	// reset
-	l1 = L1_ALTO;
-	TwoPoints link1alto;
-	link1alto.x1 = pos0xalto;
-	link1alto.y1 = pos0yalto;
-	link1alto.x2 = pos0xalto + l1 * Alpha.sin;
-	link1alto.y2 = pos0yalto - l1 * Alpha.cos;
-	line(screen, link1alto.x1, link1alto.y1, link1alto.x1, link1alto.y1 - l1, colrif); // rif link alto
-	circlerif_parup(screen, pos0xalto, pos0yalto, l1, alpharad, colrif); // rif angolo alpha
-	thick_line(screen, link1alto.x1, link1alto.y1, link1alto.x2, link1alto.y2, THICK, colmdl); // link alto
 }
 
 ///////////
@@ -398,5 +330,111 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 	}// end if
 
 }
+
+
+void vista_assonometrica(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon,  AngleSinCos Lat, float alpharad, float thetarad, float lonrad, float latrad ){
+//--------------------
+	// Vista Assonometrica
+	rectfill(screen, resetasso.x1, resetasso.y1, resetasso.x2, resetasso.y2, colbck);	// reset
+	int l1 = L1_ASSO, l2 = L2_ASSO;	//lunghezze aste
+
+	Vect Arif, Prif;
+	Arif.x = l1;
+	Arif.y = 0;
+	Arif.z = 0;
+	Prif.x = l1*Alpha.cos;
+	Prif.y = l1*Alpha.sin;
+	Prif.z = l2;
+	Vect A0, P0; // 0 indica il sistema di riferimento
+	A0.x = l1*Alpha.cos;
+	A0.y = l1*Alpha.sin;
+	A0.z = 0;
+	P0.x = l1*Alpha.cos - l2*Alpha.sin*Theta.sin;
+	P0.y = l1*Alpha.sin + l2*Alpha.cos*Theta.sin;
+	P0.z = l2*Theta.cos;
+
+	TwoPoints riflink1ass, riflink2ass; //riferimenti link vista assonometrica
+	riflink1ass.x1 = pos0xasso;
+	riflink1ass.y1 = pos0yasso;
+	riflink1ass.x1 = pos0xasso;
+	riflink1ass.y1 = pos0yasso;
+	riflink1ass.x2 = pos0xasso + proiez_ass(Arif, Lon, Lat).x;
+	riflink1ass.y2 = pos0yasso + proiez_ass(Arif, Lon, Lat).y;
+	riflink2ass.x1 = pos0xasso + proiez_ass(A0, Lon, Lat).x;
+	riflink2ass.y1 = pos0yasso + proiez_ass(A0, Lon, Lat).y;
+	riflink2ass.x2 = pos0xasso + proiez_ass(Prif, Lon, Lat).x;
+	riflink2ass.y2 = pos0yasso + proiez_ass(Prif, Lon, Lat).y;
+
+	TwoPoints link1ass, link2ass; //link vista assonometrica
+	link1ass.x1 = pos0xasso;
+	link1ass.y1 = pos0yasso;
+	link1ass.x2 = pos0xasso + proiez_ass(A0, Lon, Lat).x;
+	link1ass.y2 = pos0yasso + proiez_ass(A0, Lon, Lat).y;
+	link2ass.x1 = pos0xasso + proiez_ass(A0, Lon, Lat).x;
+	link2ass.y1 = pos0yasso + proiez_ass(A0, Lon, Lat).y;
+	link2ass.x2 = pos0xasso + proiez_ass(P0, Lon, Lat).x;
+	link2ass.y2 = pos0yasso + proiez_ass(P0, Lon, Lat).y;
+
+	// Disegno riferimenti e oggeti
+
+	//Griglia
+	Vect P1, P2;
+	P1.x = -LX_GRID/2; P1.y = -LY_GRID/2; P1.z = -l1;
+	P2.x = +LX_GRID/2; P2.y = +LY_GRID/2; P2.z = -l1;
+	grid(P1, P2, NUM_GRID, pos0xasso, pos0yasso, Lon, Lat, colrif);
+	//asse verticale
+	thick_line(screen, pos0xasso, pos0yasso + l1*Lat.cos, pos0xasso, pos0yasso, THICK+1, makecol(0,0,0));
+	line(screen, riflink1ass.x1, riflink1ass.y1, riflink1ass.x2, riflink1ass.y2, colrif); //rif link1
+	line(screen, riflink2ass.x1, riflink2ass.y1, riflink2ass.x2, riflink2ass.y2, colrif); //rif link2
+	circlerif_alpha(screen, pos0xasso, pos0yasso, l1, alpharad, lonrad, latrad, colrif); //rif alpha
+	circlerif_theta(screen, pos0xasso, pos0yasso, l2, l1, alpharad, thetarad, lonrad, latrad, colrif); //rif theta
+
+	// Disegno link
+	thick_line(screen, link1ass.x1, link1ass.y1, link1ass.x2, link1ass.y2, THICK, colmdl); //link1
+	thick_line(screen, link2ass.x1, link2ass.y1, link2ass.x2, link2ass.y2, THICK, colmdl2); //link2
+}
+
+
+void vista_lato(AngleSinCos Theta, float thetarad){
+//--------------------
+	// Vista lato
+	rectfill(screen, resetlato.x1, resetlato.y1, resetlato.x2, resetlato.y2, colbck);	// reset
+	int l2 = L2_LATO;
+	TwoPoints link2lato;
+	link2lato.x1 = pos0xlato;
+	link2lato.y1 = pos0ylato;
+	link2lato.x2 = pos0xlato + l2 * Theta.sin;
+	link2lato.y2 = pos0ylato - l2 * Theta.cos;
+	line(screen, link2lato.x1, link2lato.y1, link2lato.x1, link2lato.y1 -l2, colrif); // rif link lato
+	circlerif_parup(screen, pos0xlato, pos0ylato, l2, thetarad, colrif); // rif angolo theta
+	thick_line(screen, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, THICK, colmdl2); // link lato
+
+}
+
+void vista_alto(AngleSinCos Alpha, float alpharad){
+
+	// Vista alto
+	rectfill(screen, resetalto.x1, resetalto.y1, resetalto.x2, resetalto.y2, colbck); 	// reset
+	int l1 = L1_ALTO;
+	TwoPoints link1alto;
+	link1alto.x1 = pos0xalto;
+	link1alto.y1 = pos0yalto;
+	link1alto.x2 = pos0xalto + l1 * Alpha.sin;
+	link1alto.y2 = pos0yalto - l1 * Alpha.cos;
+	line(screen, link1alto.x1, link1alto.y1, link1alto.x1, link1alto.y1 - l1, colrif); // rif link alto
+	circlerif_parup(screen, pos0xalto, pos0yalto, l1, alpharad, colrif); // rif angolo alpha
+	thick_line(screen, link1alto.x1, link1alto.y1, link1alto.x2, link1alto.y2, THICK, colmdl); // link alto
+}
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -23,5 +23,38 @@
 #define NUM_POINTS			800
 #define THICK				1
 
+//Tipi definiti da noi
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+typedef struct {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+} TwoPoints;
+
+typedef struct {
+	int x;
+	int y;
+	int z;
+} Vect;
+
+typedef struct {
+	float sin;
+	float cos;
+}AngleSinCos;
+
+typedef struct {
+		float alpha;
+		float theta;
+		float lon;
+		float lat;
+		float bu;
+}Par;
+
+
 
 #endif //SIMUL_FURUTA_DEFINES_H

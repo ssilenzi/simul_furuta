@@ -6,8 +6,9 @@
 #define SIMUL_FURUTA_KEYS_H
 
 #include <allegro.h>
+#include "defines.h"
 
-void keys(float *alpha, float *theta, int *lon, int *lat, float *bu);
+void keys(Par *par_new);
 
 // get_keycodes
 void get_keycodes(char *scan, char *ascii);
