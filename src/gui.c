@@ -8,6 +8,7 @@ static TwoPoints resetasson, resetlato, resetalto; //angoli dell'area da resetta
 static struct {
 	int mdl;	//colore modello
 	int mdl2;	//colore modello2
+	int vert;	//colore asta verticale
 	int rif;	//colore riferimento
 	int scr;	//colore scritte
 	int bck;	//colore background
@@ -41,7 +42,7 @@ int gui_init()
 
 	int qdistvert = (hscreen)/ dist - 2; // quante dist entrano dentro il mio schermo, dimensione dell'array scritte
 	scritte.x = 2*dist;
-	for(int i = 0; i < qdistvert; i++){
+	for (int i = 0; i < qdistvert; i++) {
 		scritte.y[i] = dist * (i+1);
 	} //popolo l'array scritte con le posizioni xy delle scritte
 
@@ -65,6 +66,7 @@ int gui_init()
 	// colori modello, rif
 	col.mdl = COL_MDL;
 	col.mdl2 = COL_MDL2;
+	col.vert = COL_VERT;
 	col.rif = COL_RIF;
 
 	// colora background
@@ -87,20 +89,23 @@ int gui_init()
 	textout_ex(scrbuf, font, reset3, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
 
 	//rett2 - Vista assonometrica
-	rect(scrbuf, dist + wrett1 + dist, dist, dist + wrett1 + dist + wrett2 , dist + hrett2, col.rett);
+	rect(scrbuf, dist + wrett1 + dist, dist, dist + wrett1 + dist + wrett2, dist + hrett2, col.rett);
 	char assonstr[50];
 	sprintf(assonstr, "Vista Assonometrica");
-	textout_ex(scrbuf, font, assonstr, round( dist + wrett1 + dist  + wrett2 /2 -3.5*dist ), 2 * dist , col.scr, col.bck);
+	textout_ex(scrbuf, font, assonstr, (int)(dist + wrett1 + dist + wrett2 /2 -3.5*dist), 2*dist, col.scr, col.bck);
 	//rett3 - vista alto
-	rect(scrbuf, dist + wrett1 + dist , dist + hrett2 ,  dist + wrett1 + dist + wrett3, dist + hrett2 + hrett3, col.rett);
+	rect(scrbuf, dist + wrett1 + dist, dist + hrett2, dist + wrett1 + dist + wrett3, dist + hrett2 + hrett3, col.rett);
 	char altostr[50];
 	sprintf(altostr, "Vista Alto");
-	textout_ex(scrbuf, font, altostr, round( dist + wrett1 + dist  + wrett3 /2 -2.1*dist )  , dist + hrett2 + dist, col.scr, col.bck);
+	textout_ex(scrbuf, font, altostr, (int)(dist + wrett1 + dist + wrett3 /2 -2.1*dist), dist + hrett2 + dist,
+			col.scr, col.bck);
 	//rett4 - vista Lato
-	rect(scrbuf, dist + wrett1 + dist + wrett3 , dist + hrett2 , dist + wrett1 + dist + wrett3 + wrett4,  dist + hrett2 + hrett4, col.rett);
+	rect(scrbuf, dist + wrett1 + dist + wrett3, dist + hrett2, dist + wrett1 + dist + wrett3 + wrett4,
+			dist + hrett2 + hrett4, col.rett);
 	char latostr[50];
 	sprintf(latostr, "Vista Lato");
-	textout_ex(scrbuf, font, latostr,  round( dist + wrett1 + dist + wrett3  +  wrett4/2 -2.1*dist )  , dist + hrett2 + dist, col.scr, col.bck);
+	textout_ex(scrbuf, font, latostr, (int)(dist + wrett1 + dist + wrett3 + wrett4/2 -2.1*dist),
+			dist + hrett2 + dist, col.scr, col.bck);
 
 	//----------------------------------
 	// Calcoli per la grafica
@@ -137,52 +142,52 @@ int gui_init()
 }
 
 // GUI
-void gui(Par par_new){
+void gui(Par par_new) {
 	static Par par_old = {1, 1, 1, 1, 1};
 	char bustr[30], alphastr[30], thetastr[30];	// stringhe di comunicazione che vengono aggiornate
 	float alpharad, thetarad, latrad, lonrad;
 	AngleSinCos Alpha, Theta, Lon, Lat;
 
-	alpharad = (float)par_new.alpha/180 * M_PI; // conversione in radianti degli angoli nuovi
-	thetarad = (float)par_new.theta/180 * M_PI;
-	lonrad = (float)par_new.lon/180 * M_PI;
-	latrad = (float)par_new.lat/180 * M_PI;
+	alpharad = par_new.alpha/180 * M_PI; // conversione in radianti degli angoli nuovi
+	thetarad = par_new.theta/180 * M_PI;
+	lonrad = par_new.lon/180 * M_PI;
+	latrad = par_new.lat/180 * M_PI;
 
 	// ANIMAZIONE
-	if(par_new.alpha != par_old.alpha){
+	if (par_new.alpha != par_old.alpha) {
 
-		Alpha.sin = sin(alpharad);	Alpha.cos = cos(alpharad);
+		Alpha.sin = sinf(alpharad);	Alpha.cos = cosf(alpharad);
 		vista_alto(Alpha, alpharad);
 	}
 
-	if(par_new.theta != par_old.theta){
+	if (par_new.theta != par_old.theta) {
 
-		Theta.sin = sin(thetarad);	Theta.cos = cos(thetarad);
+		Theta.sin = sinf(thetarad);	Theta.cos = cosf(thetarad);
 		vista_lato(Theta, thetarad);
 	}
 
-	if( par_new.alpha != par_old.alpha ||  par_new.theta != par_old.theta || par_new.lon != par_old.lon ||
-		par_new.lat != par_old.lat ){
+	if (par_new.alpha != par_old.alpha || par_new.theta != par_old.theta || par_new.lon != par_old.lon ||
+		par_new.lat != par_old.lat) {
 
-		Alpha.sin = sin(alpharad);	Alpha.cos = cos(alpharad);
-		Theta.sin = sin(thetarad);	Theta.cos = cos(thetarad);
-		Lat.sin = sin(latrad); Lat.cos = cos(latrad);
-		Lon.sin = sin(lonrad); Lon.cos = cos(lonrad);
-		vista_asson( Alpha, Theta, Lon, Lat, alpharad, thetarad, lonrad, latrad );
+		Alpha.sin = sinf(alpharad);	Alpha.cos = cosf(alpharad);
+		Theta.sin = sinf(thetarad);	Theta.cos = cosf(thetarad);
+		Lat.sin = sinf(latrad); Lat.cos = cosf(latrad);
+		Lon.sin = sinf(lonrad); Lon.cos = cosf(lonrad);
+		vista_asson(Alpha, Theta, Lon, Lat, alpharad, thetarad, lonrad, latrad);
 	}
 
 	// SCRITTE
-	if( par_new.alpha != par_old.alpha ||  par_new.theta != par_old.theta || par_new.lon != par_old.lon ||
-		par_new.lat != par_old.lat || par_new.bu != par_old.bu){
+	if (par_new.alpha != par_old.alpha || par_new.theta != par_old.theta || par_new.lon != par_old.lon ||
+		par_new.lat != par_old.lat || par_new.bu != par_old.bu) {
 
 		// bu
-		sprintf(bustr, "bu = %5.2f, a/z +-0.1  ", par_new.bu);
+		sprintf(bustr, "bu = %5.2f, a/z +-0.1          ", par_new.bu);
 		textout_ex(scrbuf, font, bustr, scritte.x, scritte.y[1], col.scr, col.bck);
 		// alpha
-		sprintf(alphastr, "alpha = %5.2f, k/l +-5  ", par_new.alpha);
+		sprintf(alphastr, "alpha = %5.2f, k/l +-5          ", par_new.alpha);
 		textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[2], col.scr, col.bck);
 		// theta
-		sprintf(thetastr, "theta = %5.2f, i/o +-5  ", par_new.theta);
+		sprintf(thetastr, "theta = %5.2f, i/o +-5          ", par_new.theta);
 		textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[3], col.scr, col.bck);
 	}
 	blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -190,7 +195,7 @@ void gui(Par par_new){
 }
 
 // ThickLine
-void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color){
+void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color) {
 	float dx = x - x_;
 	float dy = y - y_;
 	float d = sqrtf(dx * dx + dy * dy);
@@ -215,60 +220,67 @@ void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickne
 
 }
 // Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
-void circlerif_alpha(BITMAP *bmp, int xc, int yc, int r, float alpharad, float lonrad, float latrad, int color){
+void circlerif_alpha(BITMAP *bmp, int xc, int yc, int r, float alpharad, float lonrad, float latrad, int color) {
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, alpharad, lonrad angolo long vista asson, latrad " ", color colore
 
 	float anglim = 0, d_ang; // angolo limite
 	anglim = alpharad;
 	d_ang = 2*M_PI/NUM_POINTS;
-	if(alpharad < 0){
+	if (alpharad < 0) {
 		d_ang = - d_ang;
 	} // end if
 
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto alpharad in un giro disegno NUM_POINTS punti.
+	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) { 
+		// mi fermo raggiunto alpharad; in un giro disegno NUM_POINTS punti.
 		float x,y;
-		x =  xc -r*sin(lonrad - t);
-		y =  yc + r*cos(lonrad - t)*sin(latrad);
+		x = xc -r*sinf(lonrad - t);
+		y = yc + r*cosf(lonrad - t)*sinf(latrad);
 		putpixel(bmp, x, y, color);
 	} // end for
 
 }
 // circlerif_theta: disegna un arco di circonf in prospettiva per visualizzare theta
-void circlerif_theta(BITMAP *bmp, int xc, int yc, int r, int l1, float alpharad, float thetarad, float lonrad, float latrad, int color){
-	// bmp, xc xcentro, yc ycentro, raggio cerchio, dimensione link1, alpharad, thetarad, lonrad angolo long vista asson, latrad " ", color colore
+void circlerif_theta(BITMAP *bmp, int xc, int yc, int r, int l1, float alpharad, float thetarad,
+		float lonrad, float latrad, int color) {
+	// bmp, xc xcentro, yc ycentro, raggio cerchio, dimensione link1, alpharad, thetarad
+	// lonrad angolo long vista asson, latrad " ", color colore
 	float anglim = 0, d_ang; // angolo limite
 	anglim = thetarad;
 	d_ang = 2*M_PI/NUM_POINTS;
-	if(thetarad < 0){
+	if (thetarad < 0) {
 		d_ang = - d_ang;
 	} // end if
 
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto thetarad; in un giro disegno NUM_POINTS punti.
+	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) {
+		// mi fermo raggiunto thetarad; in un giro disegno NUM_POINTS punti.
 		float x,y;
-		x = xc + cos(lonrad)*(l1*sin(alpharad) + r*cos(alpharad)*sin(t)) - sin(lonrad)*(l1*cos(alpharad) - r*sin(alpharad)*sin(t));
-		y = yc + cos(lonrad)*sin(latrad)*(l1*cos(alpharad) - r*sin(alpharad)*sin(t)) - r*cos(latrad)*cos(t) + sin(latrad)*sin(lonrad)*(l1*sin(alpharad) + r*cos(alpharad)*sin(t));
+		x = xc + cosf(lonrad)*(l1*sinf(alpharad) + r*cosf(alpharad)*sinf(t)) - sinf(lonrad)*(l1*cosf(alpharad) -
+				r*sinf(alpharad)*sinf(t));
+		y = yc + cosf(lonrad)*sinf(latrad)*(l1*cosf(alpharad) - r*sinf(alpharad)*sinf(t)) - r*cosf(latrad)*cosf(t) +
+				sinf(latrad)*sinf(lonrad)*(l1*sinf(alpharad) + r*cosf(alpharad)*sinf(t));
 		putpixel(bmp, x, y, color);
 	} // end for
 }
 // circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
-void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float ang, int color){
+void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float ang, int color) {
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, ang angolo a cui fermarsi, color colores
 	float anglim = 0, d_ang; // angolo limite
 	anglim = ang;
 	d_ang = 2*M_PI/NUM_POINTS;
-	if(ang < 0){
+	if (ang < 0) {
 		d_ang = - d_ang;
 	} // end if
-	for(float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang){  // mi fermo raggiunto ang, in un giro disegno NUM_POINTS punti
+	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) {
+		// mi fermo raggiunto ang, in un giro disegno NUM_POINTS punti
 		float x,y;
-		x = xc + r*sin(t);
-		y = yc - r*cos(t);
+		x = xc + r*sinf(t);
+		y = yc - r*cosf(t);
 		putpixel(bmp, x, y, color);
 	} // end for
 
 }
 // proiez_asson proietto coordinate spaziali in coordinate di disegno secondo una proiezione assonometrica
-Point proiez_asson(Vect P, AngleSinCos Lon, AngleSinCos Lat){
+Point proiez_asson(Vect P, AngleSinCos Lon, AngleSinCos Lat) {
 	// P vettore x y z
 	Point PAlleg;
 	PAlleg.x = P.y*Lon.cos - P.x * Lon.sin;
@@ -276,10 +288,10 @@ Point proiez_asson(Vect P, AngleSinCos Lon, AngleSinCos Lat){
 	return PAlleg;
 }
 // disegna griglia in assonometria
-void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSinCos Lat, int col){
+void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSinCos Lat, int col) {
 	int lx, ly;
-	lx = abs( P1.x - P2.x );
-	ly = abs( P1.y - P2.y );
+	lx = abs(P1.x - P2.x);
+	ly = abs(P1.y - P2.y);
 	int dx, dy;
 	dx = lx / q;
 	dy = ly / q;
@@ -290,8 +302,8 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 	Point a, b;
 
 	//Parte X
-	if(P1.x < P2.x){
-		for(int t=P1.x; t <=  P2.x; t = t + dx ){
+	if (P1.x < P2.x) {
+		for (int t=P1.x; t <= P2.x; t = t + dx) {
 			A.x = t;
 			B.x = t;
 			a = proiez_asson(A, Lon, Lat); a.x += posx; a.y += posy;
@@ -299,8 +311,8 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 			line(scrbuf, a.x, a.y, b.x, b.y, col);
 		} // end for
 	}// end if
-	if(P1.x > P2.x){
-		for(int t=P2.x; t <=  P1.x; t = t + dx ){
+	if (P1.x > P2.x) {
+		for (int t=P2.x; t <= P1.x; t = t + dx) {
 			A.x = t;
 			B.x = t;
 			a = proiez_asson(A, Lon, Lat); a.x += posx; a.y += posy;
@@ -312,8 +324,8 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 	//Parte Y
 	A = P1;
 	B = P1; B.x += lx;
-	if(P1.y < P2.y){
-		for(int t=P1.y; t <=  P2.y; t = t + dy ){
+	if (P1.y < P2.y) {
+		for (int t=P1.y; t <= P2.y; t = t + dy) {
 			A.y = t;
 			B.y = t;
 			a = proiez_asson(A, Lon, Lat); a.x += posx; a.y += posy;
@@ -321,8 +333,8 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 			line(scrbuf, a.x, a.y, b.x, b.y, col);
 		} // end for
 	}// end if
-	if(P1.y > P2.y){
-		for(int t=P2.y; t <=  P1.y; t = t + dy ){
+	if (P1.y > P2.y) {
+		for (int t=P2.y; t <= P1.y; t = t + dy) {
 			A.y = t;
 			B.y = t;
 			a = proiez_asson(A, Lon, Lat); a.x += posx; a.y += posy;
@@ -333,7 +345,8 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 
 }
 // disegna vista assonometrica
-void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon,  AngleSinCos Lat, float alpharad, float thetarad, float lonrad, float latrad ){
+void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon, AngleSinCos Lat, float alpharad, float thetarad,
+		float lonrad, float latrad) {
 	//--------------------
 	// Vista Assonometrica
 	rectfill(scrbuf, resetasson.x1, resetasson.y1, resetasson.x2, resetasson.y2, col.bck);	// reset
@@ -384,7 +397,7 @@ void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon,  AngleSi
 	P2.x = +LX_GRID/2; P2.y = +LY_GRID/2; P2.z = -l1;
 	grid(P1, P2, NUM_GRID, asson0.x, asson0.y, Lon, Lat, col.rif);
 	//asse verticale
-	thick_line(scrbuf, asson0.x, asson0.y + l1*Lat.cos, asson0.x, asson0.y, THICK+1, makecol(0,0,0));
+	thick_line(scrbuf, asson0.x, asson0.y + l1*Lat.cos, asson0.x, asson0.y, THICK+1, col.vert);
 	line(scrbuf, riflink1asson.x1, riflink1asson.y1, riflink1asson.x2, riflink1asson.y2, col.rif); //rif link1
 	line(scrbuf, riflink2asson.x1, riflink2asson.y1, riflink2asson.x2, riflink2asson.y2, col.rif); //rif link2
 	circlerif_alpha(scrbuf, asson0.x, asson0.y, l1, alpharad, lonrad, latrad, col.rif); //rif alpha
@@ -395,7 +408,7 @@ void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon,  AngleSi
 	thick_line(scrbuf, link2asson.x1, link2asson.y1, link2asson.x2, link2asson.y2, THICK, col.mdl2); //link2
 }
 // disegna vista lato
-void vista_lato(AngleSinCos Theta, float thetarad){
+void vista_lato(AngleSinCos Theta, float thetarad) {
 //--------------------
 	// Vista lato
 	rectfill(scrbuf, resetlato.x1, resetlato.y1, resetlato.x2, resetlato.y2, col.bck);	// reset
@@ -411,7 +424,7 @@ void vista_lato(AngleSinCos Theta, float thetarad){
 
 }
 // disegna vista alto
-void vista_alto(AngleSinCos Alpha, float alpharad){
+void vista_alto(AngleSinCos Alpha, float alpharad) {
 
 	// Vista alto
 	rectfill(scrbuf, resetalto.x1, resetalto.y1, resetalto.x2, resetalto.y2, col.bck); 	// reset

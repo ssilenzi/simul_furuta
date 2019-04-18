@@ -8,8 +8,7 @@
 // MAIN
 int main()
 {
-	if (gui_init() != 0)	// inizializza allegro
-		return 1;
+	if (gui_init() != 0) return 1;	// inizializza allegro
 	//Variabili
 	//float alpha = 0, theta = 0; // angoli
 	//int lon = 45, lat = 35;

@@ -2,59 +2,59 @@
 #include <stdio.h>
 #include <math.h>
 
-void keys(Par *par_new){
+void keys(Par *par_new) {
 	char ascii, scan; // output di get_keycodes(&scan, &ascii)
-	if( keypressed() ){  // importante altrimenti readkey blocca l'esecuzione
+	if (keypressed()) {  // importante altrimenti readkey blocca l'esecuzione
 		get_keycodes(&scan, &ascii);
 		// reset
-		if(key[KEY_R]){
+		if (key[KEY_R]) {
 			par_new->bu = 3.000;
 			par_new->alpha = 0;
 			par_new->theta = 0;
 		}
 		// reset vista
-		if(key[KEY_T]){
+		if (key[KEY_T]) {
 			par_new->lon = 45;
 			par_new->lat = 35;
 		}
 
 		// BU a/z
-		if(key[KEY_A]) {
+		if (key[KEY_A]) {
 			par_new->bu += 0.1;
 		}
-		if(key[KEY_Z]){
+		if (key[KEY_Z]) {
 			par_new->bu += -0.1;
 		}
 		// ALPHA k/l
-		if(key[KEY_K]) {
+		if (key[KEY_K]) {
 			par_new->alpha +=  -5;
 		}
-		if(key[KEY_L]){
+		if (key[KEY_L]) {
 			par_new->alpha += 5;
 		}
 		// THETA i/o
-		if(key[KEY_I]) {
+		if (key[KEY_I]) {
 			par_new->theta +=  -5;
 		}
-		if(key[KEY_O]){
+		if (key[KEY_O]) {
 			par_new->theta += 5;
 		}
 		// LAT up down
-		if(key[KEY_UP]){
+		if (key[KEY_UP]) {
 			if (par_new->lat + 5 <= 90) {
 				par_new->lat += 5;
 			}
 		}
-		if(key[KEY_DOWN]){
+		if (key[KEY_DOWN]) {
 			if (par_new->lat + -5 >= -90) {
 				par_new->lat += -5;
 			}
 		}
 		// LON left right
-		if(key[KEY_LEFT]){
+		if (key[KEY_LEFT]) {
 			par_new->lon += -5;
 		}
-		if(key[KEY_RIGHT]){
+		if (key[KEY_RIGHT]) {
 			par_new->lon += +5;
 		}
 	} // end keypressed

@@ -27,6 +27,7 @@
 #define COL_SCR				makecol(0, 0, 0)
 #define COL_MDL				makecol(255, 0, 0)
 #define COL_MDL2			makecol(255, 204, 0)
+#define COL_VERT            makecol(0,0,0)
 #define COL_RIF				makecol(128, 128, 128)
 
 #endif //SIMUL_FURUTA_DEFINES_H
