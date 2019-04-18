@@ -7,6 +7,7 @@
 
 #include <allegro.h>
 #include "defines.h"
+#include "types.h"
 
 void keys(Par *par_new);
 

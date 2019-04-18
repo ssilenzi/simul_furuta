@@ -6,8 +6,8 @@
 #define SIMUL_FURUTA_DEFINES_H
 
 //Grafica
-#define GRAFICA_WIN32       GFX_GDI
 #define GRAFICA_LINUX       GFX_AUTODETECT_WINDOWED
+#define GRAFICA_WIN32       GFX_GDI
 #define wscreen             1024
 #define hscreen             768
 #define color_depth         32
@@ -22,39 +22,11 @@
 #define NUM_GRID			5
 #define NUM_POINTS			800
 #define THICK				1
-
-//Tipi definiti da noi
-typedef struct {
-    int x;
-    int y;
-} Point;
-
-typedef struct {
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-} TwoPoints;
-
-typedef struct {
-	int x;
-	int y;
-	int z;
-} Vect;
-
-typedef struct {
-	float sin;
-	float cos;
-}AngleSinCos;
-
-typedef struct {
-	float alpha;
-	float theta;
-	float lon;
-	float lat;
-	float bu;
-}Par;
-
-
+#define COL_BCK				makecol(190, 190, 190)
+#define COL_RETT			makecol(0, 0, 179)
+#define COL_SCR				makecol(0, 0, 0)
+#define COL_MDL				makecol(255, 0, 0)
+#define COL_MDL2			makecol(255, 204, 0)
+#define COL_RIF				makecol(128, 128, 128)
 
 #endif //SIMUL_FURUTA_DEFINES_H

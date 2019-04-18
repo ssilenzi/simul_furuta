@@ -8,13 +8,14 @@
 #include <allegro.h>
 #include "defines.h"
 #include "os.h"
+#include "types.h"
 
 
 //Static GUI
 int gui_init();
 
 // GUI
-void gui(Par par_old, Par par_new);
+void gui(Par par_new);
 
 // ThickLine
 void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color);

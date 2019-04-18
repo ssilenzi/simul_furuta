@@ -37,5 +37,5 @@ include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/inclu
 file(GLOB SRC "${PROJECT_SOURCE_DIR}/src/*.c" "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(${PROJECT_NAME} ${SRC})
 target_compile_options(${PROJECT_NAME} PUBLIC -Werror -Wall -Wextra)
-target_link_libraries(${PROJECT_NAME} Threads::Threads "${ALLEGRO_LIBRARY}" m) # rt ptask
+target_link_libraries(${PROJECT_NAME} Threads::Threads "${ALLEGRO_LIBRARY}" m rt) # ptask
 install(TARGETS ${PROJECT_NAME} DESTINATION "${PROJECT_SOURCE_DIR}/bin")

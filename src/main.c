@@ -1,4 +1,7 @@
-#include "main.h"
+#include <allegro.h>
+#include "gui.h"
+#include "keys.h"
+#include "types.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -14,21 +17,15 @@ int main()
 	//float alphaold=1, thetaold=1; // vecchie variabili
 	//int lonold = 0, latold = 0;
 
-
-	Par par_new;
-	Par par_old;
-	par_new.alpha = 0; par_new.theta = 0; par_new.lon = 45; par_new.lat = 35; par_new.bu = 3;
-	par_old.alpha = 1; par_old.theta = 1; par_old.lon = 1; par_old.lat = 1; par_old.bu = 1;
+	Par par;
+	par.alpha = 0; par.theta = 0; par.lon = 45; par.lat = 35; par.bu = 3;
 
 	do {
-		gui(par_old, par_new); // aggiorna grafica solo se cambia qualcosa
+		gui(par); // aggiorna grafica solo se cambia qualcosa
+		keys(&par); // interazione con la tastiera
 
-		par_old.alpha = par_new.alpha; par_old.theta = par_new.theta; par_old.lon= par_new.lon; par_old.lat= par_new.lat; par_old.bu= par_new.bu;
-
-		keys(&par_new); // interazione con la tastiera
-
-		par_new.alpha = atan2f(sinf(par_new.alpha/180*M_PI), cosf(par_new.alpha/180*M_PI))*180/M_PI;
-		par_new.theta = atan2f(sinf(par_new.theta/180*M_PI), cosf(par_new.theta/180*M_PI))*180/M_PI;
+		//par.alpha = atan2f(sinf(par.alpha/180*M_PI), cosf(par.alpha/180*M_PI))*180/M_PI;
+		//par.theta = atan2f(sinf(par.theta/180*M_PI), cosf(par.theta/180*M_PI))*180/M_PI;
 
 	} while (!key[KEY_ESC]);
 
