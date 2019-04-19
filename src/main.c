@@ -9,12 +9,6 @@
 int main()
 {
 	if (gui_init() != 0) return 1;	// inizializza allegro
-	//Variabili
-	//float alpha = 0, theta = 0; // angoli
-	//int lon = 45, lat = 35;
-	//float bu = 3;	// boh, variabile a caso
-	//float alphaold=1, thetaold=1; // vecchie variabili
-	//int lonold = 0, latold = 0;
 
 	Par par;
 	par.alpha = 0; par.theta = 0; par.lon = 45; par.lat = 35; par.bu = 3;

@@ -55,7 +55,7 @@ int gui_init()
 	scrbuf = create_bitmap(SCREEN_W, SCREEN_H);
 	if (!scrbuf) {
 		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-		allegro_message("Unable to initialize page flipping\n%s\n", allegro_error);
+		allegro_message("Unable to initialize page flipping\n");
 		return 1;
 	}
 
@@ -173,7 +173,7 @@ void gui(Par par_new) {
 		Theta.sin = sinf(thetarad);	Theta.cos = cosf(thetarad);
 		Lat.sin = sinf(latrad); Lat.cos = cosf(latrad);
 		Lon.sin = sinf(lonrad); Lon.cos = cosf(lonrad);
-		vista_asson(Alpha, Theta, Lon, Lat, alpharad, thetarad, lonrad, latrad);
+		vista_asson(Alpha, Theta, Lon, Lat, alpharad, thetarad);
 	}
 
 	// SCRITTE
@@ -220,31 +220,33 @@ void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickne
 
 }
 // Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
-void circlerif_alpha(BITMAP *bmp, int xc, int yc, int r, float alpharad, float lonrad, float latrad, int color) {
+void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos Lat, float alpharad, int color) {
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, alpharad, lonrad angolo long vista asson, latrad " ", color colore
-
 	float anglim = 0, d_ang; // angolo limite
+	Vect P; Point PAlleg;
+
 	anglim = alpharad;
 	d_ang = 2*M_PI/NUM_POINTS;
 	if (alpharad < 0) {
 		d_ang = - d_ang;
 	} // end if
-
-	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) { 
+	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) {
 		// mi fermo raggiunto alpharad; in un giro disegno NUM_POINTS punti.
-		float x,y;
-		x = xc -r*sinf(lonrad - t);
-		y = yc + r*cosf(lonrad - t)*sinf(latrad);
-		putpixel(bmp, x, y, color);
+		P.x = r*cosf(t);
+		P.y = r*sinf(t);
+		P.z = 0;
+		PAlleg = proiez_asson(P, Lon, Lat);
+		putpixel(bmp, C.x + PAlleg.x, C.y + PAlleg.y, color);
 	} // end for
-
 }
 // circlerif_theta: disegna un arco di circonf in prospettiva per visualizzare theta
-void circlerif_theta(BITMAP *bmp, int xc, int yc, int r, int l1, float alpharad, float thetarad,
-		float lonrad, float latrad, int color) {
+void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, AngleSinCos Lon, AngleSinCos Lat,
+					 float thetarad, int color) {
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, dimensione link1, alpharad, thetarad
 	// lonrad angolo long vista asson, latrad " ", color colore
 	float anglim = 0, d_ang; // angolo limite
+	Vect P; Point PAlleg;
+
 	anglim = thetarad;
 	d_ang = 2*M_PI/NUM_POINTS;
 	if (thetarad < 0) {
@@ -253,18 +255,19 @@ void circlerif_theta(BITMAP *bmp, int xc, int yc, int r, int l1, float alpharad,
 
 	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) {
 		// mi fermo raggiunto thetarad; in un giro disegno NUM_POINTS punti.
-		float x,y;
-		x = xc + cosf(lonrad)*(l1*sinf(alpharad) + r*cosf(alpharad)*sinf(t)) - sinf(lonrad)*(l1*cosf(alpharad) -
-				r*sinf(alpharad)*sinf(t));
-		y = yc + cosf(lonrad)*sinf(latrad)*(l1*cosf(alpharad) - r*sinf(alpharad)*sinf(t)) - r*cosf(latrad)*cosf(t) +
-				sinf(latrad)*sinf(lonrad)*(l1*sinf(alpharad) + r*cosf(alpharad)*sinf(t));
-		putpixel(bmp, x, y, color);
+		P.x = l1*Alpha.cos - r*Alpha.sin*sinf(t);
+		P.y = l1*Alpha.sin + r*Alpha.cos*sinf(t);
+		P.z = r*cosf(t);
+		PAlleg = proiez_asson(P, Lon, Lat);
+		putpixel(bmp, C.x + PAlleg.x, C.y + PAlleg.y, color);
 	} // end for
 }
 // circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
-void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float ang, int color) {
+void circlerif_parup(BITMAP *bmp, Point C, int r, float ang, int color) {
 	// bmp, xc xcentro, yc ycentro, raggio cerchio, ang angolo a cui fermarsi, color colores
 	float anglim = 0, d_ang; // angolo limite
+	Point PAlleg;
+
 	anglim = ang;
 	d_ang = 2*M_PI/NUM_POINTS;
 	if (ang < 0) {
@@ -272,10 +275,9 @@ void circlerif_parup(BITMAP *bmp, int xc, int yc, int r, float ang, int color) {
 	} // end if
 	for (float t=0; fabsf(t) < fabsf(anglim); t = t + d_ang) {
 		// mi fermo raggiunto ang, in un giro disegno NUM_POINTS punti
-		float x,y;
-		x = xc + r*sinf(t);
-		y = yc - r*cosf(t);
-		putpixel(bmp, x, y, color);
+		PAlleg.x = r*sinf(t);
+		PAlleg.y = - r*cosf(t);
+		putpixel(bmp, C.x + PAlleg.x, C.y + PAlleg.y, color);
 	} // end for
 
 }
@@ -290,8 +292,8 @@ Point proiez_asson(Vect P, AngleSinCos Lon, AngleSinCos Lat) {
 // disegna griglia in assonometria
 void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSinCos Lat, int col) {
 	int lx, ly;
-	lx = abs(P1.x - P2.x);
-	ly = abs(P1.y - P2.y);
+	lx = fabsf(P1.x - P2.x);
+	ly = fabsf(P1.y - P2.y);
 	int dx, dy;
 	dx = lx / q;
 	dy = ly / q;
@@ -345,8 +347,8 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 
 }
 // disegna vista assonometrica
-void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon, AngleSinCos Lat, float alpharad, float thetarad,
-		float lonrad, float latrad) {
+void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon, AngleSinCos Lat, float alpharad, float thetarad)
+{
 	//--------------------
 	// Vista Assonometrica
 	rectfill(scrbuf, resetasson.x1, resetasson.y1, resetasson.x2, resetasson.y2, col.bck);	// reset
@@ -400,8 +402,8 @@ void vista_asson(AngleSinCos Alpha, AngleSinCos Theta, AngleSinCos Lon, AngleSin
 	thick_line(scrbuf, asson0.x, asson0.y + l1*Lat.cos, asson0.x, asson0.y, THICK+1, col.vert);
 	line(scrbuf, riflink1asson.x1, riflink1asson.y1, riflink1asson.x2, riflink1asson.y2, col.rif); //rif link1
 	line(scrbuf, riflink2asson.x1, riflink2asson.y1, riflink2asson.x2, riflink2asson.y2, col.rif); //rif link2
-	circlerif_alpha(scrbuf, asson0.x, asson0.y, l1, alpharad, lonrad, latrad, col.rif); //rif alpha
-	circlerif_theta(scrbuf, asson0.x, asson0.y, l2, l1, alpharad, thetarad, lonrad, latrad, col.rif); //rif theta
+	circlerif_alpha(scrbuf, asson0, l1, Lon, Lat, alpharad, col.rif); //rif alpha
+	circlerif_theta(scrbuf, asson0, l2, l1, Alpha, Lon, Lat, thetarad, col.rif); //rif theta
 
 	// Disegno link
 	thick_line(scrbuf, link1asson.x1, link1asson.y1, link1asson.x2, link1asson.y2, THICK, col.mdl); //link1
@@ -419,7 +421,7 @@ void vista_lato(AngleSinCos Theta, float thetarad) {
 	link2lato.x2 = lato0.x + l2 * Theta.sin;
 	link2lato.y2 = lato0.y - l2 * Theta.cos;
 	line(scrbuf, link2lato.x1, link2lato.y1, link2lato.x1, link2lato.y1 -l2, col.rif); // rif link lato
-	circlerif_parup(scrbuf, lato0.x, lato0.y, l2, thetarad, col.rif); // rif angolo theta
+	circlerif_parup(scrbuf, lato0, l2, thetarad, col.rif); // rif angolo theta
 	thick_line(scrbuf, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, THICK, col.mdl2); // link lato
 
 }
@@ -435,7 +437,7 @@ void vista_alto(AngleSinCos Alpha, float alpharad) {
 	link1alto.x2 = alto0.x - l1 * Alpha.sin;
 	link1alto.y2 = alto0.y - l1 * Alpha.cos;
 	line(scrbuf, link1alto.x1, link1alto.y1, link1alto.x1, link1alto.y1 - l1, col.rif); // rif link alto
-	circlerif_parup(scrbuf, alto0.x, alto0.y, l1, -alpharad, col.rif); // rif angolo alpha
+	circlerif_parup(scrbuf, alto0, l1, -alpharad, col.rif); // rif angolo alpha
 	thick_line(scrbuf, link1alto.x1, link1alto.y1, link1alto.x2, link1alto.y2, THICK, col.mdl); // link alto
 }
 

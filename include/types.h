@@ -19,9 +19,9 @@ typedef struct {
 } TwoPoints;
 
 typedef struct {
-    int x;
-    int y;
-    int z;
+    float x;
+    float y;
+    float z;
 } Vect;
 
 typedef struct {
