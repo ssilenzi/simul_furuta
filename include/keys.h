@@ -9,7 +9,7 @@
 #include "defines.h"
 #include "types.h"
 
-void keys(Par *par_new);
+void keys(State *state, Ref *ref, View *view);
 
 // get_keycodes
 void get_keycodes(char *scan, char *ascii);

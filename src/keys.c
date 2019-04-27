@@ -1,61 +1,63 @@
 #include "keys.h"
 #include <stdio.h>
 #include <math.h>
+#define LAT_MAX		90
 
-void keys(Par *par_new) {
+void keys(State *state, Ref *ref, View *view) {
 	char ascii, scan; // output di get_keycodes(&scan, &ascii)
 	if (keypressed()) {  // importante altrimenti readkey blocca l'esecuzione
 		get_keycodes(&scan, &ascii);
 		// reset
 		if (key[KEY_R]) {
-			par_new->bu = 3.000;
-			par_new->alpha = 0;
-			par_new->theta = 0;
+			ref->alpha = ALPHA_0;
+			ref->theta = THETA_0;
+            state->alpha = ALPHA_0;
+            state->theta = THETA_0;
 		}
 		// reset vista
 		if (key[KEY_T]) {
-			par_new->lon = 45;
-			par_new->lat = 35;
+			view->lon = LON_0;
+			view->lat = LAT_0;
 		}
 
-		// BU a/z
-		if (key[KEY_A]) {
-			par_new->bu += 0.1;
-		}
-		if (key[KEY_Z]) {
-			par_new->bu += -0.1;
-		}
-		// ALPHA k/l
-		if (key[KEY_K]) {
-			par_new->alpha +=  -5;
-		}
-		if (key[KEY_L]) {
-			par_new->alpha += 5;
-		}
-		// THETA i/o
+		// REF_ALPHA a/z
 		if (key[KEY_I]) {
-			par_new->theta +=  -5;
+			ref->alpha += -INCR_ANG;
 		}
 		if (key[KEY_O]) {
-			par_new->theta += 5;
+			ref->alpha += INCR_ANG;
 		}
-		// LAT up down
+		// STATE_ALPHA k/l
+		if (key[KEY_K]) {
+			state->alpha += -INCR_ANG;
+		}
+		if (key[KEY_L]) {
+			state->alpha += INCR_ANG;
+		}
+		// STATE_THETA i/o
+		if (key[KEY_N]) {
+			state->theta += -INCR_ANG;
+		}
+		if (key[KEY_M]) {
+			state->theta += INCR_ANG;
+		}
+		// VIEW_LAT up down
 		if (key[KEY_UP]) {
-			if (par_new->lat + 5 <= 90) {
-				par_new->lat += 5;
+			if (view->lat + INCR_ANG <= LAT_MAX) {
+				view->lat += INCR_ANG;
 			}
 		}
 		if (key[KEY_DOWN]) {
-			if (par_new->lat + -5 >= -90) {
-				par_new->lat += -5;
+			if (view->lat + -INCR_ANG >= -LAT_MAX) {
+				view->lat += -INCR_ANG;
 			}
 		}
-		// LON left right
+		// VIEW_LON left right
 		if (key[KEY_LEFT]) {
-			par_new->lon += -5;
+			view->lon += -INCR_ANG;
 		}
 		if (key[KEY_RIGHT]) {
-			par_new->lon += +5;
+			view->lon += +INCR_ANG;
 		}
 	} // end keypressed
 }

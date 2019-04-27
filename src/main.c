@@ -8,17 +8,19 @@
 // MAIN
 int main()
 {
-	if (gui_init() != 0) return 1;	// inizializza allegro
+	if (gui_init()) return 1;
 
-	Par par;
-	par.alpha = 0; par.theta = 0; par.lon = 45; par.lat = 35; par.bu = 3;
+	State state; Ref ref; View view;
+	ref.alpha = ALPHA_0; ref.theta = THETA_0;
+	state.alpha = ALPHA_0; state.theta = THETA_0;
+	view.lon = LON_0; view.lat = LAT_0;
 
 	do {
-		gui(par); // aggiorna grafica solo se cambia qualcosa
-		keys(&par); // interazione con la tastiera
+		gui(state, ref, view); // aggiorna grafica solo se cambia qualcosa
+		keys(&state, &ref, &view); // interazione con la tastiera
 
-		//par.alpha = atan2f(sinf(par.alpha/180*M_PI), cosf(par.alpha/180*M_PI))*180/M_PI;
-		//par.theta = atan2f(sinf(par.theta/180*M_PI), cosf(par.theta/180*M_PI))*180/M_PI;
+		//state.alpha = atan2f(sinf(par.alpha/180*M_PI), cosf(par.alpha/180*M_PI))*180/M_PI;
+		//state.theta = atan2f(sinf(par.theta/180*M_PI), cosf(par.theta/180*M_PI))*180/M_PI;
 
 	} while (!key[KEY_ESC]);
 

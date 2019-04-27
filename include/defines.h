@@ -5,14 +5,21 @@
 #ifndef SIMUL_FURUTA_DEFINES_H
 #define SIMUL_FURUTA_DEFINES_H
 
-//Grafica
+// Stato
+#define ALPHA_0             0
+#define THETA_0             0
+#define LON_0               45
+#define LAT_0               35
+#define INCR_ANG            5
+
+// Grafica
 #define GRAFICA_LINUX       GFX_AUTODETECT_WINDOWED
 #define GRAFICA_WIN32       GFX_GDI
-#define wscreen             1024
-#define hscreen             768
-#define color_depth         32
-#define dist                20
-#define wrett1              400
+#define WSCREEN             1024
+#define HSCREEN             768
+#define COLOR_DEPTH         32
+#define DIST                20
+#define WRETT1              400
 #define L1_ASSON			133
 #define L2_ASSON			100
 #define L1_ALTO             100

@@ -32,9 +32,20 @@ typedef struct {
 typedef struct {
     float alpha;
     float theta;
-    float lon;
-    float lat;
-    float bu;
-} Par;
+    float I;
+} State;
+
+typedef struct {
+    float alpha;
+    float theta;
+    float Kp;
+    float Ki;
+    float Kd;
+} Ref;
+
+typedef struct {
+    int lon;
+    int lat;
+} View;
 
 #endif //SIMUL_FURUTA_TYPES_H
