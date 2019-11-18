@@ -184,13 +184,13 @@ void gui(State state_new, Ref ref_new, View view_new) {
 
 		// Riferimento
 		textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
-		sprintf(refalphastr, "alpha = %5.2f, i/o -+%d         ", ref_new.alpha, INCR_ANG);
+		sprintf(refalphastr, "alpha = %5.2f, i/o -+%d  ", ref_new.alpha, INCR_ANG);
 		textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
 		// Stato
 		textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
-		sprintf(alphastr, "alpha = %5.2f, k/l -+%d         ", state_new.alpha, INCR_ANG);
+		sprintf(alphastr, "alpha = %5.2f, k/l -+%d     ", state_new.alpha, INCR_ANG);
 		textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
-		sprintf(thetastr, "theta = %5.2f, n/m -+%d         ", state_new.theta, INCR_ANG);
+		sprintf(thetastr, "theta = %5.2f, n/m -+%d     ", state_new.theta, INCR_ANG);
 		textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
 		draw = 1;
 	}
