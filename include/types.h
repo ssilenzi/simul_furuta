@@ -50,10 +50,8 @@ typedef struct {
 
 
 // types for handling pthread
-#include <stdbool.h>
-#include <pthread.h>
-    // BRUTTO QUI, pero` comodissimo
-    // Alternativamente potremmo mettere la definizione in ptask.h
+#include <stdbool.h>        // BRUTTO QUI, pero` comodissimo
+                            // Alternativamente potremmo mettere la definizione in ptask.h
 
 typedef struct task_par {
 	bool 		in_use;		// structure is free or in use
