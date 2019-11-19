@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <pthread.h>
+#include <time.h>
 #include "ptask.h"
+#include "types.h"
+
+
 
 
 
@@ -45,6 +50,7 @@ int time_cmp(struct timespec t1, struct timespec t2) {
 	return 0;
 }
 
+
 /* 
     *
     * Threads
@@ -53,8 +59,8 @@ int time_cmp(struct timespec t1, struct timespec t2) {
 
 
 /* Initialize thread pool descriptors */
-void init_rt_thread_manager(void) {
-
+void init_rt_thread_manager() 
+{
 	pthread_mutex_lock(&rt_threads_mtx);
 
 	active_rt_threads = 0;
@@ -159,7 +165,6 @@ void set_activation(task_par *const tp) {
 
 /* Return true if the last deadline has been missed */
 bool missed_deadline(task_par *const tp) {
-bool missed_deadline(task_par *const tp) {
 
 	struct timespec now;
 
@@ -190,7 +195,7 @@ void wait_next_activation(task_par *const tp) {
 
 void *rt_thr_body(void *const arg) {
 
-	struct timespec t;
+//	struct timespec t;
 	task_par *tp = (task_par *)arg;
 	int tid = get_task_id(tp);
 
@@ -276,7 +281,6 @@ int start_thread(void *(*func)(void *), void *args, int policy,
 	pthread_mutex_unlock(&tp->mtx);
 	return id;
 }
-
 
 /* Gracefully stop a running thread */
 int stop_thread(unsigned int id) {

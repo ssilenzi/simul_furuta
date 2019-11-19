@@ -11,17 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 find_package(Allegro REQUIRED)
 include_directories("${ALLEGRO_INCLUDE_DIR}")
 
-#[[
-# Carica ptask
-add_library(ptask STATIC IMPORTED)
-set_property(TARGET ptask APPEND PROPERTY IMPORTED_CONFIGURATIONS NOCONFIG)
-set_target_properties(ptask PROPERTIES
-	IMPORTED_LINK_INTERFACE_LANGUAGES_NOCONFIG "C"
-	IMPORTED_LOCATION_NOCONFIG "${PROJECT_SOURCE_DIR}/ptask/libptask.a"
-)
-include_directories("${PROJECT_SOURCE_DIR}/ptask")
-]]
-
 # Varianti per diversi sistemi operativi
 if(WIN32)
 	set(GRAFICA GRAFICA_WIN32)
@@ -37,5 +26,5 @@ include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/inclu
 file(GLOB SRC "${PROJECT_SOURCE_DIR}/src/*.c" "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(${PROJECT_NAME} ${SRC})
 target_compile_options(${PROJECT_NAME} PUBLIC -Werror -Wall -Wextra)
-target_link_libraries(${PROJECT_NAME} Threads::Threads "${ALLEGRO_LIBRARY}" m rt) # ptask
+target_link_libraries(${PROJECT_NAME} Threads::Threads "${ALLEGRO_LIBRARY}" m rt)
 install(TARGETS ${PROJECT_NAME} DESTINATION "${PROJECT_SOURCE_DIR}/bin")

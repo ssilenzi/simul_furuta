@@ -1,6 +1,7 @@
-#include "gui.h"
 #include <stdio.h>
 #include <math.h>
+#include "gui.h"
+
 
 static BITMAP *scrbuf;
 static Point asson0, lato0, alto0; //centro rettangoli
@@ -71,8 +72,8 @@ int gui_init()
 	// colora background
 	clear_to_color(scrbuf, col.bck);
 
-	// Disegno rettangoli e cose statiche
-	//rett1 - coeff, sinistra
+	// Disegno rettangoli e elementi statici
+	//rett1 - parametri, sinistra
 	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
 	char exit[50], reset1[50], reset2[50], reset3[50];
 	sprintf(exit, "Premere Esc per uscire");

@@ -5,10 +5,11 @@
 #ifndef SIMUL_FURUTA_GUI_H
 #define SIMUL_FURUTA_GUI_H
 
-#include <allegro.h>
 #include "defines.h"
 #include "os.h"
 #include "types.h"
+#include <allegro.h>
+
 
 
 //Static GUI
