@@ -1,9 +1,12 @@
 #include <allegro.h>
+#include <stdio.h>
+#include <math.h>
+
+#include "ptask.h"
 #include "gui.h"
 #include "keys.h"
 #include "types.h"
-#include <stdio.h>
-#include <math.h>
+
 
 // MAIN
 int main()
@@ -16,8 +19,8 @@ int main()
 	view.lon = LON_0; view.lat = LAT_0;
 
 	do {
-		gui(state, ref, view); // aggiorna grafica solo se cambia qualcosa
-		keys(&state, &ref, &view); // interazione con la tastiera
+		gui(state, ref, view);        // Update gui iff something changes
+		keys(&state, &ref, &view);    // Keyboard interaction
 
 		//state.alpha = atan2f(sinf(par.alpha/180*M_PI), cosf(par.alpha/180*M_PI))*180/M_PI;
 		//state.theta = atan2f(sinf(par.theta/180*M_PI), cosf(par.theta/180*M_PI))*180/M_PI;
@@ -27,4 +30,6 @@ int main()
 	allegro_exit();
 	return 0;
 }
+
+
 END_OF_MAIN()
