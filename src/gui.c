@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <math.h>
 #include "gui.h"
 
 
@@ -21,9 +19,8 @@ static struct{
 	int y[(int)(HSCREEN/DIST - 2)];
 } scritte; // array per scrivere "parametricamente" le scritte
 
-// init gui
-int gui_init()
-{
+//----------- init gui
+int gui_init(){
 	// Init allegro
 	if (allegro_init() != 0)
 		return 1;
@@ -75,7 +72,7 @@ int gui_init()
 	// Disegno rettangoli e elementi statici
 	//rett1 - parametri, sinistra
 	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
-	char exit[50], reset1[50], reset2[50], reset3[50];
+	char exit[50], reset1[50], reset2[50], reset3[50], state_pause[50];
 	sprintf(exit, "Premere Esc per uscire");
 	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
 
@@ -88,6 +85,9 @@ int gui_init()
 	sprintf(reset3, "T per resettare la vista");
 	textout_ex(scrbuf, font, reset3, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
 
+    sprintf(state_pause, "A pause/unpause la simulazione");
+	textout_ex(scrbuf, font, state_pause, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
+    
 	TwoPoints rett_asso, rett_alto, rett_lato;
 	Point titolo_asso, titolo_alto, titolo_lato;
 	char assonstr[50], altostr[50], latostr[50];
@@ -155,13 +155,13 @@ int gui_init()
 	return 0;
 }
 
-// GUI
+//----------- gui
 void gui(State state_new, Ref ref_new, View view_new) {
 	static State state_old = {1, 1, 1};
     static Ref ref_old = {1, 1, 1, 1, 1};
     static View view_old = {1, 1};
 	char refalphastr[30], alphastr[30], thetastr[30];	// stringhe di comunicazione che vengono aggiornate
-	int draw = 0;
+	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 
 	// ANIMAZIONE
 	if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
@@ -200,11 +200,12 @@ void gui(State state_new, Ref ref_new, View view_new) {
 	state_old = state_new; ref_old = ref_new; view_old = view_new;
 }
 
+//----------- rad
 float rad(float ang) {
     return ang / 180 * M_PI;
 }
 
-// ThickLine
+//----------- thick_line
 void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color) {
 	float dx = x - x_;
 	float dy = y - y_;
@@ -229,7 +230,7 @@ void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickne
 	polygon(bmp, 4, v, color);
 }
 
-// Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
+//----------- Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
 void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos Lat, float alpha, float refalpha,
 					 int color) {
 	float initial, final, step;
@@ -254,7 +255,7 @@ void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos L
 		putpixel(bmp, C.x + PAlleg.x, C.y + PAlleg.y, color);
 	} // end for
 }
-// circlerif_theta: disegna un arco di circonf in prospettiva per visualizzare theta
+//----------- circlerif_theta: disegna un arco di circonf in prospettiva per visualizzare theta
 void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, AngleSinCos Lon, AngleSinCos Lat,
 					 float theta, float reftheta, int color) {
 	float initial, final, step;
@@ -279,7 +280,7 @@ void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, Ang
 		putpixel(bmp, C.x + PAlleg.x, C.y + PAlleg.y, color);
 	} // end for
 }
-// circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
+//----------- circlerif_parup: disegna un cerchio parametrico che inizia dalla verticale
 void circlerif_parup(BITMAP *bmp, Point C, int r, float ang, float refang, int color) {
 	float initial, final, step;
 	Point PAlleg;
@@ -302,14 +303,14 @@ void circlerif_parup(BITMAP *bmp, Point C, int r, float ang, float refang, int c
 	} // end for
 
 }
-// proiez_asson proietto coordinate spaziali in coordinate di disegno secondo una proiezione assonometrica
+//-----------  proiez_asson proietto coordinate spaziali in coordinate di disegno secondo una proiezione assonometrica
 Point proiez_asson(Vect P, AngleSinCos Lon, AngleSinCos Lat) {
 	Point PAlleg;
 	PAlleg.x = P.y*Lon.cos - P.x * Lon.sin;
 	PAlleg.y = P.x*Lon.cos * Lat.sin - P.z* Lat.cos + P.y * Lat.sin*Lon.sin;
 	return PAlleg;
 }
-// disegna griglia in assonometria
+//----------- grid, disegna griglia in assonometria
 void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSinCos Lat, int col) {
 	int lx, ly;
 	int dx, dy;
@@ -366,7 +367,7 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 	}// end if
 
 }
-// disegna vista assonometrica
+//----------- vista_asson, disegna vista assonometrica
 void vista_asson(float alpha, float refalpha, float theta, float reftheta, float lon, float lat) {
 	int l1 = L1_ASSON, l2 = L2_ASSON;	//lunghezze aste
 	AngleSinCos Alpha, RefAlpha, Theta, RefTheta, Lon, Lat;
@@ -435,7 +436,7 @@ void vista_asson(float alpha, float refalpha, float theta, float reftheta, float
 	thick_line(scrbuf, link1asson.x1, link1asson.y1, link1asson.x2, link1asson.y2, THICK, col.mdl); //link1
 	thick_line(scrbuf, link2asson.x1, link2asson.y1, link2asson.x2, link2asson.y2, THICK, col.mdl2); //link2
 }
-// disegna vista lato
+//----------- vista_lato, disegna vista lato
 void vista_lato(float theta, float reftheta) {
 	int l2 = L2_LATO;
 	AngleSinCos Theta, RefTheta;
@@ -459,7 +460,7 @@ void vista_lato(float theta, float reftheta) {
 	circlerif_parup(scrbuf, lato0, l2, theta, reftheta, col.rif); // rif angolo theta
 	thick_line(scrbuf, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, THICK, col.mdl2); // link lato
 }
-// disegna vista alto
+// vista_alto, disegna vista alto
 void vista_alto(float alpha, float refalpha) {
 	int l1 = L1_ALTO;
 	AngleSinCos Alpha, RefAlpha;

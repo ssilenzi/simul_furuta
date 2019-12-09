@@ -1,62 +1,102 @@
 #include "keys.h"
-#include <stdio.h>
-#include <math.h>
-#define LAT_MAX		90
+
+int state_freeze = 0;
 
 void keys(State *state, Ref *ref, View *view) {
 	char ascii, scan; // output di get_keycodes(&scan, &ascii)
 	if (keypressed()) {  // importante altrimenti readkey blocca l'esecuzione
 		get_keycodes(&scan, &ascii);
-		// reset
-		if (key[KEY_R]) {
+		
+        // Create Thread State Update
+        if (scan==KEY_A) {
+        
+            if(!state_freeze){
+                end_pc=0;
+                task_create(state_update, ID_STATE_UPDATE, 20, 20, 1);
+                state_freeze=1;
+            }
+            else{
+                 end_pc = 1;
+                 state_freeze = 0;
+            }
+            
+            
+		}
+		if (scan==KEY_A) {
+            
+        }
+        
+        // End Threads
+        if (scan==KEY_ESC) {
+            end_pc=1;
+			end = 1;
+		}
+        
+        
+        // reset
+		if (scan ==KEY_R) {
 			ref->alpha = ALPHA_0;
 			ref->theta = THETA_0;
             state->alpha = ALPHA_0;
             state->theta = THETA_0;
 		}
-		// reset vista
-		if (key[KEY_T]) {
-			view->lon = LON_0;
-			view->lat = LAT_0;
-		}
+		
+		/*
+         *      RIFERIMENTO
+         */
 
 		// REF_ALPHA a/z
-		if (key[KEY_I]) {
+		if (scan==KEY_I) {
 			ref->alpha += -INCR_ANG;
 		}
-		if (key[KEY_O]) {
+		if (scan==KEY_O) {
 			ref->alpha += INCR_ANG;
 		}
+		
+		/*
+         *      STATO, andra` cancellato
+         */
+		
 		// STATE_ALPHA k/l
-		if (key[KEY_K]) {
+		if (scan==KEY_K) {
 			state->alpha += -INCR_ANG;
 		}
-		if (key[KEY_L]) {
+		if (scan==KEY_L) {
 			state->alpha += INCR_ANG;
 		}
 		// STATE_THETA i/o
-		if (key[KEY_N]) {
+		if (scan==KEY_N) {
 			state->theta += -INCR_ANG;
 		}
-		if (key[KEY_M]) {
+		if (scan==KEY_M) {
 			state->theta += INCR_ANG;
 		}
-		// VIEW_LAT up down
-		if (key[KEY_UP]) {
+		
+		/*
+         *      VIEW
+        */ 
+        // reset vista
+		if (scan==KEY_T) {
+			view->lon = LON_0;
+			view->lat = LAT_0;
+		}
+        
+        //VIEW_LAT up down
+		if (scan==KEY_UP) {
 			if (view->lat + INCR_ANG <= LAT_MAX) {
 				view->lat += INCR_ANG;
 			}
 		}
-		if (key[KEY_DOWN]) {
+		if (scan==KEY_DOWN) {
 			if (view->lat + -INCR_ANG >= -LAT_MAX) {
 				view->lat += -INCR_ANG;
 			}
 		}
 		// VIEW_LON left right
-		if (key[KEY_LEFT]) {
+		if (scan==KEY_LEFT) {
 			view->lon += -INCR_ANG;
 		}
-		if (key[KEY_RIGHT]) {
+		if (scan==KEY_RIGHT) {
 			view->lon += +INCR_ANG;
 		}
 	} // end keypressed

@@ -1,23 +1,35 @@
 //
-// Funzione che aggiorna le scritte, aggiorna l'animazione in funzione di alpha, theta e bu
+// Foglioche si occupa di aggiornare le scritte e aggiornare l'animazione in funzione dello stato
 //
 
 #ifndef SIMUL_FURUTA_GUI_H
 #define SIMUL_FURUTA_GUI_H
 
-#include "defines.h"
-#include "os.h"
-#include "types.h"
+#include <stdio.h>
+#include <math.h>
 #include <allegro.h>
 
+#include "condiviso.h"
+#include "os.h"
+
+// variabili extern
+extern Ref ref;
+extern State state;
+extern View view;
+extern int end;
 
 
-//Static GUI
+
+//inizializza gui
 int gui_init();
 
 // GUI
 void gui(State state_new, Ref ref_new, View view_new);
 
+
+
+// FUNZIONI INTERNE
+// rad
 float rad(float ang);
 
 // ThickLine
@@ -43,6 +55,7 @@ void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSin
 void vista_asson(float alpha, float refalpha, float theta, float reftheta, float lon, float lat);
 void vista_lato(float theta, float reftheta);
 void vista_alto(float alpha, float refalpha);
+
 
 
 #endif //SIMUL_FURUTA_GUI_H

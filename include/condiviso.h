@@ -1,18 +1,22 @@
-//
-// Foglio delle definizioni
-//
+#ifndef CONDIVISO_H
+#define CONDIVISO_H
 
-#ifndef SIMUL_FURUTA_DEFINES_H
-#define SIMUL_FURUTA_DEFINES_H
+#include <stdbool.h>
+#include <pthread.h>
 
-// Stato
+
+//----------- costanti, definizioni
+// stato
 #define ALPHA_0             0
 #define THETA_0             0
+
+// view
 #define LON_0               45
 #define LAT_0               35
+#define LAT_MAX             90
 #define INCR_ANG            5
 
-// Grafica
+// grafica
 #define GRAFICA_LINUX       GFX_AUTODETECT_WINDOWED
 #define GRAFICA_WIN32       GFX_GDI
 #define WSCREEN             1024
@@ -37,4 +41,52 @@
 #define COL_VERT            makecol(0,0,0)
 #define COL_RIF				makecol(128, 128, 128)
 
-#endif //SIMUL_FURUTA_DEFINES_H
+// task
+#define ID_STATE_UPDATE     1
+
+//----------- types, definizioni
+// types per gui
+typedef struct {
+    int x;
+    int y;
+} Point; 
+
+typedef struct {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+} TwoPoints;
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+} Vect;
+
+typedef struct {
+    float sin;
+    float cos;
+} AngleSinCos;
+
+typedef struct {
+    float alpha;
+    float theta;
+    float I;
+} State;
+
+typedef struct {
+    float alpha;
+    float theta;
+    float Kp;
+    float Ki;
+    float Kd;
+} Ref;
+
+typedef struct {
+    int lon;
+    int lat;
+} View;
+
+
+#endif //CONDIVISO_H
