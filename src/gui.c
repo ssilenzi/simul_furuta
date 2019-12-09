@@ -156,48 +156,72 @@ int gui_init(){
 }
 
 //----------- gui
-void gui(State state_new, Ref ref_new, View view_new) {
+void* gui(void* arg){
+	int id;							// task index
+	id = get_task_index(arg);		// retrieve the task index
+	set_activation(id);
+	
 	static State state_old = {1, 1, 1};
+	static State state_new = {1, 1, 1};
     static Ref ref_old = {1, 1, 1, 1, 1};
-    static View view_old = {1, 1};
+	static Ref ref_new = {1, 1, 1, 1, 1};
+	static View view_old = {1, 1};
+	static View view_new = {1, 1};
+
 	char refalphastr[30], alphastr[30], thetastr[30];	// stringhe di comunicazione che vengono aggiornate
 	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
+	
+	while(!end){
+		// rendo locali le variabili, cosi` da usare un solo semaforo
+		pthread_mutex_lock(&mux_state);
+			state_new = state;
+		pthread_mutex_unlock(&mux_state);
+		pthread_mutex_lock(&mux_ref);
+			ref_new = ref;
+		pthread_mutex_unlock(&mux_ref);
+		pthread_mutex_lock(&mux_state);
+			view_new = view;
+		pthread_mutex_unlock(&mux_state);
+		
+		// ANIMAZIONE
+		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
+			vista_alto(state_new.alpha, ref_new.alpha);
+			draw = 1;
+		}
 
-	// ANIMAZIONE
-	if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
-		vista_alto(state_new.alpha, ref_new.alpha);
-		draw = 1;
+		if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
+			vista_lato(state_new.theta, ref_new.theta);
+			draw = 1;
+		}
+
+		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
+			ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
+			vista_asson(state_new.alpha, ref_new.alpha, state_new.theta, ref_new.theta, view_new.lon, view_new.lat);
+			draw = 1;
+		}
+
+		// SCRITTE
+		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha) {
+
+			// Riferimento
+			textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
+			sprintf(refalphastr, "alpha = %5.2f, i/o -+%d  ", ref_new.alpha, INCR_ANG);
+			textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
+			// Stato
+			textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
+			sprintf(alphastr, "alpha = %5.2f, k/l -+%d     ", state_new.alpha, INCR_ANG);
+			textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
+			sprintf(thetastr, "theta = %5.2f, n/m -+%d     ", state_new.theta, INCR_ANG);
+			textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
+			draw = 1;
+		}
+
+		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+		state_old = state_new; ref_old = ref_new; view_old = view_new;
+		
+		wait_for_period(id);		// wait to next period
 	}
-
-	if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
-		vista_lato(state_new.theta, ref_new.theta);
-		draw = 1;
-	}
-
-	if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
-		ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
-		vista_asson(state_new.alpha, ref_new.alpha, state_new.theta, ref_new.theta, view_new.lon, view_new.lat);
-		draw = 1;
-	}
-
-	// SCRITTE
-	if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha) {
-
-		// Riferimento
-		textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
-		sprintf(refalphastr, "alpha = %5.2f, i/o -+%d  ", ref_new.alpha, INCR_ANG);
-		textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
-		// Stato
-		textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
-		sprintf(alphastr, "alpha = %5.2f, k/l -+%d     ", state_new.alpha, INCR_ANG);
-		textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
-		sprintf(thetastr, "theta = %5.2f, n/m -+%d     ", state_new.theta, INCR_ANG);
-		textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
-		draw = 1;
-	}
-
-	if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-	state_old = state_new; ref_old = ref_new; view_old = view_new;
+	return 0;
 }
 
 //----------- rad

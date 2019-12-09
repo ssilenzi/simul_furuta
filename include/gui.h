@@ -9,22 +9,26 @@
 #include <math.h>
 #include <allegro.h>
 
+#include "ptask.h"
 #include "condiviso.h"
 #include "os.h"
 
-// variabili extern
+// Variabili extern
 extern Ref ref;
 extern State state;
 extern View view;
 extern int end;
-
+extern int end_pc;
+extern pthread_mutex_t 		mux_state;			// mutual exclusion for state
+extern pthread_mutex_t 		mux_ref;			// mutual exclusion for ref
+extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
 
 
 //inizializza gui
 int gui_init();
 
 // GUI
-void gui(State state_new, Ref ref_new, View view_new);
+void* gui(void* arg);
 
 
 

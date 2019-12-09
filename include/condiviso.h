@@ -16,7 +16,7 @@
 #define LAT_MAX             90
 #define INCR_ANG            5
 
-// grafica
+// gui
 #define GRAFICA_LINUX       GFX_AUTODETECT_WINDOWED
 #define GRAFICA_WIN32       GFX_GDI
 #define WSCREEN             1024
@@ -41,9 +41,24 @@
 #define COL_VERT            makecol(0,0,0)
 #define COL_RIF				makecol(128, 128, 128)
 
-// task
-#define ID_STATE_UPDATE     1
 
+//----------- tasks
+// state_update
+#define ID_STATE_UPDATE		10
+#define PRIO_STATE_UPDATE	60
+#define PERIOD_STATE_UPDATE	20
+	
+// gui
+#define FPS					40
+#define ID_GUI				100
+#define PRIO_GUI			20
+
+
+// keys
+#define ID_KEYS				200
+#define PRIO_KEYS			10
+#define PERIOD_KEYS			20
+	
 //----------- types, definizioni
 // types per gui
 typedef struct {

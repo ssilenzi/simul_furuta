@@ -17,10 +17,15 @@ extern State state;
 extern View view;
 extern int end;
 extern int end_pc;
+extern pthread_mutex_t 		mux_state;			// mutual exclusion for state
+extern pthread_mutex_t 		mux_ref;			// mutual exclusion for ref
+extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
+
+
 
 
 //keys
-void keys(State *state, Ref *ref, View *view);
+void* keys(void* arg);
 
 // get_keycodes
 void get_keycodes(char *scan, char *ascii);

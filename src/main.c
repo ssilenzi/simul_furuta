@@ -40,20 +40,27 @@ int init(){
     return 0;
 }
 
+//----------- exit
+int exiting(){
+	printf("Chiusura thread...\n");
+	wait_for_task_end(ID_STATE_UPDATE);
+	printf("Chiusura Allegro...\n");
+	allegro_exit();	
+	return 0;
+}
+
+//int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
+// period = drel (rate monotonic)
 
 //----------- main 
 int main()
 {    
     init();
-	do {
-		gui(state, ref, view);        // Update gui se cambia qualcosa
-		keys(&state, &ref, &view);    // Interazioni con tastiera
-		//state.alpha = atan2f(sinf(par.alpha/180*M_PI), cosf(par.alpha/180*M_PI))*180/M_PI;
-		//state.theta = atan2f(sinf(par.theta/180*M_PI), cosf(par.theta/180*M_PI))*180/M_PI;
-	} while (!end);
+	task_create(keys, ID_KEYS, PERIOD_KEYS, PERIOD_KEYS, PRIO_KEYS);		// Interazioni con tastiera
+	task_create(gui, ID_STATE_UPDATE, 1000/FPS, 1000/FPS, PRIO_GUI);			// update interfaccia
     
-	wait_for_task_end(ID_STATE_UPDATE);
-	allegro_exit();
+	exiting();
+	
 	return 0;
 }
 

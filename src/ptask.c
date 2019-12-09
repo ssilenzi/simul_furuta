@@ -17,8 +17,8 @@ int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
 	//setup thread
 	pthread_attr_init(&myatt);			// default are: joinable, 2MB stack
 	// need root ----------------- commenta per fare prove non RT
-	//pthread_attr_setinheritsched(&myatt, PTHREAD_EXPLICIT_SCHED);				// use another scheduler
-	//pthread_attr_setschedpolicy(&myatt, SCHED_FIFO);							// scheduler fifo
+	pthread_attr_setinheritsched(&myatt, PTHREAD_EXPLICIT_SCHED);				// use another scheduler
+	pthread_attr_setschedpolicy(&myatt, SCHED_FIFO);							// scheduler fifo
 	// ---------------------------
 	mypar.sched_priority = tp[i].priority;										// set task priority
 	pthread_attr_setschedparam(&myatt, &mypar);									// setup parameters and attributes
