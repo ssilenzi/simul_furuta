@@ -4,11 +4,17 @@
 #include <stdbool.h>
 #include <pthread.h>
 
-
 //----------- costanti, definizioni
 // stato
 #define ALPHA_0             0
+#define ALPHADOT_0			0
 #define THETA_0             0
+#define THETADOT_0			0
+#define CURRENT_0			0
+#define VOLTAGE_0			0
+#define CCR_0				0
+#define ENC_ALPHA_0			0
+#define ENC_THETA_0			0
 
 // view
 #define LON_0               45
@@ -41,23 +47,33 @@
 #define COL_VERT            makecol(0,0,0)
 #define COL_RIF				makecol(128, 128, 128)
 
+// par_control	
+#define KP_ALPHA_DEF 		1 // Valori di default delle costanti per i controllori
+#define KD_ALPHA_DEF 		1 // P = proporzionale, D = derivativo
+#define KP_THETA_DEF 		1 // su = swing up
+#define KD_THETA_DEF 		1
+#define KSU_DEF 			1
 
 //----------- tasks
 // state_update
 #define ID_STATE_UPDATE		10
-#define PRIO_STATE_UPDATE	60
-#define PERIOD_STATE_UPDATE	20
+#define PRIO_STATE_UPDATE	90
+#define PERIOD_STATE_UPDATE	10
 	
 // gui
-#define FPS					40
 #define ID_GUI				100
 #define PRIO_GUI			20
-
+#define FPS					60
 
 // keys
 #define ID_KEYS				200
 #define PRIO_KEYS			10
 #define PERIOD_KEYS			20
+	
+// control
+#define ID_CONTROL			300
+#define PRIO_CONTROL		50
+#define PERIOD_CONTROL		40
 	
 //----------- types, definizioni
 // types per gui
@@ -85,23 +101,44 @@ typedef struct {
 } AngleSinCos;
 
 typedef struct {
-    float alpha;
-    float theta;
-    float I;
+    float alpha;		// angolo con asta orizzontale
+	float alphadot;		// velocita` di alpha 
+    float theta;		// angolo con asta verticale
+	float thetadot;		// velocita` di theta
+	float current;		// corrente motore
+    float voltage;		// voltaggio motore
+	float ccr;			// capture compare register (per settare duty cicle del pwm del motore)
+	float enc_alpha;	// lettura encoder per l'angolo alpha
+	float enc_theta;	// lettura encoder per l'angolo theta
 } State;
 
 typedef struct {
     float alpha;
     float theta;
-    float Kp;
-    float Ki;
-    float Kd;
 } Ref;
+
+typedef struct{
+	float alpha_kp;
+	float alpha_kd;
+	float theta_kp;
+	float theta_kd;
+	float ksu;
+} Par_control;
+
 
 typedef struct {
     int lon;
     int lat;
 } View;
+
+typedef struct{
+	int brake;
+	State state;
+	Par_control par_control;
+	Ref ref;
+} Buffer;
+
+
 
 
 #endif //CONDIVISO_H

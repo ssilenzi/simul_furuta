@@ -72,11 +72,11 @@ int gui_init(){
 	// Disegno rettangoli e elementi statici
 	//rett1 - parametri, sinistra
 	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
-	char exit[50], reset1[50], reset2[50], reset3[50], state_pause[50];
+	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], state_pause[50],control_pause[50];
 	sprintf(exit, "Premere Esc per uscire");
 	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
 
-	sprintf(reset1, "R per resettare");
+	sprintf(reset1, "R per resettare stato e riferimento");
 	textout_ex(scrbuf, font, reset1, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
 
 	sprintf(reset2, "Up, down, left right per modificare la vista");
@@ -87,7 +87,15 @@ int gui_init(){
 
     sprintf(state_pause, "A pause/unpause la simulazione");
 	textout_ex(scrbuf, font, state_pause, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
-    
+	
+    sprintf(control_pause, "S pause/unpause il controllo");
+	textout_ex(scrbuf, font, control_pause, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);
+	
+	sprintf(reset4, "E per resettare i parametri del controllore");
+	textout_ex(scrbuf, font, reset4, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
+	
+	
+	
 	TwoPoints rett_asso, rett_alto, rett_lato;
 	Point titolo_asso, titolo_alto, titolo_lato;
 	char assonstr[50], altostr[50], latostr[50];
@@ -161,14 +169,28 @@ void* gui(void* arg){
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
 	
-	static State state_old = {1, 1, 1};
-	static State state_new = {1, 1, 1};
-    static Ref ref_old = {1, 1, 1, 1, 1};
-	static Ref ref_new = {1, 1, 1, 1, 1};
+	static State state_old = 
+		{ALPHA_0+1, 
+		ALPHADOT_0+1,
+		THETA_0+1,
+		THETADOT_0+1,
+		CURRENT_0+1,
+		VOLTAGE_0+1,
+		CCR_0+1,
+		ENC_ALPHA_0+1,
+		ENC_THETA_0+1
+		};
+	static State state_new;
+    static Ref ref_old = {1, 1};
+	static Ref ref_new = {1, 1};
 	static View view_old = {1, 1};
 	static View view_new = {1, 1};
 
-	char refalphastr[30], alphastr[30], thetastr[30];	// stringhe di comunicazione che vengono aggiornate
+	static Par_control par_control_old = {KP_ALPHA_DEF+1, KD_ALPHA_DEF+1, KP_THETA_DEF+1, KD_THETA_DEF+1, KSU_DEF +1};
+	static Par_control par_control_new = {KP_ALPHA_DEF+1, KD_ALPHA_DEF+1, KP_THETA_DEF+1, KD_THETA_DEF+1, KSU_DEF +1};
+
+	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[14]; // stringhe di comunicazione che vengono aggiornate
+	char parcontrstralpha[30], parcontrstrtheta[30],parcontrstrsu[22];	
 	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 	
 	while(!end){
@@ -182,6 +204,10 @@ void* gui(void* arg){
 		pthread_mutex_lock(&mux_state);
 			view_new = view;
 		pthread_mutex_unlock(&mux_state);
+		pthread_mutex_lock(&mux_parcontr);
+			par_control_new = par_control;
+		pthread_mutex_unlock(&mux_parcontr);
+	
 		
 		// ANIMAZIONE
 		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
@@ -201,7 +227,8 @@ void* gui(void* arg){
 		}
 
 		// SCRITTE
-		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha) {
+		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.ksu != par_control_old.ksu ||par_control_new.alpha_kd != par_control_old.alpha_kd ||par_control_new.alpha_kp != par_control_old.alpha_kp ||par_control_new.theta_kd != par_control_old.alpha_kd|| par_control_new.theta_kp != par_control_old.theta_kp) 
+		{
 
 			// Riferimento
 			textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
@@ -213,11 +240,22 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
 			sprintf(thetastr, "theta = %5.2f, n/m -+%d     ", state_new.theta, INCR_ANG);
 			textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
+			sprintf(voltagestr, "Volt = %5.2fV", state_new.voltage);
+			textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
+			// Par control
+			textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
+			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f, Kd = %5.2f", par_control_new.alpha_kp, par_control_new.alpha_kd);
+			textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
+			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f, Kd = %5.2f", par_control_new.theta_kp, par_control_new.theta_kd);
+			textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
+			sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f", par_control_new.ksu);
+			textout_ex(scrbuf, font, parcontrstrsu,scritte.x, scritte.y[12], col.scr, col.bck);
+			
 			draw = 1;
 		}
 
 		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-		state_old = state_new; ref_old = ref_new; view_old = view_new;
+		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old=par_control_new;
 		
 		wait_for_period(id);		// wait to next period
 	}
