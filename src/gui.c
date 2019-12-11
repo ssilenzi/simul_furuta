@@ -72,27 +72,31 @@ int gui_init(){
 	// Disegno rettangoli e elementi statici
 	//rett1 - parametri, sinistra
 	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
-	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], state_pause[50],control_pause[50];
+	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], motor_pause[50]; //state_pause[50],control_pause[50];
 	sprintf(exit, "Premere Esc per uscire");
 	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
 
 	sprintf(reset1, "R per resettare stato e riferimento");
-	textout_ex(scrbuf, font, reset1, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
+	textout_ex(scrbuf, font, reset1, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
 
 	sprintf(reset2, "Up, down, left right per modificare la vista");
-	textout_ex(scrbuf, font, reset2, scritte.x, scritte.y[qdistvert-3], col.scr, col.bck);
+	textout_ex(scrbuf, font, reset2, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
 
 	sprintf(reset3, "T per resettare la vista");
-	textout_ex(scrbuf, font, reset3, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
+	textout_ex(scrbuf, font, reset3, scritte.x, scritte.y[qdistvert-3], col.scr, col.bck);
 
-    sprintf(state_pause, "A pause/unpause la simulazione");
-	textout_ex(scrbuf, font, state_pause, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
-	
-    sprintf(control_pause, "S pause/unpause il controllo");
-	textout_ex(scrbuf, font, control_pause, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);
-	
 	sprintf(reset4, "E per resettare i parametri del controllore");
-	textout_ex(scrbuf, font, reset4, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
+	textout_ex(scrbuf, font, reset4, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
+	
+	sprintf(motor_pause, "W spegne/accende il motore, default spento");
+	textout_ex(scrbuf, font, motor_pause, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);
+	
+    // sprintf(state_pause, "A pause/unpause la simulazione");
+	// textout_ex(scrbuf, font, state_pause, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
+	
+    
+	
+	
 	
 	
 	
@@ -191,6 +195,7 @@ void* gui(void* arg){
 
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[14]; // stringhe di comunicazione che vengono aggiornate
 	char parcontrstralpha[30], parcontrstrtheta[30],parcontrstrsu[22];	
+	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 	
 	while(!end){
@@ -250,12 +255,21 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
 			sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f", par_control_new.ksu);
 			textout_ex(scrbuf, font, parcontrstrsu,scritte.x, scritte.y[12], col.scr, col.bck);
-			
+			// deadline_miss
+			textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[14], col.scr, col.bck);
+			sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
+			textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[15], col.scr, col.bck);
+			sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
+			textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[16], col.scr, col.bck);
 			draw = 1;
 		}
 
 		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old=par_control_new;
+		
+		if(deadline_miss(id)){
+			dl_miss_gui+=1;
+		}
 		
 		wait_for_period(id);		// wait to next period
 	}

@@ -1,5 +1,5 @@
 #ifndef CONDIVISO_H
-#define CONDIVISO_H
+	#define CONDIVISO_H
 
 #include <stdbool.h>
 #include <pthread.h>
@@ -54,15 +54,30 @@
 #define KD_THETA_DEF 		1
 #define KSU_DEF 			1
 
-//----------- tasks
+//----------- tasks, in ordine di priorita`
 // state_update
 #define ID_STATE_UPDATE		10
-#define PRIO_STATE_UPDATE	90
-#define PERIOD_STATE_UPDATE	10
-	
+#define PRIO_STATE_UPDATE	99
+#define PERIOD_STATE_UPDATE	4
+
+// control
+#define ID_CONTROL			300
+#define PRIO_CONTROL		90
+#define PERIOD_CONTROL		40
+
+// compc
+#define ID_COMPC			400
+#define PRIO_COMPC			30
+#define PERIOD_COMPC		20
+
+// comboard
+#define ID_COMBOARD			500
+#define PRIO_COMBOARD		30
+#define PERIOD_COMBOARD		20
+
 // gui
 #define ID_GUI				100
-#define PRIO_GUI			20
+#define PRIO_GUI			50
 #define FPS					60
 
 // keys
@@ -70,10 +85,11 @@
 #define PRIO_KEYS			10
 #define PERIOD_KEYS			20
 	
-// control
-#define ID_CONTROL			300
-#define PRIO_CONTROL		50
-#define PERIOD_CONTROL		40
+
+
+
+
+
 	
 //----------- types, definizioni
 // types per gui
@@ -100,6 +116,8 @@ typedef struct {
     float cos;
 } AngleSinCos;
 
+// types usati da piu` task
+
 typedef struct {
     float alpha;		// angolo con asta orizzontale
 	float alphadot;		// velocita` di alpha 
@@ -118,11 +136,11 @@ typedef struct {
 } Ref;
 
 typedef struct{
-	float alpha_kp;
-	float alpha_kd;
-	float theta_kp;
-	float theta_kd;
-	float ksu;
+	float alpha_kp;		// guadagno proporzionale controllore su alpha
+	float alpha_kd;		// guadagno derivativo controllore su alpha
+	float theta_kp;		// guadagno proporzionale controllore su theta
+	float theta_kd;		// guadagno derivativo controllore su theta
+	float ksu;			// guadagno del controllore di swing up
 } Par_control;
 
 

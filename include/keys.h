@@ -9,7 +9,7 @@
 #include <allegro.h>
 #include "ptask.h"
 #include "condiviso.h"
-#include "physic.h"
+#include "simulation.h"
 
 // Variabili extern
 extern Ref ref;
@@ -19,13 +19,13 @@ extern View view;
 extern Par_control par_control;
 
 extern int end;
-extern int end_su;
-extern int end_c;
+extern int dl_miss_keys;
 
 extern pthread_mutex_t 		mux_state;			// mutual exclusion for state
 extern pthread_mutex_t 		mux_ref;			// mutual exclusion for ref
 extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
 extern pthread_mutex_t 		mux_parcontr;		// mutual exclusion for par_control
+extern pthread_mutex_t 		mux_brake;			// mutual exclusion for brake
 
 
 

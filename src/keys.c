@@ -1,7 +1,7 @@
 #include "keys.h"
 
-int stateupd_active = 0;
-int control_active = 0;
+//int stateupd_active = 0;
+//int control_active = 0;
 
 void* keys(void* arg){
 	int id;							// task index
@@ -15,38 +15,51 @@ void* keys(void* arg){
 			
 			// A pausa/unpausa state_update, se e` attivo control mentre e` attivo anche state_update pausa/unpausa anche quello
 			if (scan==KEY_A) {
+				/*
 				if(stateupd_active){
-					end_su = 1;
+					//end_su = 1;
 					stateupd_active = 0;
 				}
 				else{
-					end_su = 0;
+					//end_su = 0;
 					stateupd_active = 1;
 				}
 				if(stateupd_active){
-					task_create(state_update, ID_CONTROL, PERIOD_CONTROL, PERIOD_CONTROL, PRIO_CONTROL);								// task controllo
 				}
-			
+				*/
 			}
 			// Create Thread state_update e control
 			if (scan==KEY_S) {
+				/*
 				if(control_active){
-					end_c = 1;
+					//end_c = 1;
 					control_active = 0;
 				}
 				else{
-					end_c = 0;
+					//end_c = 0;
 					control_active = 1;
 				}
 				if(control_active){
 					task_create(control, ID_CONTROL, PERIOD_CONTROL, PERIOD_CONTROL, PRIO_CONTROL);								// task controllo
 				}
+				*/
+			}
+			
+			if (scan == KEY_W){
+				pthread_mutex_lock(&mux_brake);
+				if(brake){
+					brake = 0;
+				}else{
+					brake = 1;
+				}
+				pthread_mutex_unlock(&mux_brake);
+				
 			}
 			
 			// End Threads
 			if (scan==KEY_ESC) {
-				end_su =1;
-				end_c = 1;
+				//end_su =1;
+				//end_c = 1;
 				end = 1;
 			}
 			
@@ -162,7 +175,10 @@ void* keys(void* arg){
 			pthread_mutex_unlock(&mux_view);				
 			}
 		} // end keypressed
-	
+		
+	if(deadline_miss(id)){
+			dl_miss_keys+=1;
+	}
 	wait_for_period(id);			// wait to next period
 	
 	}

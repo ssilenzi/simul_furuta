@@ -19,12 +19,21 @@ extern State state;
 extern View view;
 extern Par_control par_control;
 
+extern int dl_miss_gui;
+extern int dl_miss_keys;
+extern int dl_miss_compc;
+extern int dl_miss_control;
+extern int dl_miss_state_update;
+extern int dl_miss_comboard;
+
 extern int end;
+
 
 extern pthread_mutex_t 		mux_state;			// mutual exclusion for state
 extern pthread_mutex_t 		mux_ref;			// mutual exclusion for ref
 extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
 extern pthread_mutex_t 		mux_parcontr;		// mutual exclusion for par_control
+
 
 
 //inizializza gui
