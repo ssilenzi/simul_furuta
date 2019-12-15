@@ -12,7 +12,18 @@
 #include "simulation.h"
 
 //----------- Risorse condivise
-State state=
+
+/*
+ * _pc = variabile su pc
+ * _board = variabile sulla scheda simulata
+ * _buffer = variabile su buffer
+ * 
+ */
+
+
+
+//state
+/*State state_buffer= 
 	{ALPHA_0, 
 	ALPHADOT_0,
 	THETA_0,
@@ -23,6 +34,36 @@ State state=
 	ENC_ALPHA_0,
 	ENC_THETA_0
 	}; 			// struct stato
+pthread_mutex_t 	mux_state_buffer = PTHREAD_MUTEX_INITIALIZER;
+*/
+
+/*State state_board=
+	{ALPHA_0, 
+	ALPHADOT_0,
+	THETA_0,
+	THETADOT_0,
+	CURRENT_0,
+	VOLTAGE_0,
+	CCR_0,
+	ENC_ALPHA_0,
+	ENC_THETA_0
+	}; 
+pthread_mutex_t 	mux_state_board = PTHREAD_MUTEX_INITIALIZER;
+	*/
+	
+State state_pc=
+	{ALPHA_0, 
+	ALPHADOT_0,
+	THETA_0,
+	THETADOT_0,
+	CURRENT_0,
+	VOLTAGE_0,
+	CCR_0,
+	ENC_ALPHA_0,
+	ENC_THETA_0
+	};
+pthread_mutex_t 	mux_state_pc = PTHREAD_MUTEX_INITIALIZER;
+
 	
 State state_reset = 
 	{ALPHA_0, 
@@ -34,14 +75,34 @@ State state_reset =
 	CCR_0,
 	ENC_ALPHA_0,
 	ENC_THETA_0
-	};			// struct stato per il reset
+	};// struct stato per il reset
 
-Par_control par_control = 
+	
+//par_control
+/*Par_control par_control_buffer = 
 	{KP_ALPHA_DEF, 
 	KD_ALPHA_DEF, 
 	KP_THETA_DEF, 
 	KD_THETA_DEF, 
 	KSU_DEF};	// struct con parametri del controllore
+*/
+	
+Par_control par_control_pc = 
+	{KP_ALPHA_DEF, 
+	KD_ALPHA_DEF, 
+	KP_THETA_DEF, 
+	KD_THETA_DEF, 
+	KSU_DEF};	// struct con parametri del controllore
+pthread_mutex_t 	mux_parcontr_pc = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per par_control
+/*
+Par_control par_control_board = 
+	{KP_ALPHA_DEF, 
+	KD_ALPHA_DEF, 
+	KP_THETA_DEF, 
+	KD_THETA_DEF, 
+	KSU_DEF};	// struct con parametri del controllore
+pthread_mutex_t 	mux_parcontr_board = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per par_control
+*/
 
 Par_control par_control_reset = 
 	{KP_ALPHA_DEF, 
@@ -51,21 +112,31 @@ Par_control par_control_reset =
 	KSU_DEF};	// struct con parmetri del controllore di default
 
 	
-Ref ref = {ALPHA_0, THETA_0};					// struct riferimento 
-
-View view = {LON_0, LAT_0};						// struct vista
-
 int end = 0;			// regola chiusura threads
+
 int brake = 1;			// spegne il motore ma non la scheda consentendo di continuare la lettura degli encoder
+pthread_mutex_t		mux_brake = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per brake
+	
+	
+// Variabili solo PC	
+Ref ref_pc = {ALPHA_0, THETA_0};		// struct riferimento 
+pthread_mutex_t 	mux_ref_pc = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per ref
+//Ref ref_board = {ALPHA_0, THETA_0};		// struct riferimento 
+//pthread_mutex_t 	mux_ref_board = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per ref
+
+//Ref ref = {ALPHA_0, THETA_0};		// struct riferimento 
+
+
+View view = {LON_0, LAT_0};			// struct vista
+
+
+
+
 
 //----------- Mutex per le risorse condivise
-pthread_mutex_t 	mux_state = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per state
-pthread_mutex_t 	mux_ref = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per ref
+
 pthread_mutex_t 	mux_view = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per view
-pthread_mutex_t 	mux_parcontr = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per par_control
-pthread_mutex_t		mux_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per buffer
-pthread_mutex_t		mux_brake = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per brake
-//DA FARE TUTTA LA DISTINZIONE TRA VARIABILI PC E BOARD
+//pthread_mutex_t		mux_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per buffer UHMUHMUHM
 
 // Counter deadline miss
 int dl_miss_gui = 0;
@@ -112,7 +183,7 @@ int main()
 	task_create(comboard, ID_COMBOARD, PERIOD_COMBOARD, PERIOD_COMBOARD, PRIO_COMBOARD);						// task comunicazione dalla scheda su buffer
 
 	// task pc
-	task_create(comboard, ID_COMPC, PERIOD_COMPC, PERIOD_COMPC, PRIO_COMPC);									// task comunicazione dal pc su buffer
+	task_create(compc, ID_COMPC, PERIOD_COMPC, PERIOD_COMPC, PRIO_COMPC);									// task comunicazione dal pc su buffer
 	task_create(keys, ID_KEYS, PERIOD_KEYS, PERIOD_KEYS, PRIO_KEYS);											// Interazioni con tastiera (dentro c'e` attivazione state_update e control)
 	task_create(gui, ID_GUI, 1000/FPS, 1000/FPS, PRIO_GUI);														// update interfaccia
 	

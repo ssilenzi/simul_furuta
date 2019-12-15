@@ -53,6 +53,7 @@
 #define KP_THETA_DEF 		1 // su = swing up
 #define KD_THETA_DEF 		1
 #define KSU_DEF 			1
+#define INCR_K				1 // incremento da tastiera 
 
 //----------- tasks, in ordine di priorita`
 // state_update
@@ -77,7 +78,7 @@
 
 // gui
 #define ID_GUI				100
-#define PRIO_GUI			50
+#define PRIO_GUI			20
 #define FPS					60
 
 // keys

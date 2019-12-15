@@ -1,6 +1,30 @@
 #include "gui.h"
 
 
+// Variabili extern
+extern Ref 					ref_pc;
+extern pthread_mutex_t 		mux_ref_pc;			// mutual exclusion for ref
+extern State 				state_pc;
+extern pthread_mutex_t 		mux_state_pc;
+extern View 				view;
+extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
+extern Par_control 			par_control_pc;
+extern pthread_mutex_t 		mux_parcontr_pc;		// mutual exclusion for par_control_pc
+extern int 					dl_miss_gui;
+extern int 					dl_miss_keys;
+extern int 					dl_miss_compc;
+extern int 					dl_miss_control;
+extern int 					dl_miss_state_update;
+extern int 					dl_miss_comboard;
+extern int 					end;
+
+
+
+
+
+
+
+
 static BITMAP *scrbuf;
 static Point asson0, lato0, alto0; //centro rettangoli
 static TwoPoints resetasson, resetlato, resetalto; //angoli dell'area da resettare prima di disegnare di nuovo
@@ -193,25 +217,25 @@ void* gui(void* arg){
 	static Par_control par_control_old = {KP_ALPHA_DEF+1, KD_ALPHA_DEF+1, KP_THETA_DEF+1, KD_THETA_DEF+1, KSU_DEF +1};
 	static Par_control par_control_new = {KP_ALPHA_DEF+1, KD_ALPHA_DEF+1, KP_THETA_DEF+1, KD_THETA_DEF+1, KSU_DEF +1};
 
-	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[14]; // stringhe di comunicazione che vengono aggiornate
-	char parcontrstralpha[30], parcontrstrtheta[30],parcontrstrsu[22];	
+	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; // stringhe di comunicazione che vengono aggiornate
+	char parcontrstralpha[42], parcontrstrtheta[42],parcontrstrsu[34];	
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 	
 	while(!end){
 		// rendo locali le variabili, cosi` da usare un solo semaforo
-		pthread_mutex_lock(&mux_state);
-			state_new = state;
-		pthread_mutex_unlock(&mux_state);
-		pthread_mutex_lock(&mux_ref);
-			ref_new = ref;
-		pthread_mutex_unlock(&mux_ref);
-		pthread_mutex_lock(&mux_state);
+		pthread_mutex_lock(&mux_state_pc);
+			state_new = state_pc;
+		pthread_mutex_unlock(&mux_state_pc);
+		pthread_mutex_lock(&mux_ref_pc);
+			ref_new = ref_pc;
+		pthread_mutex_unlock(&mux_ref_pc);
+		pthread_mutex_lock(&mux_state_pc);
 			view_new = view;
-		pthread_mutex_unlock(&mux_state);
-		pthread_mutex_lock(&mux_parcontr);
-			par_control_new = par_control;
-		pthread_mutex_unlock(&mux_parcontr);
+		pthread_mutex_unlock(&mux_state_pc);
+		pthread_mutex_lock(&mux_parcontr_pc);
+			par_control_new = par_control_pc;
+		pthread_mutex_unlock(&mux_parcontr_pc);
 	
 		
 		// ANIMAZIONE
@@ -237,23 +261,23 @@ void* gui(void* arg){
 
 			// Riferimento
 			textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
-			sprintf(refalphastr, "alpha = %5.2f, i/o -+%d  ", ref_new.alpha, INCR_ANG);
+			sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref_new.alpha, INCR_ANG);
 			textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
 			// Stato
 			textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
-			sprintf(alphastr, "alpha = %5.2f, k/l -+%d     ", state_new.alpha, INCR_ANG);
+			sprintf(alphastr, "alpha = %5.2f    ", state_new.alpha);
 			textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
-			sprintf(thetastr, "theta = %5.2f, n/m -+%d     ", state_new.theta, INCR_ANG);
+			sprintf(thetastr, "theta = %5.2f    ", state_new.theta);
 			textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
-			sprintf(voltagestr, "Volt = %5.2fV", state_new.voltage);
+			sprintf(voltagestr, "Volt = %5.2f V", state_new.voltage);
 			textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
 			// Par control
 			textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
-			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f, Kd = %5.2f", par_control_new.alpha_kp, par_control_new.alpha_kd);
+			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control_new.alpha_kp, par_control_new.alpha_kd);
 			textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
-			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f, Kd = %5.2f", par_control_new.theta_kp, par_control_new.theta_kd);
+			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control_new.theta_kp, par_control_new.theta_kd);
 			textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
-			sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f", par_control_new.ksu);
+			sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f n/m    ", par_control_new.ksu);
 			textout_ex(scrbuf, font, parcontrstrsu,scritte.x, scritte.y[12], col.scr, col.bck);
 			// deadline_miss
 			textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[14], col.scr, col.bck);

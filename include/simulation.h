@@ -7,23 +7,6 @@
 #include "ptask.h"
 #include "condiviso.h"
 
-//----------- Variabili extern 
-extern Ref ref;
-extern State state;
-extern Par_control par_control;
-
-extern int end;
-extern int brake;
-extern int dl_miss_control;
-extern int dl_miss_state_update;
-extern int dl_miss_comboard;
-extern int dl_miss_compc;
-
-extern pthread_mutex_t 		mux_state;			// mutual exclusion for state
-extern pthread_mutex_t 		mux_ref;			// mutual exclusion for ref
-extern pthread_mutex_t 		mux_parcontr;		// mutual exclusion for par_control
-extern pthread_mutex_t 		mux_brake;			// mutual exclusion for brake
-
 
 
 //----------- Task

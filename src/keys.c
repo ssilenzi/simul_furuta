@@ -1,7 +1,24 @@
 #include "keys.h"
 
-//int stateupd_active = 0;
-//int control_active = 0;
+// Variabili extern
+extern Ref 					ref_pc;
+extern pthread_mutex_t 		mux_ref_pc;
+extern State 				state_pc;
+extern State 				state_board;
+extern State 				state_reset;
+extern pthread_mutex_t 		mux_state_pc;
+extern pthread_mutex_t 		mux_state_board;
+extern View 				view;
+extern pthread_mutex_t 		mux_view;
+extern Par_control 			par_control_pc;
+extern Par_control 			par_control_reset;
+extern pthread_mutex_t 		mux_parcontr_pc;
+extern int 					brake;
+extern pthread_mutex_t 		mux_brake;
+
+extern int dl_miss_keys;
+
+extern int end;
 
 void* keys(void* arg){
 	int id;							// task index
@@ -13,38 +30,28 @@ void* keys(void* arg){
 		if (keypressed()) {  		// importante altrimenti readkey blocca l'esecuzione
 			get_keycodes(&scan, &ascii);
 			
-			// A pausa/unpausa state_update, se e` attivo control mentre e` attivo anche state_update pausa/unpausa anche quello
-			if (scan==KEY_A) {
-				/*
-				if(stateupd_active){
-					//end_su = 1;
-					stateupd_active = 0;
-				}
-				else{
-					//end_su = 0;
-					stateupd_active = 1;
-				}
-				if(stateupd_active){
-				}
-				*/
-			}
-			// Create Thread state_update e control
-			if (scan==KEY_S) {
-				/*
-				if(control_active){
-					//end_c = 1;
-					control_active = 0;
-				}
-				else{
-					//end_c = 0;
-					control_active = 1;
-				}
-				if(control_active){
-					task_create(control, ID_CONTROL, PERIOD_CONTROL, PERIOD_CONTROL, PRIO_CONTROL);								// task controllo
-				}
-				*/
+			
+			// ESC, end Threads e conseguente chiusura del programma
+			if (scan==KEY_ESC) {
+				end = 1;
 			}
 			
+			// R, reset state_pc e ref_pc
+			if (scan == KEY_R) {
+				//Devo resettare per forza state_board, il flusso di update su state e`: board -> buffer -> pc
+				
+				pthread_mutex_lock(&mux_state_board);
+					state_board = state_reset;
+				pthread_mutex_unlock(&mux_state_board);
+				
+				pthread_mutex_lock(&mux_ref_pc);
+					ref_pc.alpha = ALPHA_0;
+					ref_pc.theta = THETA_0;
+				pthread_mutex_unlock(&mux_ref_pc);
+				
+			}
+			
+			// W, attiva/disattiva il motore
 			if (scan == KEY_W){
 				pthread_mutex_lock(&mux_brake);
 				if(brake){
@@ -56,82 +63,92 @@ void* keys(void* arg){
 				
 			}
 			
-			// End Threads
-			if (scan==KEY_ESC) {
-				//end_su =1;
-				//end_c = 1;
-				end = 1;
+			/*
+			 * Par_control
+			 */
+			
+			// alpha kp
+			if(scan == KEY_Y){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.alpha_kp += INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			if(scan == KEY_U){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.alpha_kp += -INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			// alpha kd
+			if(scan == KEY_I){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.alpha_kd += INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			if(scan == KEY_O){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.alpha_kd += -INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
-			// reset state
-			if (scan == KEY_R) {
-				pthread_mutex_lock(&mux_state);
-					state = state_reset;
-				pthread_mutex_unlock(&mux_state);
-				pthread_mutex_lock(&mux_ref);
-					ref.alpha = ALPHA_0;
-					ref.theta = THETA_0;
-				pthread_mutex_unlock(&mux_ref);
-				
+			// theta kp
+			if(scan == KEY_H){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.theta_kp += INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			if(scan == KEY_J){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.theta_kp += -INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			// theta kd
+			if(scan == KEY_K){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.theta_kd += INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			if(scan == KEY_L){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.theta_kd += -INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
-			// reset par_control
+			// swingup
+			if(scan == KEY_N){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.ksu += INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			if(scan == KEY_M){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.ksu += -INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			
+			// E, reset par_control_pc
 			if(scan == KEY_E){
-				pthread_mutex_lock(&mux_parcontr);
-					par_control.alpha_kd = KD_ALPHA_DEF;
-					par_control.alpha_kp = KP_ALPHA_DEF;
-					par_control.theta_kd = KD_THETA_DEF;
-					par_control.theta_kp = KP_THETA_DEF;
-					par_control.ksu = KSU_DEF;
-				pthread_mutex_unlock(&mux_parcontr);
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc = par_control_reset;
+				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
 			
 			/*
 			*      RIFERIMENTO
 			*/
-
-			// REF_ALPHA a/z
-			if (scan==KEY_I) {
-				pthread_mutex_lock(&mux_ref);
-					ref.alpha += -INCR_ANG;
-				pthread_mutex_unlock(&mux_ref);
-				
+			// A, incrementa riferimento di alpha
+			if (scan==KEY_A) {
+				pthread_mutex_lock(&mux_ref_pc);
+					ref_pc.alpha += INCR_ANG;
+				pthread_mutex_unlock(&mux_ref_pc);
 			}
-			if (scan==KEY_O) {
-				pthread_mutex_lock(&mux_ref);
-					ref.alpha += INCR_ANG;
-				pthread_mutex_unlock(&mux_ref);
+			// S, diminuisce riferimento di alpha
+			if (scan==KEY_S) {
+				pthread_mutex_lock(&mux_ref_pc);
+					ref_pc.alpha += -INCR_ANG;
+				pthread_mutex_unlock(&mux_ref_pc);
 			}
 			
-			/*
-			*      STATO, andra` cancellato
-			*/
-			
-			// STATE_ALPHA k/l
-			if (scan==KEY_K) {
-				pthread_mutex_lock(&mux_state);
-					state.alpha += -INCR_ANG;
-				pthread_mutex_unlock(&mux_state);
-				
-			}
-			if (scan==KEY_L) {
-				pthread_mutex_lock(&mux_state);
-					state.alpha += INCR_ANG;
-				pthread_mutex_unlock(&mux_state);
-				
-			}
-			// STATE_THETA i/o
-			if (scan==KEY_N) {
-				pthread_mutex_lock(&mux_state);
-					state.theta += -INCR_ANG;
-				pthread_mutex_unlock(&mux_state);
-			}
-			if (scan==KEY_M) {
-				pthread_mutex_lock(&mux_state);
-					state.theta += INCR_ANG;
-				pthread_mutex_unlock(&mux_state);
-			}
 			
 			/*
 			*      VIEW
