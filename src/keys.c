@@ -15,7 +15,8 @@ extern Par_control 			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
 extern int 					brake;
 extern pthread_mutex_t 		mux_brake;
-
+extern int 					swingup;
+extern pthread_mutex_t		mux_swingup;
 extern int dl_miss_keys;
 
 extern int end;
@@ -60,6 +61,18 @@ void* keys(void* arg){
 					brake = 1;
 				}
 				pthread_mutex_unlock(&mux_brake);
+				
+			}
+			
+			// Q, attiva/disattiva controllore di swingup
+			if (scan == KEY_Q){
+				pthread_mutex_lock(&mux_swingup);
+				if(swingup){
+					swingup = 0;
+				}else{
+					swingup = 1;
+				}
+				pthread_mutex_unlock(&mux_swingup);
 				
 			}
 			

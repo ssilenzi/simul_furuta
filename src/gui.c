@@ -17,13 +17,8 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
-
-
-
-
-
-
-
+extern int 					brake;
+extern int 					swingup;
 
 static BITMAP *scrbuf;
 static Point asson0, lato0, alto0; //centro rettangoli
@@ -96,7 +91,7 @@ int gui_init(){
 	// Disegno rettangoli e elementi statici
 	//rett1 - parametri, sinistra
 	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
-	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], motor_pause[50]; //state_pause[50],control_pause[50];
+	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], motor_pause[50], swingup_pause[43]; //state_pause[50],control_pause[50];
 	sprintf(exit, "Premere Esc per uscire");
 	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
 
@@ -115,15 +110,10 @@ int gui_init(){
 	sprintf(motor_pause, "W spegne/accende il motore, default spento");
 	textout_ex(scrbuf, font, motor_pause, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);
 	
-    // sprintf(state_pause, "A pause/unpause la simulazione");
-	// textout_ex(scrbuf, font, state_pause, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
+	sprintf(swingup_pause, "Q attiva/disattiva swingup, default spento");
+	textout_ex(scrbuf, font, swingup_pause, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
 	
-    
-	
-	
-	
-	
-	
+	//-----------  disegno rettangoli
 	TwoPoints rett_asso, rett_alto, rett_lato;
 	Point titolo_asso, titolo_alto, titolo_lato;
 	char assonstr[50], altostr[50], latostr[50];
@@ -220,6 +210,7 @@ void* gui(void* arg){
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; // stringhe di comunicazione che vengono aggiornate
 	char parcontrstralpha[42], parcontrstrtheta[42],parcontrstrsu[34];	
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
+	char motor_str[18], swingup_str[31];
 	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 	
 	while(!end){
@@ -238,7 +229,7 @@ void* gui(void* arg){
 		pthread_mutex_unlock(&mux_parcontr_pc);
 	
 		
-		// ANIMAZIONE
+		//--------- ANIMAZIONE
 		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
 			vista_alto(state_new.alpha, ref_new.alpha);
 			draw = 1;
@@ -255,7 +246,7 @@ void* gui(void* arg){
 			draw = 1;
 		}
 
-		// SCRITTE
+		//--------- SCRITTE
 		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.ksu != par_control_old.ksu ||par_control_new.alpha_kd != par_control_old.alpha_kd ||par_control_new.alpha_kp != par_control_old.alpha_kp ||par_control_new.theta_kd != par_control_old.alpha_kd|| par_control_new.theta_kp != par_control_old.theta_kp) 
 		{
 
@@ -285,12 +276,28 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[15], col.scr, col.bck);
 			sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
 			textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[16], col.scr, col.bck);
+			// motor
+			if(brake){
+				sprintf(motor_str, "Motore disattivo.");
+			}else{
+				sprintf(motor_str, "Motore attivo!   ");
+			}
+			textout_ex(scrbuf, font, motor_str,scritte.x, scritte.y[18], col.scr, col.bck);
+			// swingup
+			if(swingup){
+				sprintf(swingup_str, "Controllore Swingup attivo!  ");
+			}else{
+				sprintf(swingup_str, "Controllore Swingup disattivo");
+			}
+			textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[19], col.scr, col.bck);
+			
 			draw = 1;
 		}
 
 		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old=par_control_new;
 		
+		//--------- end task
 		if(deadline_miss(id)){
 			dl_miss_gui+=1;
 		}

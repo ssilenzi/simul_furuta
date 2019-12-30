@@ -7,10 +7,8 @@
 #include "ptask.h"
 #include "condiviso.h"
 
-
-
 //----------- Task
-void* state_update(void* arg); 	// task che updata lo state leggendo ccr
+void* state_update(void* arg); 	// task che aggiorna lo state leggendo ccr
 
 void* control(void* arg);		// task che legge lo stato, il riferimento e setta ccr
 
