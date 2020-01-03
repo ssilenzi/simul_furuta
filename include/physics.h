@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'fast'.
  *
- * Model version                  : 1.243
+ * Model version                  : 1.247
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Tue Dec 31 19:37:27 2019
+ * C/C++ source code generated on : Fri Jan  3 22:18:41 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -29,10 +29,21 @@
 #include "rtwtypes.h"
 #endif                                 /* fast_COMMON_INCLUDES_ */
 
-// 		SCRITTO DA PEPO 	//
 #include "condiviso.h"
-// 	FINE SCRITTO DA PEPO 	//
 
+/* Block signals and states (default storage) */
+extern DW_fast_T fast_DW;
+
+/*
+ * Exported States
+ *
+ * Note: Exported states are block states with an exported global
+ * storage class designation.  Code generation will declare the memory for these
+ * states and exports their symbols.
+ *
+ */
+extern dn_t dn;                        /* Simulink.Signal object 'dn' */
+extern state_board_t state_board;     /* Simulink.Signal object 'state_board' */
 
 extern void physics_Init(void);
 extern void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T

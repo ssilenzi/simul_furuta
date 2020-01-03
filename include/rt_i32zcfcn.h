@@ -3,17 +3,17 @@
  * course requirements at degree granting institutions only.  Not for
  * government, commercial, or other organizational use.
  *
- * File: rt_zcfcn.h
+ * File: rt_i32zcfcn.h
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.256
+ * Model version                  : 1.262
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Tue Dec 31 17:35:19 2019
+ * C/C++ source code generated on : Fri Jan  3 22:10:28 2020
  */
 
-#ifndef RTW_HEADER_rt_zcfcn_h_
-#define RTW_HEADER_rt_zcfcn_h_
+#ifndef RTW_HEADER_rt_i32zcfcn_h_
+#define RTW_HEADER_rt_i32zcfcn_h_
 #include "rtwtypes.h"
 #include "solver_zc.h"
 #include "zero_crossing_types.h"
@@ -25,11 +25,10 @@
 #define slZcUnAliasEvents(evL, evR)    ((((slZcHadEvent((evL), (SL_ZCS_EVENT_N2Z)) && slZcHadEvent((evR), (SL_ZCS_EVENT_Z2P))) || (slZcHadEvent((evL), (SL_ZCS_EVENT_P2Z)) && slZcHadEvent((evR), (SL_ZCS_EVENT_Z2N)))) ? (SL_ZCS_EVENT_NUL) : (evR)))
 #endif
 
+extern ZCEventType rt_I32ZCFcn(ZCDirection zcDir, ZCSigState *prevZc, int32_T
+  currValue);
 
-extern ZCEventType rt_ZCFcn(ZCDirection zcDir, ZCSigState *prevZc, real_T  currValue);
-  
-
-#endif                                 /* RTW_HEADER_rt_zcfcn_h_ */
+#endif                                 /* RTW_HEADER_rt_i32zcfcn_h_ */
 
 /*
  * File trailer for generated code.

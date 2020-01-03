@@ -226,50 +226,49 @@ typedef struct {
     uint8_T swingup;
 } ref_t;
 
+/* Block signals and states (default storage) for system '<Root>' */
 typedef struct {
-    real32_T Delay_DSTATE[4];            /* '<S7>/Delay' */
-    real32_T DiscreteTimeIntegrator_DSTATE[4];/* '<S7>/Discrete-Time Integrator' */
-    real32_T Delay_DSTATE_p;             /* '<S3>/Delay' */
-    real32_T DiscreteStateSpace_DSTATE;  /* '<S3>/Discrete State-Space' */
+  real32_T Delay_DSTATE[4];            /* '<S6>/Delay' */
+  real32_T DiscreteTimeIntegrator_DSTATE[4];/* '<S6>/Discrete-Time Integrator' */
+  real32_T Delay_DSTATE_c;             /* '<S2>/Delay' */
+  real32_T DiscreteStateSpace_DSTATE;  /* '<S2>/Discrete State-Space' */
 } DW_fast_T;
 
-
-// Block signals and states (default storage) for system '<S5>/ref_gen' 
+/* Block signals and states (default storage) for system '<S4>/ref_gen' */
 typedef struct {
-  real_T DiscreteTransferFcn_states;   // '<S8>/Discrete Transfer Fcn' 
-  uint8_T DiscreteTransferFcn_icLoad; // '<S8>/Discrete Transfer Fcn' 
+    real32_T DiscreteTransferFcn_states; /* '<S7>/Discrete Transfer Fcn' */
+    uint8_T DiscreteTransferFcn_icLoad;  /* '<S7>/Discrete Transfer Fcn' */
 } DW_ref_gen_slow_T;
 
-
-// Zero-crossing (trigger) state for system '<S5>/ref_gen'
+/* Zero-crossing (trigger) state for system '<S4>/ref_gen' */
 typedef struct {
-  ZCSigState DiscreteTransferFcn_Reset_ZCE;// '<S8>/Discrete Transfer Fcn'
+    ZCSigState DiscreteTransferFcn_Reset_ZCE;/* '<S7>/Discrete Transfer Fcn' */
 } ZCE_ref_gen_slow_T;
 
-
 typedef struct {
-  DW_ref_gen_slow_T ref_gen;           /* '<S5>/ref_gen' */
-  real_T Noise_generator_NextOutput;   /* '<S12>/Noise_generator' */
-  real_T Noise_generator1_NextOutput;  /* '<S12>/Noise_generator1' */
-  real32_T Delay_DSTATE[2];            /* '<S6>/Delay' */
-  real32_T vel_estim_DSTATE[2];        /* '<S6>/vel_estim' */
-  real32_T K[4];                       /* '<S3>/Hybrid_controller' */
-  real32_T dist;                       /* '<S10>/Disturbance_generator' */
-  real32_T volt;                       /* '<S3>/Hybrid_controller' */
-  real32_T theta_ref;                  /* '<S3>/Hybrid_controller' */
-  uint32_T RandSeed;                   /* '<S12>/Noise_generator' */
-  uint32_T RandSeed_n;                 /* '<S12>/Noise_generator1' */
-  uint16_T Delay_DSTATE_l[255];        /* '<S3>/Delay' */
-  uint8_T is_active_c8_slow;           /* '<S10>/Disturbance_generator' */
-  uint8_T is_c8_slow;                  /* '<S10>/Disturbance_generator' */
-  uint8_T temporalCounter_i1;          /* '<S10>/Disturbance_generator' */
-  uint8_T is_active_c5_slow;           /* '<S3>/Hybrid_controller' */
-  uint8_T is_c5_slow;                  /* '<S3>/Hybrid_controller' */
-  uint8_T is_Sliding_mode_controller;  /* '<S3>/Hybrid_controller' */
+  DW_ref_gen_slow_T ref_gen;           /* '<S4>/ref_gen' */
+  real_T Noise_generator_NextOutput;   /* '<S10>/Noise_generator' */
+  real_T Noise_generator1_NextOutput;  /* '<S10>/Noise_generator1' */
+  real32_T Delay_DSTATE[2];            /* '<S5>/Delay' */
+  real32_T vel_estim_DSTATE[2];        /* '<S5>/vel_estim' */
+  real32_T K[4];                       /* '<S1>/Hybrid_controller' */
+  real32_T dist;                       /* '<S2>/Disturbance_generator' */
+  real32_T volt;                       /* '<S1>/Hybrid_controller' */
+  real32_T theta_ref;                  /* '<S1>/Hybrid_controller' */
+  uint32_T RandSeed;                   /* '<S10>/Noise_generator' */
+  uint32_T RandSeed_b;                 /* '<S10>/Noise_generator1' */
+  uint16_T Delay_DSTATE_n[255];        /* '<S1>/Delay' */
+  uint8_T is_active_c7_slow;           /* '<S2>/Disturbance_generator' */
+  uint8_T is_c7_slow;                  /* '<S2>/Disturbance_generator' */
+  uint8_T temporalCounter_i1;          /* '<S2>/Disturbance_generator' */
+  uint8_T is_active_c5_slow;           /* '<S1>/Hybrid_controller' */
+  uint8_T is_c5_slow;                  /* '<S1>/Hybrid_controller' */
+  uint8_T is_Sliding_mode_controller;  /* '<S1>/Hybrid_controller' */
 } DW_slow_T;
 
+/* Zero-crossing (trigger) state */
 typedef struct {
-  ZCE_ref_gen_slow_T ref_gen;          /* '<S5>/ref_gen' */
+  ZCE_ref_gen_slow_T ref_gen;          /* '<S4>/ref_gen' */
 } PrevZCX_slow_T;
 
 

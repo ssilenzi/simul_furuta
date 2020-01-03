@@ -117,12 +117,14 @@ pthread_mutex_t 	mux_ref_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusi
 //----------- Variabili locali
 
 ref_t ref= {ALPHA_REF, THETA_REF, SWINGUP_DEF};
-//state_board_t state_board;            				/* Simulink.Signal object 'state_board' */
+real32_T rtb_rad_to_deg1[2]; // variabile locale che condiene il valore di alpha e theta in gradi.
 
+/* Block signals and states (default storage) */
 DW_fast_T fast_DW;
 DW_slow_T slow_DW;
 
-real32_T rtb_rad_to_deg1[2]; // variabile locale che condiene il valore di alpha e theta in gradi. 
+/* Previous zero-crossings (trigger) states */
+PrevZCX_slow_T slow_PrevZCX;
 
 
 //----------- state_update
