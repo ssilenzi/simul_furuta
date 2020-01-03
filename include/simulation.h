@@ -7,6 +7,11 @@
 #include "ptask.h"
 #include "condiviso.h"
 
+#include "controller.h"
+#include "disturbance_and_noise.h"
+#include "physics.h"
+
+
 //----------- Task
 void* state_update(void* arg); 	// task che aggiorna lo state leggendo ccr
 

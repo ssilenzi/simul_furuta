@@ -6,6 +6,7 @@
 *	Descrizione generale e funzionalita`
 * 			Il programma simula l'interazione BLABLABLA SCRIVIMI
 *		
+* 		Task:
 * 		PC
 * 			- gui BLABLABLA SCRIVIMI
 * 			- keys BLABLABLA SCRIVIMI
@@ -16,6 +17,16 @@
 *			- comboard BLABLABLA SCRIVIMI
 * 		Fisica
 * 			- state_update BLABLABLA SCRIVIMI
+* 
+* 	Files:
+* 	condiviso.h
+* 	gui.c, gui.h
+* 	keys.c, keys.h
+* 
+* 
+* 
+* 
+* 
 *--------------------------------------------------------------------------------------------------------------------------*/
 
 
@@ -33,6 +44,12 @@
 #include "keys.h"
 #include "simulation.h"
 
+/*
+#include "controller.h"
+#include "physics.h"
+#include "disturbance_and_noise.h"
+*/
+
 //----------- Variabili
 /*
  * _pc = variabile su pc
@@ -40,7 +57,7 @@
  * _buffer = variabile su buffer
  * 
  */
-
+/* OLD
 State state_pc=
 	{ALPHA_0, 
 	ALPHADOT_0,
@@ -49,11 +66,19 @@ State state_pc=
 	CURRENT_0,
 	VOLTAGE_0,
 	CCR_0,
-	ENC_ALPHA_0,
-	ENC_THETA_0
+	CNT_ALPHA_0,
+	CNT_THETA_0
 	};
+	*/
+
+state_pc_t state_pc=
+{	ALPHA_0,
+	THETA_0,
+	VOLTAGE_0
+}; 
 pthread_mutex_t 	mux_state_pc = PTHREAD_MUTEX_INITIALIZER;
-State state_reset = 
+
+/*State state_reset = 
 	{ALPHA_0, 
 	ALPHADOT_0,
 	THETA_0,
@@ -64,10 +89,12 @@ State state_reset =
 	ENC_ALPHA_0,
 	ENC_THETA_0
 	};// struct stato per il reset
+*/
 
 	
 //----------- par_control
-Par_control par_control_pc = 
+/* OLD
+ * Par_control par_control_pc = 
 	{KP_ALPHA_DEF, 
 	KD_ALPHA_DEF, 
 	KP_THETA_DEF, 
@@ -80,18 +107,48 @@ Par_control par_control_reset =
 	KP_THETA_DEF, 
 	KD_THETA_DEF, 
 	KSU_DEF};	// struct con parmetri del controllore di default
+	*/
+par_ctrl_t par_control_pc =
+{KP_UP_ALPHA_DEF,
+	KP_UP_THETA_DEF,
+	KD_UP_ALPHA_DEF,
+	KD_UP_THETA_DEF,
+	KP_DOWN_ALPHA_DEF,
+	KD_DOWN_ALPHA_DEF,
+	DPOLE_REF,
+	REF_GEN_NUM,
+	REF_GEN_DEN};// struct con parmetri del controllore di default
+par_ctrl_t par_control_reset =
+{KP_UP_ALPHA_DEF,
+	KP_UP_THETA_DEF,
+	KD_UP_ALPHA_DEF,
+	KD_UP_THETA_DEF,
+	KP_DOWN_ALPHA_DEF,
+	KD_DOWN_ALPHA_DEF,
+	DPOLE_REF,
+	REF_GEN_NUM,
+	REF_GEN_DEN};
+pthread_mutex_t 	mux_parcontr_pc = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
 
+//----------- disturbance and noise
+par_dn_t par_dn = {
+  DIST_AMP_DEF,
+  NOISE_AMP_DEF
+} ; // parametri disturbance and noise
+dn_t dn= {KICK_DEF, DIST_DEF, NOISE_DEF, DELAY_DEF};
+	
 //----------- miscellanee
 int end = 0;			// regola chiusura threads
-int brake = 1;			// spegne il motore ma non la scheda consentendo di continuare la lettura degli encoder
-pthread_mutex_t		mux_brake = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per brake
+//int brake = 1;			// spegne il motore ma non la scheda consentendo di continuare la lettura degli encoder
+//pthread_mutex_t		mux_brake = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per brake
 
-int swingup = 0;		// regola il controllore di swingup, swingup = 1 attivo
-pthread_mutex_t		mux_swingup = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per swingup
+//int swingup = 0;		// regola il controllore di swingup, swingup = 1 attivo
+//pthread_mutex_t		mux_swingup = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per swingup
 
 //----------- variabili lato pc	
-Ref ref_pc = {ALPHA_0, THETA_0};		// struct riferimento 
+ref_t ref_pc = {ALPHA_REF, THETA_REF, SWINGUP_DEF};		// struct riferimento 
 pthread_mutex_t 	mux_ref_pc = PTHREAD_MUTEX_INITIALIZER;
+ref_t ref_reset = {ALPHA_REF, THETA_REF, SWINGUP_DEF};
 View view = {LON_0, LAT_0};			// struct vista
 pthread_mutex_t 	mux_view = PTHREAD_MUTEX_INITIALIZER;
 

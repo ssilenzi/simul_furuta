@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 #include <pthread.h>
+#include "rtwtypes.h" //conversioni matlab
+#include "zero_crossing_types.h"
+//#include "controller.h"
 
 //----------- costanti, definizioni
 // stato, _0 iniziale 
@@ -13,8 +16,8 @@
 #define CURRENT_0			0
 #define VOLTAGE_0			0
 #define CCR_0				2625 // meta` del range 0-5250
-#define ENC_ALPHA_0			0
-#define ENC_THETA_0			0
+#define CNT_ALPHA_0			0
+#define CNT_THETA_0			0
 
 // view
 #define LON_0				45		// longitudine iniziale
@@ -48,12 +51,34 @@
 #define COL_RIF				makecol(128, 128, 128)	// colore riferimenti
 
 // par_control	
-#define KP_ALPHA_DEF 		1 	// Valori di default delle costanti per i controllori
-#define KD_ALPHA_DEF 		1 	// P = proporzionale, D = derivativo
-#define KP_THETA_DEF 		1 	// su = swing up
-#define KD_THETA_DEF 		1
-#define KSU_DEF 			1
-#define INCR_K				0.25 // incremento da tastiera 
+#define KP_UP_ALPHA_DEF 	-2.23606801F 	// Valori di default delle costanti per i controllori
+#define KP_UP_THETA_DEF 	-20.0269184F 	// UP = quando il pendolo e` su, DWON = quando il pendolo e` giu`
+#define KD_UP_ALPHA_DEF 	-2.08667636F 	// P = proporzionale, D = derivativo
+#define KD_UP_THETA_DEF 	-2.67355F
+#define KP_DOWN_ALPHA_DEF	0.9F
+#define KD_DOWN_ALPHA_DEF	0.0F
+#define DPOLE_REF			0.990049839F
+#define REF_GEN_NUM			{ 0.00995016098F, 0.0F }
+#define REF_GEN_DEN			{ 1.0F, -0.990049839F }
+//#define KSU_DEF 			1
+#define INCR_K				0.15 // incremento da tastiera 
+
+// dn
+#define KICK_DEF			0U
+#define DIST_DEF			0.0F
+#define NOISE_DEF			{ 0.0F, 0.0F }
+#define DELAY_DEF			0U
+
+// par_dn
+#define DIST_AMP_DEF		1
+#define NOISE_AMP_DEF		0
+
+
+//ref
+#define ALPHA_REF			0
+#define THETA_REF			0
+#define SWINGUP_DEF			1
+
 
 //----------- tasks, in ordine di priorita`
 // state_update
@@ -118,7 +143,7 @@ typedef struct {
 } AngleSinCos;
 
 // types usati da piu` task
-
+/* OLD
 typedef struct {
     float alpha;		// angolo con asta orizzontale
 	float alphadot;		// velocita` di alpha 
@@ -130,12 +155,16 @@ typedef struct {
 	float enc_alpha;	// lettura encoder per l'angolo alpha
 	float enc_theta;	// lettura encoder per l'angolo theta
 } State;	// structure dello stato
+*/
 
+/* OLD
 typedef struct {
     float alpha;
     float theta;
 } Ref;		// structure del riferimento
+*/
 
+/* OLD
 typedef struct{
 	float alpha_kp;		// guadagno proporzionale controllore su alpha
 	float alpha_kd;		// guadagno derivativo controllore su alpha
@@ -143,11 +172,106 @@ typedef struct{
 	float theta_kd;		// guadagno derivativo controllore su theta
 	float ksu;			// guadagno del controllore di swing up
 } Par_control;	// structure dei parametri di controllo
+*/
 
 typedef struct {
     int lon;
     int lat;
 } View; 		// structure della vista
+
+
+
+//------ structure generate da Matlab
+typedef struct {
+    uint8_T kick;
+    real32_T dist;
+    real32_T noise[2];
+    uint8_T delay;
+} dn_t;// disturb and noise
+
+typedef struct
+{
+    uint16_T CNT_alpha;
+    uint16_T CNT_theta;
+    uint16_T CCR;
+} state_board_t;
+
+
+typedef struct {
+    real32_T alpha;
+    real32_T theta;
+    real32_T voltage;
+} state_pc_t;
+
+typedef struct {
+    real32_T up_kp_alpha;
+    real32_T up_kp_theta;
+    real32_T up_kd_alpha;
+    real32_T up_kd_theta;
+    real32_T down_kp_alpha;
+    real32_T down_kd_alpha;
+    real32_T dpole_ref;
+    real32_T ref_gen_num[2];
+    real32_T ref_gen_den[2];
+} par_ctrl_t;
+
+typedef struct {
+    real32_T dist_amp;
+    real32_T noise_amp;
+} par_dn_t;
+
+typedef struct {
+    real32_T alpha;
+    real32_T theta;
+    uint8_T swingup;
+} ref_t;
+
+typedef struct {
+    real32_T Delay_DSTATE[4];            /* '<S7>/Delay' */
+    real32_T DiscreteTimeIntegrator_DSTATE[4];/* '<S7>/Discrete-Time Integrator' */
+    real32_T Delay_DSTATE_p;             /* '<S3>/Delay' */
+    real32_T DiscreteStateSpace_DSTATE;  /* '<S3>/Discrete State-Space' */
+} DW_fast_T;
+
+
+// Block signals and states (default storage) for system '<S5>/ref_gen' 
+typedef struct {
+  real_T DiscreteTransferFcn_states;   // '<S8>/Discrete Transfer Fcn' 
+  uint8_T DiscreteTransferFcn_icLoad; // '<S8>/Discrete Transfer Fcn' 
+} DW_ref_gen_slow_T;
+
+
+// Zero-crossing (trigger) state for system '<S5>/ref_gen'
+typedef struct {
+  ZCSigState DiscreteTransferFcn_Reset_ZCE;// '<S8>/Discrete Transfer Fcn'
+} ZCE_ref_gen_slow_T;
+
+
+typedef struct {
+  DW_ref_gen_slow_T ref_gen;           /* '<S5>/ref_gen' */
+  real_T Noise_generator_NextOutput;   /* '<S12>/Noise_generator' */
+  real_T Noise_generator1_NextOutput;  /* '<S12>/Noise_generator1' */
+  real32_T Delay_DSTATE[2];            /* '<S6>/Delay' */
+  real32_T vel_estim_DSTATE[2];        /* '<S6>/vel_estim' */
+  real32_T K[4];                       /* '<S3>/Hybrid_controller' */
+  real32_T dist;                       /* '<S10>/Disturbance_generator' */
+  real32_T volt;                       /* '<S3>/Hybrid_controller' */
+  real32_T theta_ref;                  /* '<S3>/Hybrid_controller' */
+  uint32_T RandSeed;                   /* '<S12>/Noise_generator' */
+  uint32_T RandSeed_n;                 /* '<S12>/Noise_generator1' */
+  uint16_T Delay_DSTATE_l[255];        /* '<S3>/Delay' */
+  uint8_T is_active_c8_slow;           /* '<S10>/Disturbance_generator' */
+  uint8_T is_c8_slow;                  /* '<S10>/Disturbance_generator' */
+  uint8_T temporalCounter_i1;          /* '<S10>/Disturbance_generator' */
+  uint8_T is_active_c5_slow;           /* '<S3>/Hybrid_controller' */
+  uint8_T is_c5_slow;                  /* '<S3>/Hybrid_controller' */
+  uint8_T is_Sliding_mode_controller;  /* '<S3>/Hybrid_controller' */
+} DW_slow_T;
+
+typedef struct {
+  ZCE_ref_gen_slow_T ref_gen;          /* '<S5>/ref_gen' */
+} PrevZCX_slow_T;
+
 
 
 /*

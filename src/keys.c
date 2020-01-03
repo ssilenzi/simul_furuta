@@ -1,22 +1,28 @@
 #include "keys.h"
 
 // Variabili extern
-extern Ref 					ref_pc;
+extern ref_t				ref_pc;
 extern pthread_mutex_t 		mux_ref_pc;
-extern State 				state_pc;
-extern State 				state_board;
-extern State 				state_reset;
+extern state_pc_t 			state_pc;
+//extern State 				state_board;
+extern state_board_t 		state_board;
+//extern State 				state_reset;
+extern state_board_t 		state_board_reset;
 extern pthread_mutex_t 		mux_state_pc;
 extern pthread_mutex_t 		mux_state_board;
 extern View 				view;
 extern pthread_mutex_t 		mux_view;
-extern Par_control 			par_control_pc;
-extern Par_control 			par_control_reset;
+extern par_ctrl_t 			par_control_pc;
+extern par_ctrl_t 			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
-extern int 					brake;
-extern pthread_mutex_t 		mux_brake;
-extern int 					swingup;
-extern pthread_mutex_t		mux_swingup;
+//extern int 					brake;
+//extern pthread_mutex_t 		mux_brake;
+//extern int 					swingup;
+//extern pthread_mutex_t		mux_swingup;
+extern dn_t dn;
+extern par_dn_t par_dn;
+
+
 extern int dl_miss_keys;
 
 extern int end;
@@ -42,7 +48,7 @@ void* keys(void* arg){
 				//Devo resettare per forza state_board, il flusso di update su state e`: board -> buffer -> pc
 				
 				pthread_mutex_lock(&mux_state_board);
-					state_board = state_reset;
+					state_board = state_board_reset;
 				pthread_mutex_unlock(&mux_state_board);
 				
 				pthread_mutex_lock(&mux_ref_pc);
@@ -54,6 +60,7 @@ void* keys(void* arg){
 			
 			// W, attiva/disattiva il motore
 			if (scan == KEY_W){
+				/*
 				pthread_mutex_lock(&mux_brake);
 				if(brake){
 					brake = 0;
@@ -61,11 +68,13 @@ void* keys(void* arg){
 					brake = 1;
 				}
 				pthread_mutex_unlock(&mux_brake);
+				*/
 				
 			}
 			
 			// Q, attiva/disattiva controllore di swingup
 			if (scan == KEY_Q){
+				/*
 				pthread_mutex_lock(&mux_swingup);
 				if(swingup){
 					swingup = 0;
@@ -73,7 +82,15 @@ void* keys(void* arg){
 					swingup = 1;
 				}
 				pthread_mutex_unlock(&mux_swingup);
-				
+				*/
+				pthread_mutex_lock(&mux_ref_pc);
+				if(ref_pc.swingup){
+					ref_pc.swingup = 0;
+				}else{
+					ref_pc.swingup = 1;
+				}
+				pthread_mutex_unlock(&mux_ref_pc);
+
 			}
 			
 			/*
@@ -83,51 +100,52 @@ void* keys(void* arg){
 			// alpha kp
 			if(scan == KEY_Y){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.alpha_kp += INCR_K;
+					par_control_pc.up_kp_alpha += INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			if(scan == KEY_U){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.alpha_kp += -INCR_K;
+					par_control_pc.up_kp_alpha += -INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			// alpha kd
 			if(scan == KEY_I){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.alpha_kd += INCR_K;
+					par_control_pc.up_kd_alpha += INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			if(scan == KEY_O){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.alpha_kd += -INCR_K;
+					par_control_pc.up_kd_alpha += -INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
 			// theta kp
 			if(scan == KEY_H){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.theta_kp += INCR_K;
+					par_control_pc.up_kp_theta += INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			if(scan == KEY_J){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.theta_kp += -INCR_K;
+					par_control_pc.up_kp_theta += -INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			// theta kd
 			if(scan == KEY_K){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.theta_kd += INCR_K;
+					par_control_pc.up_kd_theta += INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			if(scan == KEY_L){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.theta_kd += -INCR_K;
+					par_control_pc.up_kd_theta += -INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
 			// swingup
-			if(scan == KEY_N){
+			/*
+			 * if(scan == KEY_N){
 				pthread_mutex_lock(&mux_parcontr_pc);
 					par_control_pc.ksu += INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
@@ -137,6 +155,7 @@ void* keys(void* arg){
 					par_control_pc.ksu += -INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
+			*/
 			
 			// E, reset par_control_pc
 			if(scan == KEY_E){
@@ -205,7 +224,8 @@ void* keys(void* arg){
 			pthread_mutex_unlock(&mux_view);				
 			}
 		} // end keypressed
-		
+
+	// end of task
 	if(deadline_miss(id)){
 			dl_miss_keys+=1;
 	}

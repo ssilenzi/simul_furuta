@@ -2,13 +2,14 @@
 
 
 // Variabili extern
-extern Ref 					ref_pc;
+extern ref_t 					ref_pc;
 extern pthread_mutex_t 		mux_ref_pc;			// mutual exclusion for ref
-extern State 				state_pc;
+extern state_pc_t 				state_pc;
 extern pthread_mutex_t 		mux_state_pc;
 extern View 				view;
 extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
-extern Par_control 			par_control_pc;
+extern par_ctrl_t 			par_control_pc;
+extern par_ctrl_t			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;		// mutual exclusion for par_control_pc
 extern int 					dl_miss_gui;
 extern int 					dl_miss_keys;
@@ -17,8 +18,11 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
-extern int 					brake;
-extern int 					swingup;
+//extern int 					brake;
+//extern int 					swingup;
+extern dn_t dn;
+extern par_dn_t par_dn;
+
 
 static BITMAP *scrbuf;
 static Point asson0, lato0, alto0; //centro rettangoli
@@ -187,30 +191,26 @@ void* gui(void* arg){
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
 	
-	static State state_old = 
-		{ALPHA_0+1, 
-		ALPHADOT_0+1,
+	static state_pc_t state_old = 
+		{ALPHA_0+1,
 		THETA_0+1,
-		THETADOT_0+1,
-		CURRENT_0+1,
 		VOLTAGE_0+1,
-		CCR_0+1,
-		ENC_ALPHA_0+1,
-		ENC_THETA_0+1
 		};
-	static State state_new;
-    static Ref ref_old = {1, 1};
-	static Ref ref_new = {1, 1};
+	static state_pc_t state_new;
+    static ref_t ref_old = {1, 1, 1};
+	static ref_t ref_new = {1, 1, 1};
 	static View view_old = {1, 1};
 	static View view_new = {1, 1};
 
-	static Par_control par_control_old = {KP_ALPHA_DEF+1, KD_ALPHA_DEF+1, KP_THETA_DEF+1, KD_THETA_DEF+1, KSU_DEF +1};
-	static Par_control par_control_new = {KP_ALPHA_DEF+1, KD_ALPHA_DEF+1, KP_THETA_DEF+1, KD_THETA_DEF+1, KSU_DEF +1};
+	static par_ctrl_t par_control_new;
+	static par_ctrl_t par_control_old;
+
 
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; // stringhe di comunicazione che vengono aggiornate
-	char parcontrstralpha[42], parcontrstrtheta[42],parcontrstrsu[34];	
+	char parcontrstralpha[42], parcontrstrtheta[42];//,parcontrstrsu[34];	
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
-	char motor_str[18], swingup_str[31];
+	//char motor_str[18];
+	char swingup_str[31];
 	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 	
 	while(!end){
@@ -232,6 +232,7 @@ void* gui(void* arg){
 		//--------- ANIMAZIONE
 		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
 			vista_alto(state_new.alpha, ref_new.alpha);
+			
 			draw = 1;
 		}
 
@@ -247,7 +248,7 @@ void* gui(void* arg){
 		}
 
 		//--------- SCRITTE
-		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.ksu != par_control_old.ksu ||par_control_new.alpha_kd != par_control_old.alpha_kd ||par_control_new.alpha_kp != par_control_old.alpha_kp ||par_control_new.theta_kd != par_control_old.alpha_kd|| par_control_new.theta_kp != par_control_old.theta_kp) 
+		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.up_kp_alpha != par_control_old.up_kp_alpha || par_control_new.up_kd_alpha != par_control_old.up_kd_alpha || par_control_new.up_kp_theta != par_control_old.up_kp_theta || par_control_new.up_kd_theta != par_control_old.up_kd_theta) 
 		{
 
 			// Riferimento
@@ -264,18 +265,20 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
 			// Par control
 			textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
-			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control_new.alpha_kp, par_control_new.alpha_kd);
+			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control_new.up_kp_alpha, par_control_new.up_kd_alpha);
 			textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
-			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control_new.theta_kp, par_control_new.theta_kd);
+			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control_new.up_kp_theta, par_control_new.up_kd_theta);
 			textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
-			sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f n/m    ", par_control_new.ksu);
-			textout_ex(scrbuf, font, parcontrstrsu,scritte.x, scritte.y[12], col.scr, col.bck);
+			//sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f n/m    ", par_control_new.ksu);
+			//textout_ex(scrbuf, font, parcontrstrsu,scritte.x, scritte.y[12], col.scr, col.bck);
 			// deadline_miss
 			textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[14], col.scr, col.bck);
 			sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
 			textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[15], col.scr, col.bck);
 			sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
 			textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[16], col.scr, col.bck);
+			
+			/*
 			// motor
 			if(brake){
 				sprintf(motor_str, "Motore disattivo.");
@@ -283,19 +286,22 @@ void* gui(void* arg){
 				sprintf(motor_str, "Motore attivo!   ");
 			}
 			textout_ex(scrbuf, font, motor_str,scritte.x, scritte.y[18], col.scr, col.bck);
+			
+			*/
 			// swingup
-			if(swingup){
+			if(ref_pc.swingup){
 				sprintf(swingup_str, "Controllore Swingup attivo!  ");
 			}else{
 				sprintf(swingup_str, "Controllore Swingup disattivo");
 			}
 			textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[19], col.scr, col.bck);
 			
+			
 			draw = 1;
 		}
 
 		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old=par_control_new;
+		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old = par_control_new;
 		
 		//--------- end task
 		if(deadline_miss(id)){
