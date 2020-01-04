@@ -182,12 +182,7 @@ typedef struct {
 
 
 //------ structure generate da Matlab
-typedef struct {
-    uint8_T kick;
-    real32_T dist;
-    real32_T noise[2];
-    uint8_T delay;
-} dn_t;// disturb and noise
+
 
 typedef struct
 {
@@ -214,6 +209,13 @@ typedef struct {
     real32_T ref_gen_num[2];
     real32_T ref_gen_den[2];
 } par_ctrl_t;
+
+typedef struct {
+    uint8_T kick;
+    real32_T dist;
+    real32_T noise[2];
+    uint8_T delay;
+} dn_t;// disturb and noise
 
 typedef struct {
     real32_T dist_amp;

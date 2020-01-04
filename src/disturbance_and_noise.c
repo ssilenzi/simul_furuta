@@ -28,6 +28,7 @@
 #define slow_IN_On                     ((uint8_T)2U)
 #define slow_IN_Reset                  ((uint8_T)3U)
 
+
 /* System initialize for atomic system: '<Root>/Disturbance_and_noise' */
 void disturbance_and_noise_Init(real32_T *rty_dist)
 {

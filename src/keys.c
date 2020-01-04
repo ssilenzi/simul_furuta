@@ -23,7 +23,6 @@ extern dn_t dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
 
-
 extern int dl_miss_keys;
 
 extern int end;
@@ -157,19 +156,32 @@ void* keys(void* arg){
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
-			// swingup
-			/*
-			 * if(scan == KEY_N){
+			// controllore DOWN alpha
+			// down_kp_alpha
+			if(scan == KEY_V){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.ksu += INCR_K;
+					par_control_pc.down_kp_alpha += INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			if(scan == KEY_B){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.down_kp_alpha += -INCR_K;
+				pthread_mutex_unlock(&mux_parcontr_pc);
+			}
+			
+			
+			// down_kd_alpha
+			if(scan == KEY_N){
+				pthread_mutex_lock(&mux_parcontr_pc);
+					par_control_pc.down_kd_alpha += INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			if(scan == KEY_M){
 				pthread_mutex_lock(&mux_parcontr_pc);
-					par_control_pc.ksu += -INCR_K;
+					par_control_pc.down_kd_alpha += -INCR_K;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
-			*/
+			
 			
 			// E, reset par_control_pc
 			if(scan == KEY_E){
@@ -177,6 +189,27 @@ void* keys(void* arg){
 					par_control_pc = par_control_reset;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
+			
+			/*
+			 * par_dn fg
+			 */
+			if(scan == KEY_F){
+				par_dn.dist_amp += INCR_K/2;
+			}
+			if(scan == KEY_G){
+				par_dn.dist_amp += -INCR_K/2;
+			}
+			if(scan == KEY_X){
+				par_dn.noise_amp += INCR_K/2;
+			}
+			if(scan == KEY_C){
+				par_dn.noise_amp += -INCR_K/2;
+			}
+			if(scan == KEY_1){
+				par_dn.dist_amp = DIST_AMP_DEF;
+				par_dn.noise_amp = NOISE_AMP_DEF;
+			}
+			
 			
 			
 			/*
