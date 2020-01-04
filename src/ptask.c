@@ -26,6 +26,8 @@ int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
 	return tret;
 }
 
+
+
 int get_task_index(void* arg){
 	struct task_par *tp;
 	tp = (struct task_par *)arg;

@@ -95,14 +95,14 @@ int gui_init(){
 	// Disegno rettangoli e elementi statici
 	//rett1 - parametri, sinistra
 	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
-	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], motor_pause[50], swingup_pause[43]; //state_pause[50],control_pause[50];
+	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], dist_pause[50], swingup_pause[43]; //state_pause[50],control_pause[50];
 	sprintf(exit, "Premere Esc per uscire");
 	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
 
-	sprintf(reset1, "R per resettare stato e riferimento");
+	sprintf(reset1, "R per resettare riferimento");
 	textout_ex(scrbuf, font, reset1, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
 
-	sprintf(reset2, "Up, down, left right per modificare la vista");
+	sprintf(reset2, "Up, down, left, right per modificare la vista");
 	textout_ex(scrbuf, font, reset2, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
 
 	sprintf(reset3, "T per resettare la vista");
@@ -111,10 +111,10 @@ int gui_init(){
 	sprintf(reset4, "E per resettare i parametri del controllore");
 	textout_ex(scrbuf, font, reset4, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
 	
-	sprintf(motor_pause, "W spegne/accende il motore, default spento");
-	textout_ex(scrbuf, font, motor_pause, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);
+	sprintf(dist_pause, "W disturba il sistema");
+	textout_ex(scrbuf, font, dist_pause, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);
 	
-	sprintf(swingup_pause, "Q attiva/disattiva swingup, default spento");
+	sprintf(swingup_pause, "Q attiva/disattiva swingup, default attivo");
 	textout_ex(scrbuf, font, swingup_pause, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
 	
 	//-----------  disegno rettangoli
@@ -350,7 +350,9 @@ void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos L
 	Vect P; Point PAlleg;
 
 	step = 2*M_PI/NUM_POINTS;
-
+	
+	alpha = ((int)alpha)%360;
+	
 	if (alpha < refalpha) {
 		initial = rad(alpha);
 		final = rad(refalpha);
@@ -375,13 +377,18 @@ void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, Ang
 	Vect P; Point PAlleg;
 
 	step = 2*M_PI/NUM_POINTS;
-
-	if (theta < reftheta) {
-		initial = rad(theta);
+	
+	float theta_loc;
+	theta_loc = theta;
+	if(theta_loc>350){theta_loc -= 360;}
+	if(theta_loc<-350){theta_loc += 360;}
+	
+	if (theta_loc < reftheta) {
+		initial = rad(theta_loc);
 		final = rad(reftheta);
 	} else {
 		initial = rad(reftheta);
-		final = rad(theta);
+		final = rad(theta_loc);
 	}// end if
 
 	for (float t = initial; t < final; t = t + step) {
@@ -554,8 +561,13 @@ void vista_lato(float theta, float reftheta) {
 	int l2 = L2_LATO;
 	AngleSinCos Theta, RefTheta;
 	TwoPoints riflink2lato, link2lato;
-
-	Theta.sin = sinf(rad(theta));	Theta.cos = cosf(rad(theta));
+	
+	float theta_loc;
+	theta_loc = theta;
+	if(theta_loc>350){theta_loc -= 360;}
+	if(theta_loc<-350){theta_loc += 360;}
+	
+	Theta.sin = sinf(rad(theta_loc));	Theta.cos = cosf(rad(theta_loc));
 	RefTheta.sin = sinf(rad(reftheta)); RefTheta.cos = cosf(rad(reftheta));
 
 	// Reset della vista
@@ -570,7 +582,7 @@ void vista_lato(float theta, float reftheta) {
 	link2lato.x2 = lato0.x + l2 * Theta.sin;
 	link2lato.y2 = lato0.y - l2 * Theta.cos;
 	line(scrbuf, riflink2lato.x1, riflink2lato.y1, riflink2lato.x2, riflink2lato.y2, col.rif); // rif link lato
-	circlerif_parup(scrbuf, lato0, l2, theta, reftheta, col.rif); // rif angolo theta
+	circlerif_parup(scrbuf, lato0, l2, theta_loc, reftheta, col.rif); // rif angolo theta
 	thick_line(scrbuf, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, THICK, col.mdl2); // link lato
 }
 // vista_alto, disegna vista alto

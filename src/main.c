@@ -136,6 +136,7 @@ par_dn_t par_dn = {
   NOISE_AMP_DEF
 } ; // parametri disturbance and noise
 dn_t dn= {KICK_DEF, DIST_DEF, NOISE_DEF, DELAY_DEF};
+pthread_mutex_t		mux_dn = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per dn
 	
 //----------- miscellanee
 int end = 0;			// regola chiusura threads

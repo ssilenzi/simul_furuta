@@ -20,6 +20,7 @@ extern pthread_mutex_t 		mux_parcontr_pc;
 //extern int 					swingup;
 //extern pthread_mutex_t		mux_swingup;
 extern dn_t dn;
+extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
 
 
@@ -47,9 +48,11 @@ void* keys(void* arg){
 			if (scan == KEY_R) {
 				//Devo resettare per forza state_board, il flusso di update su state e`: board -> buffer -> pc
 				
+				/* crea casino con i delay!!!
 				pthread_mutex_lock(&mux_state_board);
 					state_board = state_board_reset;
 				pthread_mutex_unlock(&mux_state_board);
+				*/
 				
 				pthread_mutex_lock(&mux_ref_pc);
 					ref_pc.alpha = ALPHA_0;
@@ -58,8 +61,19 @@ void* keys(void* arg){
 				
 			}
 			
-			// W, attiva/disattiva il motore
+			// W, kick
 			if (scan == KEY_W){
+				pthread_mutex_lock(&mux_dn);
+				if(dn.kick){
+					dn.kick = 0;
+				}else{
+					dn.kick = 1;
+				}
+				pthread_mutex_unlock(&mux_dn);
+				
+				
+				
+				
 				/*
 				pthread_mutex_lock(&mux_brake);
 				if(brake){

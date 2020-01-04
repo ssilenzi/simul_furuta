@@ -61,7 +61,7 @@
 #define REF_GEN_NUM			{ 0.00995016098F, 0.0F }
 #define REF_GEN_DEN			{ 1.0F, -0.990049839F }
 //#define KSU_DEF 			1
-#define INCR_K				0.15 // incremento da tastiera 
+#define INCR_K				0.5 // incremento da tastiera 
 
 // dn
 #define KICK_DEF			0U
@@ -84,27 +84,27 @@
 // state_update
 #define ID_STATE_UPDATE		10	// id task
 #define PRIO_STATE_UPDATE	99	// priorita` task, 0-99
-#define PERIOD_STATE_UPDATE	4	// periodo task in ms
+#define PERIOD_STATE_UPDATE	1	// periodo task in ms
 
 // control
 #define ID_CONTROL			300
 #define PRIO_CONTROL		90
-#define PERIOD_CONTROL		40
+#define PERIOD_CONTROL		5
 
 // compc
 #define ID_COMPC			400
 #define PRIO_COMPC			30
-#define PERIOD_COMPC		20
+#define PERIOD_COMPC		5
 
 // comboard
 #define ID_COMBOARD			500
 #define PRIO_COMBOARD		30
-#define PERIOD_COMBOARD		20
+#define PERIOD_COMBOARD		5
 
 // gui
 #define ID_GUI				100
 #define PRIO_GUI			20
-#define FPS					60
+#define FPS					40
 
 // keys
 #define ID_KEYS				200

@@ -7,17 +7,18 @@ extern int 					end;
 //extern int 					swingup;
 //extern pthread_mutex_t 		mux_brake;
 extern state_pc_t			state_pc;
-extern pthread_mutex_t 		mux_state_pc;
+extern pthread_mutex_t		mux_state_pc;
 extern ref_t				ref_pc;
 extern pthread_mutex_t		mux_ref_pc;
 extern par_ctrl_t 			par_control_pc;
-extern pthread_mutex_t 		mux_parcontr_pc;
+extern pthread_mutex_t		mux_parcontr_pc;
 extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					dl_miss_compc;
 
 extern dn_t dn;
+extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
 
 
@@ -62,8 +63,7 @@ par_ctrl_t par_control_board =
 	REF_GEN_NUM,
 	REF_GEN_DEN}; // parametri per il controllo scheda
 par_ctrl_t par_ctrl; // da rinominare nel file controller.c
-	
-	
+
 /* OLD
 Par_control par_control_board = 
 	{KP_ALPHA_DEF, 
@@ -119,12 +119,13 @@ pthread_mutex_t 	mux_ref_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusi
 ref_t ref= {ALPHA_REF, THETA_REF, SWINGUP_DEF};
 real32_T rtb_rad_to_deg1[2]; // variabile locale che condiene il valore di alpha e theta in gradi.
 
-/* Block signals and states (default storage) */
 DW_fast_T fast_DW;
 DW_slow_T slow_DW;
 
-/* Previous zero-crossings (trigger) states */
 PrevZCX_slow_T slow_PrevZCX;
+
+dn_t dn_su;
+dn_t dn_ctrl;
 
 
 //----------- state_update
@@ -144,9 +145,13 @@ void* state_update(void* arg){
 		pthread_mutex_lock(&mux_ref_board);
 			CCR_local = state_board.CCR;
 		pthread_mutex_unlock(&mux_ref_board);
+		pthread_mutex_lock(&mux_dn);
+			dn_su = dn;
+		pthread_mutex_unlock(&mux_dn);
+		
 		
 		// do stuff
-		physics(CCR_local, dn.dist, dn.noise, rtb_Cast2);
+		physics(CCR_local, dn_su.dist, dn_su.noise, rtb_Cast2);
 		
 		pthread_mutex_lock(&mux_ref_board);
 			state_board.CNT_alpha = rtb_Cast2[0];
@@ -179,23 +184,26 @@ void* control(void* arg){
 
 	while(!end){
 		
-		// stuff
 		pthread_mutex_lock(&mux_parcontr_board);
 			par_ctrl = par_control_board;
 		pthread_mutex_unlock(&mux_parcontr_board);
-		
 		pthread_mutex_lock(&mux_ref_board);
 			ref = ref_board;
 		pthread_mutex_unlock(&mux_ref_board);
+		pthread_mutex_lock(&mux_dn);
+			dn_ctrl = dn;
+		pthread_mutex_unlock(&mux_dn);
 		
 		controller(ref.alpha, ref.swingup, state_board.CNT_alpha,
-             state_board.CNT_theta, dn.delay, &ref.theta, rtb_rad_to_deg1,
+             state_board.CNT_theta, dn_ctrl.delay, &ref.theta, rtb_rad_to_deg1,
              &state_pc.voltage, &state_board.CCR);
 		
-		disturbance_and_noise(dn.kick, &slow_DW.dist, dn.noise);
-		dn.dist = slow_DW.dist;
-		//state_pc.alpha = rtb_rad_to_deg1[0];
-		//state_pc.theta = rtb_rad_to_deg1[1];
+		disturbance_and_noise(dn_ctrl.kick, &slow_DW.dist, dn_ctrl.noise);
+		dn_ctrl.dist = slow_DW.dist;
+		
+		pthread_mutex_lock(&mux_dn);
+			dn= dn_ctrl;
+		pthread_mutex_unlock(&mux_dn);
 		
 		// end task
 		if(deadline_miss(id)){
@@ -278,7 +286,7 @@ void* comboard(void* arg){
 			pthread_mutex_lock(&mux_state_board);
 				state_buffer.alpha = rtb_rad_to_deg1[0];
 				state_buffer.theta = rtb_rad_to_deg1[1];
-				state_buffer.voltage = state_board.CCR;			//SISTEMAMI SISTEMAMI
+				state_buffer.voltage = ((float)state_board.CCR-CCR_MAX/2)*12.0F/ CCR_MAX;
 			pthread_mutex_unlock(&mux_state_board);
 		pthread_mutex_unlock(&mux_state_buffer);
 		
