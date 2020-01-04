@@ -190,119 +190,15 @@ void* gui(void* arg){
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
-	
-	static state_pc_t state_old = 
-		{ALPHA_0+1,
-		THETA_0+1,
-		VOLTAGE_0+1,
-		};
-	static state_pc_t state_new;
-    static ref_t ref_old = {1, 1, 1};
-	static ref_t ref_new = {1, 1, 1};
-	static view_t view_old = {1, 1};
-	static view_t view_new = {1, 1};
-
-	static par_ctrl_t par_control_new;
-	static par_ctrl_t par_control_old;
-
-
-	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; // stringhe di comunicazione che vengono aggiornate
-	char parcontrstralpha[42], parcontrstrtheta[42];//,parcontrstrsu[34];	
-	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
-	//char motor_str[18];
-	char swingup_str[31];
-	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
-	
 	while(!end){
-		// rendo locali le variabili, cosi` da usare un solo semaforo
-		pthread_mutex_lock(&mux_state_pc);
-			state_new = state_pc;
-		pthread_mutex_unlock(&mux_state_pc);
-		pthread_mutex_lock(&mux_ref_pc);
-			ref_new = ref_pc;
-		pthread_mutex_unlock(&mux_ref_pc);
-		pthread_mutex_lock(&mux_state_pc);
-			view_new = view;
-		pthread_mutex_unlock(&mux_state_pc);
 		pthread_mutex_lock(&mux_parcontr_pc);
-			par_control_new = par_control_pc;
+			pthread_mutex_lock(&mux_ref_pc);
+				pthread_mutex_lock(&mux_state_pc);
+					gui_draw(state_pc, ref_pc, par_control_pc, view);					
+				pthread_mutex_unlock(&mux_state_pc);
+			pthread_mutex_unlock(&mux_ref_pc);
 		pthread_mutex_unlock(&mux_parcontr_pc);
-	
-		
-		//--------- ANIMAZIONE
-		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
-			vista_alto(state_new.alpha, ref_new.alpha);
-			
-			draw = 1;
-		}
 
-		if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
-			vista_lato(state_new.theta, ref_new.theta);
-			draw = 1;
-		}
-
-		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
-			ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
-			vista_asson(state_new.alpha, ref_new.alpha, state_new.theta, ref_new.theta, view_new.lon, view_new.lat);
-			draw = 1;
-		}
-
-		//--------- SCRITTE
-		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.up_kp_alpha != par_control_old.up_kp_alpha || par_control_new.up_kd_alpha != par_control_old.up_kd_alpha || par_control_new.up_kp_theta != par_control_old.up_kp_theta || par_control_new.up_kd_theta != par_control_old.up_kd_theta) 
-		{
-
-			// Riferimento
-			textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
-			sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref_new.alpha, INCR_ANG);
-			textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
-			// Stato
-			textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
-			sprintf(alphastr, "alpha = %5.2f    ", state_new.alpha);
-			textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
-			sprintf(thetastr, "theta = %5.2f    ", state_new.theta);
-			textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
-			sprintf(voltagestr, "Volt = %5.2f V", state_new.voltage);
-			textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
-			// Par control
-			textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
-			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control_new.up_kp_alpha, par_control_new.up_kd_alpha);
-			textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
-			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control_new.up_kp_theta, par_control_new.up_kd_theta);
-			textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
-			//sprintf(parcontrstrsu, "Swing Up: Ksu = %5.2f n/m    ", par_control_new.ksu);
-			//textout_ex(scrbuf, font, parcontrstrsu,scritte.x, scritte.y[12], col.scr, col.bck);
-			// deadline_miss
-			textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[14], col.scr, col.bck);
-			sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
-			textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[15], col.scr, col.bck);
-			sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
-			textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[16], col.scr, col.bck);
-			
-			/*
-			// motor
-			if(brake){
-				sprintf(motor_str, "Motore disattivo.");
-			}else{
-				sprintf(motor_str, "Motore attivo!   ");
-			}
-			textout_ex(scrbuf, font, motor_str,scritte.x, scritte.y[18], col.scr, col.bck);
-			
-			*/
-			// swingup
-			if(ref_pc.swingup){
-				sprintf(swingup_str, "Controllore Swingup attivo!  ");
-			}else{
-				sprintf(swingup_str, "Controllore Swingup disattivo");
-			}
-			textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[19], col.scr, col.bck);
-			
-			
-			draw = 1;
-		}
-
-		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old = par_control_new;
-		
 		//--------- end task
 		if(deadline_miss(id)){
 			dl_miss_gui+=1;
@@ -310,6 +206,86 @@ void* gui(void* arg){
 		
 		wait_for_period(id);		// wait to next period
 	}
+	return 0;
+}
+	
+int gui_draw(state_pc_t state_new, ref_t ref_new, par_ctrl_t par_control_new, view_t view_new) {
+	static state_pc_t state_old = {1, 1, 1};
+    	static ref_t ref_old = {1, 1, 1};
+	static view_t view_old = {1, 1};
+	static par_ctrl_t par_control_old = {1, 1, 1, 1, 1,
+                                      1, 1, {1, 1},
+                                      {1,1}};
+
+	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; // stringhe di comunicazione che vengono aggiornate
+	char parcontrstralpha[42], parcontrstrtheta[42];//,parcontrstrsu[34];	
+	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
+	//char motor_str[18];
+	char swingup_str[31];
+	int draw = 0;
+
+	//--------- ANIMAZIONE
+	if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
+		vista_alto(state_new.alpha, ref_new.alpha);
+		draw = 1;
+	}
+
+	if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
+		vista_lato(state_new.theta, ref_new.theta);
+		draw = 1;
+	}
+
+	if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
+		ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
+		vista_asson(state_new.alpha, ref_new.alpha, state_new.theta, ref_new.theta, view_new.lon, view_new.lat);
+		draw = 1;
+	}
+
+	//--------- SCRITTE
+	if (state_new.alpha != state_old.alpha || 	state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha ||
+	par_control_new.up_kp_alpha != par_control_old.up_kp_alpha ||
+	par_control_new.up_kd_alpha != par_control_old.up_kd_alpha ||
+	par_control_new.up_kp_theta != par_control_old.up_kp_theta ||
+	par_control_new.up_kd_theta != par_control_old.up_kd_theta)
+    {
+
+		// Riferimento
+		textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
+		sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref_new.alpha, INCR_ANG);
+		textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
+		// Stato
+		textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
+		sprintf(alphastr, "alpha = %5.2f    ", state_new.alpha);
+		textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
+		sprintf(thetastr, "theta = %5.2f    ", state_new.theta);
+		textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
+		sprintf(voltagestr, "Volt = %5.2f V", state_new.voltage);
+		textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
+		// Par control
+		textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
+		sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control_new.up_kp_alpha, par_control_new.up_kd_alpha);
+		textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
+		sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control_new.up_kp_theta, par_control_new.up_kd_theta);
+		textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
+		// deadline_miss
+		textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[14], col.scr, col.bck);
+		sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
+		textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[15], col.scr, col.bck);
+		sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
+		textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[16], col.scr, col.bck);
+		// swingup
+		if(ref_pc.swingup){
+			sprintf(swingup_str, "Controllore Swingup attivo!  ");
+		}else{
+			sprintf(swingup_str, "Controllore Swingup disattivo");
+		}
+		textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[19], col.scr, col.bck);
+
+		draw = 1;
+	}
+
+	if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+	state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old = par_control_new;
 	return 0;
 }
 
@@ -350,9 +326,7 @@ void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos L
 	Vect P; Point PAlleg;
 
 	step = 2*M_PI/NUM_POINTS;
-	
-//	alpha = ((int)alpha)%360;
-	
+
 	if (alpha < refalpha) {
 		initial = rad(alpha);
 		final = rad(refalpha);
@@ -377,12 +351,7 @@ void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, Ang
 	Vect P; Point PAlleg;
 
 	step = 2*M_PI/NUM_POINTS;
-	
-//	float theta_loc;
-//	theta_loc = theta;
-//	if(theta_loc>350){theta_loc -= 360;}
-//	if(theta_loc<-350){theta_loc += 360;}
-	
+
 	if (theta < reftheta) {
 		initial = rad(theta);
 		final = rad(reftheta);
@@ -561,12 +530,7 @@ void vista_lato(float theta, float reftheta) {
 	int l2 = L2_LATO;
 	AngleSinCos Theta, RefTheta;
 	TwoPoints riflink2lato, link2lato;
-	
-//	float theta_loc;
-//	theta_loc = theta;
-//	if(theta_loc>350){theta_loc -= 360;}
-//	if(theta_loc<-350){theta_loc += 360;}
-	
+
 	Theta.sin = sinf(rad(theta));	Theta.cos = cosf(rad(theta));
 	RefTheta.sin = sinf(rad(reftheta)); RefTheta.cos = cosf(rad(reftheta));
 

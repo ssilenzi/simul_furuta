@@ -19,6 +19,7 @@ int gui_init();
 
 // GUI
 void* gui(void* arg);
+int gui_draw(state_pc_t state_new, ref_t ref_new, par_ctrl_t par_control_new, view_t view_new);
 
 
 
