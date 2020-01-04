@@ -9,7 +9,7 @@
  *
  * Model version                  : 1.247
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Fri Jan  3 22:18:41 2020
+ * C/C++ source code generated on : Sat Jan  4 11:34:21 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -80,7 +80,7 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
   /* DiscreteStateSpace: '<S2>/Discrete State-Space' */
   {
     rtb_current = 1.0F*fast_DW.DiscreteStateSpace_DSTATE;
-    rtb_current += 0.161290318F*rtb_Sum1;
+    rtb_current += 0.337837845F*rtb_Sum1;
   }
 
   /* SignalConversion generated from: '<S9>/ SFunction ' incorporates:
@@ -141,12 +141,12 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
    *  Delay: '<S6>/Delay'
    *  MATLAB Function: '<S6>/f_mecc'
    */
-  rtb_TmpSignalConversionAtSFun_1 = 5.0E-5F * fast_DW.Delay_DSTATE[2] +
+  rtb_TmpSignalConversionAtSFun_1 = 0.0005F * fast_DW.Delay_DSTATE[2] +
     fast_DW.DiscreteTimeIntegrator_DSTATE[0];
-  q_idx_1 = 5.0E-5F * fast_DW.Delay_DSTATE[3] +
+  q_idx_1 = 0.0005F * fast_DW.Delay_DSTATE[3] +
     fast_DW.DiscreteTimeIntegrator_DSTATE[1];
-  q_idx_2 = 5.0E-5F * rtb_q_d_idx_2 + fast_DW.DiscreteTimeIntegrator_DSTATE[2];
-  q_idx_3 = 5.0E-5F * rtb_TmpSignalConversionAtSFun_0 +
+  q_idx_2 = 0.0005F * rtb_q_d_idx_2 + fast_DW.DiscreteTimeIntegrator_DSTATE[2];
+  q_idx_3 = 0.0005F * rtb_TmpSignalConversionAtSFun_0 +
     fast_DW.DiscreteTimeIntegrator_DSTATE[3];
 
   /* Sum: '<S1>/Sum3' */
@@ -219,18 +219,18 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
   /* Update for DiscreteStateSpace: '<S2>/Discrete State-Space' */
   {
     real32_T xnew[1];
-    xnew[0] = 0.161290333F*fast_DW.DiscreteStateSpace_DSTATE;
-    xnew[0] += 0.187304884F*rtb_Sum1;
+    xnew[0] = (-0.756756783F)*fast_DW.DiscreteStateSpace_DSTATE;
+    xnew[0] += 0.0821767673F*rtb_Sum1;
     (void) memcpy(&fast_DW.DiscreteStateSpace_DSTATE, xnew,
                   sizeof(real32_T)*1);
   }
 
   /* Update for DiscreteIntegrator: '<S6>/Discrete-Time Integrator' */
-  fast_DW.DiscreteTimeIntegrator_DSTATE[0] = 5.0E-5F * rtb_q_d_idx_0 +
+  fast_DW.DiscreteTimeIntegrator_DSTATE[0] = 0.0005F * rtb_q_d_idx_0 +
     rtb_TmpSignalConversionAtSFun_1;
-  fast_DW.DiscreteTimeIntegrator_DSTATE[1] = 5.0E-5F * rtb_q_d_idx_1 + q_idx_1;
-  fast_DW.DiscreteTimeIntegrator_DSTATE[2] = 5.0E-5F * rtb_q_d_idx_2 + q_idx_2;
-  fast_DW.DiscreteTimeIntegrator_DSTATE[3] = 5.0E-5F *
+  fast_DW.DiscreteTimeIntegrator_DSTATE[1] = 0.0005F * rtb_q_d_idx_1 + q_idx_1;
+  fast_DW.DiscreteTimeIntegrator_DSTATE[2] = 0.0005F * rtb_q_d_idx_2 + q_idx_2;
+  fast_DW.DiscreteTimeIntegrator_DSTATE[3] = 0.0005F *
     rtb_TmpSignalConversionAtSFun_0 + q_idx_3;
 }
 
