@@ -11,7 +11,7 @@
 // stato, _0 iniziale 
 #define ALPHA_0				0
 #define ALPHADOT_0			0
-#define THETA_0				0
+#define THETA_0				180
 #define THETADOT_0			0
 #define CURRENT_0			0
 #define VOLTAGE_0			0
@@ -77,7 +77,7 @@
 //ref
 #define ALPHA_REF			0
 #define THETA_REF			0
-#define SWINGUP_DEF			1
+#define SWINGUP_DEF			0
 
 
 //----------- tasks, in ordine di priorita`

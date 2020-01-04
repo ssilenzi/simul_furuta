@@ -118,6 +118,7 @@ pthread_mutex_t 	mux_ref_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusi
 
 ref_t ref= {ALPHA_REF, THETA_REF, SWINGUP_DEF};
 real32_T rtb_rad_to_deg1[2]; // variabile locale che condiene il valore di alpha e theta in gradi.
+real32_T voltage;
 
 DW_fast_T fast_DW;
 DW_slow_T slow_DW;
@@ -188,15 +189,17 @@ void* control(void* arg){
 			par_ctrl = par_control_board;
 		pthread_mutex_unlock(&mux_parcontr_board);
 		pthread_mutex_lock(&mux_ref_board);
-			ref = ref_board;
+			ref.alpha = ref_board.alpha;
+            ref.swingup = ref_board.swingup;
+            ref_board.theta = ref.theta;
 		pthread_mutex_unlock(&mux_ref_board);
 		pthread_mutex_lock(&mux_dn);
 			dn_ctrl = dn;
 		pthread_mutex_unlock(&mux_dn);
-		
+
 		controller(ref.alpha, ref.swingup, state_board.CNT_alpha,
              state_board.CNT_theta, dn_ctrl.delay, &ref.theta, rtb_rad_to_deg1,
-             &state_pc.voltage, &state_board.CCR);
+             &voltage, &state_board.CCR);
 		
 		disturbance_and_noise(dn_ctrl.kick, &slow_DW.dist, dn_ctrl.noise);
 		dn_ctrl.dist = slow_DW.dist;
@@ -227,7 +230,9 @@ void* compc(void* arg){
 		// scrittura di ref_pc su buffer
 		pthread_mutex_lock(&mux_ref_buffer);
 			pthread_mutex_lock(&mux_ref_pc);
-				ref_buffer = ref_pc;
+				ref_buffer.alpha = ref_pc.alpha;
+                ref_buffer.swingup = ref_pc.swingup;
+                ref_pc.theta = ref_buffer.theta;
 			pthread_mutex_unlock(&mux_ref_pc);
 		pthread_mutex_unlock(&mux_ref_buffer);
 		
@@ -268,7 +273,9 @@ void* comboard(void* arg){
 		// lettura di ref da buffer, scrittura di ref_board
 		pthread_mutex_lock(&mux_ref_buffer);
 			pthread_mutex_lock(&mux_ref_board);
-				ref_board = ref_buffer;
+				ref_board.alpha = ref_buffer.alpha;
+				ref_board.swingup = ref_buffer.swingup;
+                ref_buffer.theta = ref_board.theta;
 			pthread_mutex_unlock(&mux_ref_board);
 		pthread_mutex_unlock(&mux_ref_buffer);
 		
@@ -286,7 +293,7 @@ void* comboard(void* arg){
 			pthread_mutex_lock(&mux_state_board);
 				state_buffer.alpha = rtb_rad_to_deg1[0];
 				state_buffer.theta = rtb_rad_to_deg1[1];
-				state_buffer.voltage = ((float)state_board.CCR-CCR_MAX/2)*12.0F/ CCR_MAX;
+				state_buffer.voltage = voltage;
 			pthread_mutex_unlock(&mux_state_board);
 		pthread_mutex_unlock(&mux_state_buffer);
 		

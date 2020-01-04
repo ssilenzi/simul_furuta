@@ -351,7 +351,7 @@ void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos L
 
 	step = 2*M_PI/NUM_POINTS;
 	
-	alpha = ((int)alpha)%360;
+//	alpha = ((int)alpha)%360;
 	
 	if (alpha < refalpha) {
 		initial = rad(alpha);
@@ -378,17 +378,17 @@ void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, Ang
 
 	step = 2*M_PI/NUM_POINTS;
 	
-	float theta_loc;
-	theta_loc = theta;
-	if(theta_loc>350){theta_loc -= 360;}
-	if(theta_loc<-350){theta_loc += 360;}
+//	float theta_loc;
+//	theta_loc = theta;
+//	if(theta_loc>350){theta_loc -= 360;}
+//	if(theta_loc<-350){theta_loc += 360;}
 	
-	if (theta_loc < reftheta) {
-		initial = rad(theta_loc);
+	if (theta < reftheta) {
+		initial = rad(theta);
 		final = rad(reftheta);
 	} else {
 		initial = rad(reftheta);
-		final = rad(theta_loc);
+		final = rad(theta);
 	}// end if
 
 	for (float t = initial; t < final; t = t + step) {
