@@ -6,7 +6,7 @@ extern ref_t 					ref_pc;
 extern pthread_mutex_t 		mux_ref_pc;			// mutual exclusion for ref
 extern state_pc_t 				state_pc;
 extern pthread_mutex_t 		mux_state_pc;
-extern View 				view;
+extern view_t 				view;
 extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t			par_control_reset;
@@ -199,8 +199,8 @@ void* gui(void* arg){
 	static state_pc_t state_new;
     static ref_t ref_old = {1, 1, 1};
 	static ref_t ref_new = {1, 1, 1};
-	static View view_old = {1, 1};
-	static View view_new = {1, 1};
+	static view_t view_old = {1, 1};
+	static view_t view_new = {1, 1};
 
 	static par_ctrl_t par_control_new;
 	static par_ctrl_t par_control_old;
@@ -562,12 +562,12 @@ void vista_lato(float theta, float reftheta) {
 	AngleSinCos Theta, RefTheta;
 	TwoPoints riflink2lato, link2lato;
 	
-	float theta_loc;
-	theta_loc = theta;
-	if(theta_loc>350){theta_loc -= 360;}
-	if(theta_loc<-350){theta_loc += 360;}
+//	float theta_loc;
+//	theta_loc = theta;
+//	if(theta_loc>350){theta_loc -= 360;}
+//	if(theta_loc<-350){theta_loc += 360;}
 	
-	Theta.sin = sinf(rad(theta_loc));	Theta.cos = cosf(rad(theta_loc));
+	Theta.sin = sinf(rad(theta));	Theta.cos = cosf(rad(theta));
 	RefTheta.sin = sinf(rad(reftheta)); RefTheta.cos = cosf(rad(reftheta));
 
 	// Reset della vista
@@ -582,7 +582,7 @@ void vista_lato(float theta, float reftheta) {
 	link2lato.x2 = lato0.x + l2 * Theta.sin;
 	link2lato.y2 = lato0.y - l2 * Theta.cos;
 	line(scrbuf, riflink2lato.x1, riflink2lato.y1, riflink2lato.x2, riflink2lato.y2, col.rif); // rif link lato
-	circlerif_parup(scrbuf, lato0, l2, theta_loc, reftheta, col.rif); // rif angolo theta
+	circlerif_parup(scrbuf, lato0, l2, theta, reftheta, col.rif); // rif angolo theta
 	thick_line(scrbuf, link2lato.x1, link2lato.y1, link2lato.x2, link2lato.y2, THICK, col.mdl2); // link lato
 }
 // vista_alto, disegna vista alto

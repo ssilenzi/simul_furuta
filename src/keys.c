@@ -10,7 +10,7 @@ extern state_board_t 		state_board;
 extern state_board_t 		state_board_reset;
 extern pthread_mutex_t 		mux_state_pc;
 extern pthread_mutex_t 		mux_state_board;
-extern View 				view;
+extern view_t 				view;
 extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t 			par_control_reset;

@@ -177,7 +177,7 @@ typedef struct{
 typedef struct {
     int lon;
     int lat;
-} View; 		// structure della vista
+} view_t; 		// structure della vista
 
 
 

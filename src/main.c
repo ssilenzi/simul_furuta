@@ -150,7 +150,7 @@ int end = 0;			// regola chiusura threads
 ref_t ref_pc = {ALPHA_REF, THETA_REF, SWINGUP_DEF};		// struct riferimento 
 pthread_mutex_t 	mux_ref_pc = PTHREAD_MUTEX_INITIALIZER;
 ref_t ref_reset = {ALPHA_REF, THETA_REF, SWINGUP_DEF};
-View view = {LON_0, LAT_0};			// struct vista
+view_t view = {LON_0, LAT_0};			// struct vista
 pthread_mutex_t 	mux_view = PTHREAD_MUTEX_INITIALIZER;
 
 //----------- counter deadline miss
