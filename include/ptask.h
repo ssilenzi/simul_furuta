@@ -60,5 +60,7 @@ int time_cmp(	struct timespec t1,
 
 long time_dist(	struct timespec *t1, 		// return time distance in nanoseconds, negative if t2<t1
 				struct timespec *t2);
+
+int cpu_set(int cpu);
 	
 #endif

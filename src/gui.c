@@ -195,6 +195,7 @@ int gui_init(){
 
 //----------- gui
 void* gui(void* arg){
+    cpu_set(0);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);

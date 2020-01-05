@@ -131,6 +131,7 @@ dn_t dn_ctrl;
 
 //----------- state_update
 void* state_update(void* arg){
+    cpu_set(2);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
@@ -171,6 +172,7 @@ void* state_update(void* arg){
 
 //---------- control
 void* control(void* arg){
+    cpu_set(1);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
@@ -219,6 +221,7 @@ void* control(void* arg){
 
 // task di comunicazione pc, scrive ref_pc e par_control_pc su buffer, legge state da buffer
 void* compc(void* arg){
+    cpu_set(0);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
@@ -261,6 +264,7 @@ void* compc(void* arg){
 
 // task di comunicazione scheda, scrive state su buffer, legge par_control e ref da buffer			DA SISTEMARE!!!!!!!!!!!!!!!!!!!!!!!
 void* comboard(void* arg){
+    cpu_set(1);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);

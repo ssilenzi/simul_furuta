@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <time.h>
 #include <sched.h>
 #include <pthread.h>
@@ -94,8 +95,15 @@ int time_cmp(struct timespec t1, struct timespec t2){
 	return 0;
 }
 
-long time_dist(struct timespec *t1, struct timespec *t2){
-	long sec = t2->tv_sec - t1->tv_sec;
-	long nsec = t2->tv_nsec - t1->tv_nsec;
-	return (sec*1e9 + nsec);
+long time_dist(struct timespec *t1, struct timespec *t2) {
+    long sec = t2->tv_sec - t1->tv_sec;
+    long nsec = t2->tv_nsec - t1->tv_nsec;
+    return (sec * 1e9 + nsec);
+}
+
+int cpu_set(int cpu){
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(cpu, &cpuset);
+    return sched_setaffinity(0, sizeof(cpuset), &cpuset);
 }

@@ -24,6 +24,7 @@ extern int dl_miss_keys;
 extern int end;
 
 void* keys(void* arg){
+    cpu_set(0);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
