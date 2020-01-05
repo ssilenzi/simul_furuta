@@ -40,16 +40,8 @@ void* keys(void* arg){
 				end = 1;
 			}
 			
-			// R, reset state_pc e ref_pc
-			if (scan == KEY_R) {
-				//Devo resettare per forza state_board, il flusso di update su state e`: board -> buffer -> pc
-				
-				/* crea casino con i delay!!!
-				pthread_mutex_lock(&mux_state_board);
-					state_board = state_board_reset;
-				pthread_mutex_unlock(&mux_state_board);
-				*/
-				
+			// 1, reset state_pc e ref_pc
+			if (scan == KEY_1) {
 				pthread_mutex_lock(&mux_ref_pc);
 					ref_pc.alpha = ALPHA_0;
 					ref_pc.theta = THETA_0;
@@ -59,6 +51,7 @@ void* keys(void* arg){
 			
 			// W, kick
 			if (scan == KEY_W){
+				// SAREBBE CARINO SE TORNASSE A ZERO DOPO POCO
 				pthread_mutex_lock(&mux_dn);
 				if(dn.kick){
 					dn.kick = 0;
@@ -66,33 +59,11 @@ void* keys(void* arg){
 					dn.kick = 1;
 				}
 				pthread_mutex_unlock(&mux_dn);
-				
-				
-				
-				
-				/*
-				pthread_mutex_lock(&mux_brake);
-				if(brake){
-					brake = 0;
-				}else{
-					brake = 1;
-				}
-				pthread_mutex_unlock(&mux_brake);
-				*/
-				
+
 			}
 			
-			// Q, attiva/disattiva controllore di swingup
+			// Q, regola swingup
 			if (scan == KEY_Q){
-				/*
-				pthread_mutex_lock(&mux_swingup);
-				if(swingup){
-					swingup = 0;
-				}else{
-					swingup = 1;
-				}
-				pthread_mutex_unlock(&mux_swingup);
-				*/
 				pthread_mutex_lock(&mux_ref_pc);
 				if(ref_pc.swingup){
 					ref_pc.swingup = 0;
@@ -106,7 +77,7 @@ void* keys(void* arg){
 			/*
 			 * Par_control
 			 */
-			
+			// controllore UP
 			// alpha kp
 			if(scan == KEY_Y){
 				pthread_mutex_lock(&mux_parcontr_pc);
@@ -180,15 +151,15 @@ void* keys(void* arg){
 			}
 			
 			
-			// E, reset par_control_pc
-			if(scan == KEY_E){
+			// 3, reset par_control_pc
+			if(scan == KEY_3){
 				pthread_mutex_lock(&mux_parcontr_pc);
 					par_control_pc = par_control_reset;
 				pthread_mutex_unlock(&mux_parcontr_pc);
 			}
 			
 			/*
-			 * par_dn fg
+			 *	par_dn
 			 */
 			if(scan == KEY_F){
 				par_dn.dist_amp += INCR_K/2;
@@ -202,15 +173,33 @@ void* keys(void* arg){
 			if(scan == KEY_C && par_dn.noise_amp != 0){
 				par_dn.noise_amp += -1;
 			}
-			if(scan == KEY_1){
+			if(scan == KEY_4){
 				par_dn.dist_amp = DIST_AMP_DEF;
 				par_dn.noise_amp = NOISE_AMP_DEF;
 			}
 			
+			/*
+			 * 	DELAY
+			 */
+			if(scan == KEY_R){
+				pthread_mutex_lock(&mux_dn);
+					dn.delay += 1;
+				pthread_mutex_unlock(&mux_dn);
+			}
+			if(scan == KEY_T){
+				pthread_mutex_lock(&mux_dn);
+					dn.delay += -1;
+				pthread_mutex_unlock(&mux_dn);
+			}
 			
+			if(scan == KEY_5){
+				pthread_mutex_lock(&mux_dn);
+					dn.delay = 0;
+				pthread_mutex_unlock(&mux_dn);
+			}
 			
 			/*
-			*      RIFERIMENTO
+			*	RIFERIMENTO
 			*/
 			// A, incrementa riferimento di alpha
 			if (scan==KEY_A) {
@@ -230,7 +219,7 @@ void* keys(void* arg){
 			*      VIEW
 			*/ 
 			// reset vista
-			if (scan==KEY_T) {
+			if (scan==KEY_2) {
 				pthread_mutex_lock(&mux_view);
 					view.lon = LON_0;
 					view.lat = LAT_0;

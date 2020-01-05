@@ -48,15 +48,18 @@
 
 // par_control	
 #define KP_UP_ALPHA_DEF 	-2.23606801F 	// Valori di default delle costanti per i controllori
-#define KP_UP_THETA_DEF 	-20.0269184F 	// UP = quando il pendolo e` su, DWON = quando il pendolo e` giu`
+#define KP_UP_THETA_DEF 	-20.0269184F 	// UP = controllore per pendolo su, DOWN = controllore per pendolo giu`
 #define KD_UP_ALPHA_DEF 	-2.08667636F 	// P = proporzionale, D = derivativo
 #define KD_UP_THETA_DEF 	-2.67355F
 #define KP_DOWN_ALPHA_DEF	0.9F
 #define KD_DOWN_ALPHA_DEF	0.0F
-#define DPOLE_REF			0.990049839F
-#define REF_GEN_NUM			{ 0.00995016098F, 0.0F }
-#define REF_GEN_DEN			{ 1.0F, -0.990049839F }
-#define INCR_K				0.5 // incremento da tastiera 
+
+#define W_REF				2.0F
+#define DPOLE_REF			expf(- W_REF * 0.005F)		//0.990049839F
+#define REF_GEN_NUM			{ 1.0F - DPOLE_REF, 0.0F }	//{ 0.00995016098F, 0.0F }
+#define REF_GEN_DEN			{ 1.0F, - DPOLE_REF }		//{ 1.0F, -0.990049839F }
+
+#define INCR_K				0.5 // incremento da tastiera per i parametri del controllore
 
 // dn
 #define KICK_DEF			0U

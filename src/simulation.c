@@ -51,6 +51,7 @@ state_board_t 	state_board_reset =
     CNT_THETA_0,
     CCR_0,
 	};
+	
 
 par_ctrl_t par_control_board =
 {KP_UP_ALPHA_DEF,
@@ -62,6 +63,7 @@ par_ctrl_t par_control_board =
 	DPOLE_REF,
 	REF_GEN_NUM,
 	REF_GEN_DEN}; // parametri per il controllo scheda
+	
 par_ctrl_t par_ctrl; // da rinominare nel file controller.c
 
 /* OLD
@@ -139,8 +141,8 @@ void* state_update(void* arg){
 	
 	// init
 	physics_Init();
-	uint16_T rtb_Cast2[2]; 	// da spostare in physics_Init una volta finito
-	uint16_T CCR_local;		// da spostare in physics_Init una volta finito
+	uint16_T rtb_Cast2[2];
+	uint16_T CCR_local;
 	
 	while(!end){
 		
@@ -182,7 +184,6 @@ void* control(void* arg){
 	controller_Init();
 	disturbance_and_noise_Init(&slow_DW.dist);
 	
-
 	while(!end){
 		
 		pthread_mutex_lock(&mux_parcontr_board);

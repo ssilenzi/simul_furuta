@@ -3,7 +3,7 @@
 *	
 *	Titolo: Inverted Pendulum
 *
-*	Descrizione generale e funzionalita`
+*	Descrizione generale e funzionalita`.
 * 			Il programma simula l'interazione BLABLABLA SCRIVIMI
 *		
 * 		Task:
@@ -18,18 +18,35 @@
 * 		Fisica
 * 			- state_update BLABLABLA SCRIVIMI
 * 
-* 	Files:
-* 	condiviso.h
-* 	gui.c, gui.h
-* 	keys.c, keys.h
-* 
+* 	Files.
+* 	Scritti da noi:
+* 	main.c, 
+* 	condiviso.h,
+* 	gui.c, gui.h,
+* 	keys.c, keys.h,
+* 	simulation.c,
+* 	
+* 	Generati da Matlab:
+* 	
 * 
 * 
 * 
 * 
 *--------------------------------------------------------------------------------------------------------------------------*/
 
+/*	TO DO LIST
+ *  - modificare il comportamento di dn.dist. Una volta premuto vorrei tornasse a zero da solo, evitando di clickare due volte
+ *  - Rivedere il task della gui, farlo disegnare sempre?
+ *  - scrivere il sottotitolo
+ * 	- pulire codice
+ * 	- commentare ogni funzione
+ * 
+ */
 
+
+
+
+//-----------  include
 #include <allegro.h>
 #include <stdio.h>
 #include <math.h>
@@ -44,32 +61,13 @@
 #include "keys.h"
 #include "simulation.h"
 
-/*
-#include "controller.h"
-#include "physics.h"
-#include "disturbance_and_noise.h"
-*/
-
-//----------- Variabili
+//----------- Variabili usate da piu` task
 /*
  * _pc = variabile su pc
  * _board = variabile su scheda simulata
  * _buffer = variabile su buffer
  * 
  */
-/* OLD
-State state_pc=
-	{ALPHA_0, 
-	ALPHADOT_0,
-	THETA_0,
-	THETADOT_0,
-	CURRENT_0,
-	VOLTAGE_0,
-	CCR_0,
-	CNT_ALPHA_0,
-	CNT_THETA_0
-	};
-	*/
 
 state_pc_t state_pc=
 {	ALPHA_0,
@@ -78,36 +76,8 @@ state_pc_t state_pc=
 }; 
 pthread_mutex_t 	mux_state_pc = PTHREAD_MUTEX_INITIALIZER;
 
-/*State state_reset = 
-	{ALPHA_0, 
-	ALPHADOT_0,
-	THETA_0,
-	THETADOT_0,
-	CURRENT_0,
-	VOLTAGE_0,
-	CCR_0,
-	ENC_ALPHA_0,
-	ENC_THETA_0
-	};// struct stato per il reset
-*/
-
 	
 //----------- par_control
-/* OLD
- * Par_control par_control_pc = 
-	{KP_ALPHA_DEF, 
-	KD_ALPHA_DEF, 
-	KP_THETA_DEF, 
-	KD_THETA_DEF, 
-	KSU_DEF};	// struct con parametri del controllore
-pthread_mutex_t 	mux_parcontr_pc = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
-Par_control par_control_reset = 
-	{KP_ALPHA_DEF, 
-	KD_ALPHA_DEF, 
-	KP_THETA_DEF, 
-	KD_THETA_DEF, 
-	KSU_DEF};	// struct con parmetri del controllore di default
-	*/
 par_ctrl_t par_control_pc =
 {KP_UP_ALPHA_DEF,
 	KP_UP_THETA_DEF,
@@ -140,16 +110,11 @@ pthread_mutex_t		mux_dn = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per dn
 	
 //----------- miscellanee
 int end = 0;			// regola chiusura threads
-//int brake = 1;			// spegne il motore ma non la scheda consentendo di continuare la lettura degli encoder
-//pthread_mutex_t		mux_brake = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per brake
-
-//int swingup = 0;		// regola il controllore di swingup, swingup = 1 attivo
-//pthread_mutex_t		mux_swingup = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per swingup
 
 //----------- variabili lato pc	
 ref_t ref_pc = {ALPHA_REF, THETA_REF, SWINGUP_DEF};		// struct riferimento 
 pthread_mutex_t 	mux_ref_pc = PTHREAD_MUTEX_INITIALIZER;
-ref_t ref_reset = {ALPHA_REF, THETA_REF, SWINGUP_DEF};
+ref_t ref_reset = {ALPHA_REF, THETA_REF, SWINGUP_DEF};	// struct riferimento per il reset
 view_t view = {LON_0, LAT_0};			// struct vista
 pthread_mutex_t 	mux_view = PTHREAD_MUTEX_INITIALIZER;
 
@@ -166,19 +131,17 @@ int init(){
 	printf("Caricamento...\n");
 	srand(time(NULL));
 
-	printf("Inizializzazione grafica...\n");
-	if (gui_init()) return 1;   
+	//printf("Inizializzazione grafica...\n");
+	//if (gui_init()) return 1;   
     return 0;
 }
-
-
 
 //----------- task_creation
 int task_creation(){
 	printf("Creazione task...\n");
-	// info creazione tasks
+	// Info creazione tasks
 	// int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
-	// period = drel (rate monotonic)
+	// period = drel
 		
 	// task fisica
 	task_create(state_update, ID_STATE_UPDATE, PERIOD_STATE_UPDATE, PERIOD_STATE_UPDATE, PRIO_STATE_UPDATE); 	// task update dello stato
@@ -189,6 +152,7 @@ int task_creation(){
 	task_create(compc, ID_COMPC, PERIOD_COMPC, PERIOD_COMPC, PRIO_COMPC);										// task comunicazione dal pc su buffer
 	task_create(keys, ID_KEYS, PERIOD_KEYS, PERIOD_KEYS, PRIO_KEYS);											// Interazioni con tastiera
 	task_create(gui, ID_GUI, 1000/FPS, 1000/FPS, PRIO_GUI);														// update interfaccia
+	
 	printf("Simulazione avviata!\n");
 
 	return 0;
