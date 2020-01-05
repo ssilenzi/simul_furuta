@@ -35,12 +35,9 @@
 *--------------------------------------------------------------------------------------------------------------------------*/
 
 /*	TO DO LIST
- *  - modificare il comportamento di dn.dist. Una volta premuto vorrei tornasse a zero da solo, evitando di clickare due volte
- *  - Rivedere il task della gui, farlo disegnare sempre?
  *  - scrivere il sottotitolo
  * 	- pulire codice
  * 	- commentare ogni funzione
- * 
  */
 
 
@@ -131,8 +128,8 @@ int init(){
 	printf("Caricamento...\n");
 	srand(time(NULL));
 
-	//printf("Inizializzazione grafica...\n");
-	//if (gui_init()) return 1;   
+	printf("Inizializzazione grafica...\n");
+	gui_init();
     return 0;
 }
 

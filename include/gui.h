@@ -50,6 +50,11 @@ void vista_asson(float alpha, float refalpha, float theta, float reftheta, float
 void vista_lato(float theta, float reftheta);
 void vista_alto(float alpha, float refalpha);
 
+// disegna le scritte
+void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control);
+
+// disegna l'interfaccia
+void gui_draw(state_pc_t state,ref_t ref, view_t view, par_ctrl_t par_control);
 
 
 #endif //SIMUL_FURUTA_GUI_H

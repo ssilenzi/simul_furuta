@@ -42,161 +42,11 @@ static struct{
 	int y[(int)(HSCREEN/DIST - 2)];
 } scritte; // array per scrivere "parametricamente" le scritte
 
-//----------- init gui
-int gui_init(){
-	// Init allegro
-	if (allegro_init() != 0)
-		return 1;
-	set_color_depth(COLOR_DEPTH); 	// RGB mode (32 bits)
-	install_keyboard();		//posso usare la tastiera
-
-	// dimensioni dei rettangoli
-	int hrett1 = HSCREEN - 2 * DIST; // altezza rettangolo 1
-	int wrett5 = WSCREEN - 3 * DIST - WRETT1;
-	int hrett3 = wrett5 / 2;
-	int wrett3 = wrett5 / 2;
-	int hrett4 = hrett3;
-	int wrett4 = wrett3;
-	int hrett2 = HSCREEN - 2 * DIST - hrett3;
-	int wrett2 = wrett5;
-
-	int qdistvert = HSCREEN/ DIST - 2; // quante DIST entrano dentro il mio schermo, dimensione dell'array scritte
-	scritte.x = 2*DIST;
-	for (int i = 0; i < qdistvert; i++) {
-		scritte.y[i] = DIST * (i+1);
-	} //popolo l'array scritte con le posizioni xy delle scritte
-
-	if (set_gfx_mode(GRAFICA, WSCREEN, HSCREEN, 0, 0) != 0) {
-		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-		allegro_message("Unable to set any graphic mode\n%s\n", allegro_error);
-		return 1;
-	}
-
-	scrbuf = create_bitmap(SCREEN_W, SCREEN_H);
-	if (!scrbuf) {
-		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
-		allegro_message("Unable to initialize page flipping\n");
-		return 1;
-	}
-
-	// scelta colori rettangoli, scritte, background
-	col.bck = COL_BCK;
-	col.rett = COL_RETT;
-	col.scr = COL_SCR;
-	// colori modello, rif
-	col.mdl = COL_MDL;
-	col.mdl2 = COL_MDL2;
-	col.vert = COL_VERT;
-	col.rif = COL_RIF;
-
-	// colora background
-	clear_to_color(scrbuf, col.bck);
-
-	// Disegno rettangoli e elementi statici
-	//rett1 - parametri, sinistra
-	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
-	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], dist_pause[50], swingup_pause[43], reset_par_dn[28], reset_delay[30]; 
-	sprintf(exit, "Premere Esc per uscire");
-	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
-
-	sprintf(reset1, "1 per resettare riferimento");
-	textout_ex(scrbuf, font, reset1, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
-
-	sprintf(reset3, "2 per resettare la vista");
-	textout_ex(scrbuf, font, reset3, scritte.x, scritte.y[qdistvert-3], col.scr, col.bck);
-	
-	sprintf(reset4, "3 per resettare i parametri del controllore");
-	textout_ex(scrbuf, font, reset4, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
-	
-	sprintf(reset_par_dn, "4 resetta disturbo e rumore");
-	textout_ex(scrbuf, font, reset_par_dn, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
-	
-	sprintf(reset_delay, "5 resetta ritardi");
-	textout_ex(scrbuf, font, reset_delay, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);	
-	
-	
-	sprintf(reset2, "Up, down, left, right per modificare la vista");
-	textout_ex(scrbuf, font, reset2, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
-
-	sprintf(dist_pause, "W disturba il sistema");
-	textout_ex(scrbuf, font, dist_pause, scritte.x, scritte.y[qdistvert-8], col.scr, col.bck);
-	
-	sprintf(swingup_pause, "Q attiva/disattiva swingup, default attivo");
-	textout_ex(scrbuf, font, swingup_pause, scritte.x, scritte.y[qdistvert-9], col.scr, col.bck);
-
-	
-	//-----------  disegno rettangoli
-	TwoPoints rett_asso, rett_alto, rett_lato;
-	Point titolo_asso, titolo_alto, titolo_lato;
-	char assonstr[50], altostr[50], latostr[50];
-	//rett2 - Vista assonometrica
-	rett_asso.x1 = DIST + WRETT1 + DIST;
-	rett_asso.y1 = DIST;
-	rett_asso.x2 = DIST + WRETT1 + DIST + wrett2;
-	rett_asso.y2 = DIST + hrett2;
-	rect(scrbuf, rett_asso.x1, rett_asso.y1, rett_asso.x2, rett_asso.y2, col.rett);
-	sprintf(assonstr, "Vista Assonometrica");
-	titolo_asso.x = DIST + WRETT1 + DIST + wrett2 /2 - 3.5*DIST;
-	titolo_asso.y = 2*DIST;
-	textout_ex(scrbuf, font, assonstr, titolo_asso.x, titolo_asso.y, col.scr, col.bck);
-	//rett3 - vista alto
-	rett_alto.x1 = DIST + WRETT1 + DIST;
-	rett_alto.y1 = DIST + hrett2;
-	rett_alto.x2 = DIST + WRETT1 + DIST + wrett3;
-	rett_alto.y2 = DIST + hrett2 + hrett3;
-	rect(scrbuf, rett_alto.x1, rett_alto.y1, rett_alto.x2, rett_alto.y2, col.rett);
-	sprintf(altostr, "Vista Alto");
-	titolo_alto.x = DIST + WRETT1 + DIST + wrett3 /2 - 2.1*DIST;
-	titolo_alto.y = DIST + hrett2 + DIST;
-	textout_ex(scrbuf, font, altostr, titolo_alto.x, titolo_alto.y,	col.scr, col.bck);
-	//rett4 - vista Lato
-	rett_lato.x1 = DIST + WRETT1 + DIST + wrett3;
-	rett_lato.y1 = DIST + hrett2;
-	rett_lato.x2 = DIST + WRETT1 + DIST + wrett3 + wrett4;
-	rett_lato.y2 = DIST + hrett2 + hrett4;
-	rect(scrbuf, rett_lato.x1, rett_lato.y1, rett_lato.x2, rett_lato.y2, col.rett);
-	sprintf(latostr, "Vista Lato");
-	titolo_lato.x = DIST + WRETT1 + DIST + wrett3 + wrett4/2 - 2.1*DIST;
-	titolo_lato.y = DIST + hrett2 + DIST;
-	textout_ex(scrbuf, font, latostr, titolo_lato.x, titolo_lato.y, col.scr, col.bck);
-
-	//----------------------------------
-	// Calcoli per la grafica
-	// posizione centrale rettangolo v.assonometrica
-	asson0.x = WRETT1 + wrett2/2 + 2*DIST;
-	asson0.y = hrett2/2 + DIST; // posizione centrale rettangolo v.asson
-	// posizione centrale rettangolo v.lato
-	lato0.x = WRETT1 + wrett3 + wrett4/2 + 2*DIST;
-	lato0.y = hrett2 + hrett3/2 + DIST;
-	lato0.y += DIST;
-	// posizione centrale rettangolo v.alto
-	alto0.x = WRETT1 + wrett3/2 + 2*DIST;
-	alto0.y = hrett2 + hrett3/2 + DIST;
-	alto0.y += DIST;
-	// reset viste
-	resetasson.x1 = WRETT1 + 2*DIST + 1;
-	resetasson.y1 = DIST + 1;
-	resetasson.y1 += 2*DIST;
-	resetasson.x2 = WRETT1 + wrett2 + 2*DIST - 1;
-	resetasson.y2 = hrett2 + DIST - 1;
-	resetalto.x1 = WRETT1 + 2*DIST + 1;
-	resetalto.y1 = hrett2 + DIST + 1;
-	resetalto.y1 += 2*DIST;
-	resetalto.x2 = WRETT1 + wrett3 + 2*DIST - 1;
-	resetalto.y2 = hrett2 + hrett3 + DIST - 1;
-	resetlato.x1 = WRETT1 + wrett3 + 2*DIST + 1;
-	resetlato.y1 = hrett2 + DIST + 1;
-	resetlato.y1 += 2*DIST;
-	resetlato.x2 = WRETT1 + wrett3 + wrett4 + 2*DIST - 1;
-	resetlato.y2 = hrett2 + hrett4 + DIST - 1;
-
-	return 0;
-}
-
-//----------- gui_draw
-void gui_draw(){
-	
-}
+// stringhe di comunicazione che vengono aggiornate
+	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; 
+	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65];
+	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
+	char swingup_str[31];
 
 //----------- gui
 void* gui(void* arg){
@@ -205,116 +55,30 @@ void* gui(void* arg){
 	set_activation(id);
 	
 	// init
-	gui_init();
+	//gui_init();
 
 	// variabili
-	static state_pc_t state_old = 
-		{ALPHA_0+1,
-		THETA_0+1,
-		VOLTAGE_0+1,
-		};
-	static state_pc_t state_new;
-    static ref_t ref_old = {1, 1, 1};
-	static ref_t ref_new = {1, 1, 1};
-	static view_t view_old = {1, 1};
-	static view_t view_new = {1, 1};
-
-	static par_ctrl_t par_control_new;
-	//static par_ctrl_t par_control_old;
-
-	// stringhe di comunicazione che vengono aggiornate
-	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; 
-	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65];
-	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
-	char swingup_str[31];
-	
-	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
+	static state_pc_t state_loc;
+	static ref_t ref_loc = {1, 1, 1};
+	static view_t view_loc = {1, 1};
+	static par_ctrl_t par_control_loc;
 	
 	while(!end){
 		
 		pthread_mutex_lock(&mux_state_pc);
-			state_new = state_pc;
+			state_loc = state_pc;
 		pthread_mutex_unlock(&mux_state_pc);
 		pthread_mutex_lock(&mux_ref_pc);
-			ref_new = ref_pc;
+			ref_loc = ref_pc;
 		pthread_mutex_unlock(&mux_ref_pc);
 		pthread_mutex_lock(&mux_state_pc);
-			view_new = view;
+			view_loc = view;
 		pthread_mutex_unlock(&mux_state_pc);
 		pthread_mutex_lock(&mux_parcontr_pc);
-			par_control_new = par_control_pc;
+			par_control_loc = par_control_pc;
 		pthread_mutex_unlock(&mux_parcontr_pc);
-	
 		
-		//--------- ANIMAZIONE
-		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
-			vista_alto(state_new.alpha, ref_new.alpha);
-			
-			draw = 1;
-		}
-
-		if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
-			vista_lato(state_new.theta, ref_new.theta);
-			draw = 1;
-		}
-
-		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
-			ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
-			vista_asson(state_new.alpha, ref_new.alpha, state_new.theta, ref_new.theta, view_new.lon, view_new.lat);
-			draw = 1;
-		}
-
-		//--------- SCRITTE
-		if (1)//state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.up_kp_alpha != par_control_old.up_kp_alpha || par_control_new.up_kd_alpha != par_control_old.up_kd_alpha || par_control_new.up_kp_theta != par_control_old.up_kp_theta || par_control_new.up_kd_theta != par_control_old.up_kd_theta || par_control_new.down_kd_alpha != par_control_old.down_kd_alpha || par_control_new.down_kp_alpha != par_control_old.down_kp_alpha) 
-		{
-
-			// ref
-			textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
-			sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref_new.alpha, INCR_ANG);
-			textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
-			// state
-			textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
-			sprintf(alphastr, "alpha = %5.2f    ", state_new.alpha);
-			textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
-			sprintf(thetastr, "theta = %5.2f    ", state_new.theta);
-			textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
-			sprintf(voltagestr, "Volt = %5.2f V", state_new.voltage);
-			textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
-			// par_control
-			textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
-			sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control_new.up_kp_alpha, par_control_new.up_kd_alpha);
-			textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
-			sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control_new.up_kp_theta, par_control_new.up_kd_theta);
-			textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
-			sprintf(parcontrstralphadown, "Alpha, basso: Kp = %5.2f v/b, Kd = %5.2f n/m  ", par_control_new.down_kp_alpha, par_control_new.down_kd_alpha);
-			textout_ex(scrbuf, font, parcontrstralphadown,scritte.x, scritte.y[12], col.scr, col.bck);
-			// par_dn e dn
-			textout_ex(scrbuf, font, "Disturbo, rumore e ritardi:", scritte.x, scritte.y[13], col.scr, col.bck);
-			sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2hu x/c, Rit: %2hhu r/t ", par_dn.dist_amp, par_dn.noise_amp, dn.delay);
-			textout_ex(scrbuf, font, pardnstr, scritte.x, scritte.y[14], col.scr, col.bck);
-			
-			// deadline_miss
-			textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[16], col.scr, col.bck);
-			sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
-			textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[17], col.scr, col.bck);
-			sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
-			textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[18], col.scr, col.bck);
-			
-			
-			// swingup
-			if(ref_pc.swingup){
-				sprintf(swingup_str, "Controllore Swingup attivo!  ");
-			}else{
-				sprintf(swingup_str, "Controllore Swingup disattivo");
-			}
-			textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[20], col.scr, col.bck);
-			
-			
-			draw = 1;
-		}
-
-		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-		state_old = state_new; ref_old = ref_new; view_old = view_new; //par_control_old = par_control_new;
+		gui_draw(state_loc, ref_loc, view_loc, par_control_loc);
 		
 		//--------- end task
 		if(deadline_miss(id)){
@@ -624,8 +388,213 @@ void vista_alto(float alpha, float refalpha) {
 }
 
 
+//----------- init gui
+int gui_init(){
+	// Init allegro
+	if (allegro_init() != 0)
+		return 1;
+	set_color_depth(COLOR_DEPTH); 	// RGB mode (32 bits)
+	install_keyboard();		//posso usare la tastiera
+
+	// dimensioni dei rettangoli
+	int hrett1 = HSCREEN - 2 * DIST; // altezza rettangolo 1
+	int wrett5 = WSCREEN - 3 * DIST - WRETT1;
+	int hrett3 = wrett5 / 2;
+	int wrett3 = wrett5 / 2;
+	int hrett4 = hrett3;
+	int wrett4 = wrett3;
+	int hrett2 = HSCREEN - 2 * DIST - hrett3;
+	int wrett2 = wrett5;
+
+	int qdistvert = HSCREEN/ DIST - 2; // quante DIST entrano dentro il mio schermo, dimensione dell'array scritte
+	scritte.x = 2*DIST;
+	for (int i = 0; i < qdistvert; i++) {
+		scritte.y[i] = DIST * (i+1);
+	} //popolo l'array scritte con le posizioni xy delle scritte
+
+	if (set_gfx_mode(GRAFICA, WSCREEN, HSCREEN, 0, 0) != 0) {
+		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+		allegro_message("Unable to set any graphic mode\n%s\n", allegro_error);
+		return 1;
+	}
+
+	scrbuf = create_bitmap(SCREEN_W, SCREEN_H);
+	if (!scrbuf) {
+		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
+		allegro_message("Unable to initialize page flipping\n");
+		return 1;
+	}
+
+	// scelta colori rettangoli, scritte, background
+	col.bck = COL_BCK;
+	col.rett = COL_RETT;
+	col.scr = COL_SCR;
+	// colori modello, rif
+	col.mdl = COL_MDL;
+	col.mdl2 = COL_MDL2;
+	col.vert = COL_VERT;
+	col.rif = COL_RIF;
+
+	// colora background
+	clear_to_color(scrbuf, col.bck);
+
+	// Disegno rettangoli e elementi statici
+	//rett1 - parametri, sinistra
+	rect(scrbuf, DIST, DIST, DIST + WRETT1, DIST + hrett1, col.rett);
+	char exit[50], reset1[50], reset2[50], reset3[50], reset4[50], dist_pause[50], swingup_pause[43], reset_par_dn[28], reset_delay[30]; 
+	sprintf(exit, "Premere Esc per uscire");
+	textout_ex(scrbuf, font, exit, scritte.x, scritte.y[qdistvert-1], col.scr, col.bck);
+
+	sprintf(reset1, "1 per resettare riferimento");
+	textout_ex(scrbuf, font, reset1, scritte.x, scritte.y[qdistvert-2], col.scr, col.bck);
+
+	sprintf(reset3, "2 per resettare la vista");
+	textout_ex(scrbuf, font, reset3, scritte.x, scritte.y[qdistvert-3], col.scr, col.bck);
+	
+	sprintf(reset4, "3 per resettare i parametri del controllore");
+	textout_ex(scrbuf, font, reset4, scritte.x, scritte.y[qdistvert-4], col.scr, col.bck);
+	
+	sprintf(reset_par_dn, "4 resetta disturbo e rumore");
+	textout_ex(scrbuf, font, reset_par_dn, scritte.x, scritte.y[qdistvert-5], col.scr, col.bck);
+	
+	sprintf(reset_delay, "5 resetta ritardi");
+	textout_ex(scrbuf, font, reset_delay, scritte.x, scritte.y[qdistvert-6], col.scr, col.bck);	
+	
+	
+	sprintf(reset2, "Up, down, left, right per modificare la vista");
+	textout_ex(scrbuf, font, reset2, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
+
+	sprintf(dist_pause, "W disturba il sistema");
+	textout_ex(scrbuf, font, dist_pause, scritte.x, scritte.y[qdistvert-8], col.scr, col.bck);
+	
+	sprintf(swingup_pause, "Q attiva/disattiva swingup, default attivo");
+	textout_ex(scrbuf, font, swingup_pause, scritte.x, scritte.y[qdistvert-9], col.scr, col.bck);
+
+	
+	//-----------  disegno rettangoli
+	TwoPoints rett_asso, rett_alto, rett_lato;
+	Point titolo_asso, titolo_alto, titolo_lato;
+	char assonstr[50], altostr[50], latostr[50];
+	//rett2 - Vista assonometrica
+	rett_asso.x1 = DIST + WRETT1 + DIST;
+	rett_asso.y1 = DIST;
+	rett_asso.x2 = DIST + WRETT1 + DIST + wrett2;
+	rett_asso.y2 = DIST + hrett2;
+	rect(scrbuf, rett_asso.x1, rett_asso.y1, rett_asso.x2, rett_asso.y2, col.rett);
+	sprintf(assonstr, "Vista Assonometrica");
+	titolo_asso.x = DIST + WRETT1 + DIST + wrett2 /2 - 3.5*DIST;
+	titolo_asso.y = 2*DIST;
+	textout_ex(scrbuf, font, assonstr, titolo_asso.x, titolo_asso.y, col.scr, col.bck);
+	//rett3 - vista alto
+	rett_alto.x1 = DIST + WRETT1 + DIST;
+	rett_alto.y1 = DIST + hrett2;
+	rett_alto.x2 = DIST + WRETT1 + DIST + wrett3;
+	rett_alto.y2 = DIST + hrett2 + hrett3;
+	rect(scrbuf, rett_alto.x1, rett_alto.y1, rett_alto.x2, rett_alto.y2, col.rett);
+	sprintf(altostr, "Vista Alto");
+	titolo_alto.x = DIST + WRETT1 + DIST + wrett3 /2 - 2.1*DIST;
+	titolo_alto.y = DIST + hrett2 + DIST;
+	textout_ex(scrbuf, font, altostr, titolo_alto.x, titolo_alto.y,	col.scr, col.bck);
+	//rett4 - vista Lato
+	rett_lato.x1 = DIST + WRETT1 + DIST + wrett3;
+	rett_lato.y1 = DIST + hrett2;
+	rett_lato.x2 = DIST + WRETT1 + DIST + wrett3 + wrett4;
+	rett_lato.y2 = DIST + hrett2 + hrett4;
+	rect(scrbuf, rett_lato.x1, rett_lato.y1, rett_lato.x2, rett_lato.y2, col.rett);
+	sprintf(latostr, "Vista Lato");
+	titolo_lato.x = DIST + WRETT1 + DIST + wrett3 + wrett4/2 - 2.1*DIST;
+	titolo_lato.y = DIST + hrett2 + DIST;
+	textout_ex(scrbuf, font, latostr, titolo_lato.x, titolo_lato.y, col.scr, col.bck);
+
+	//----------------------------------
+	// Calcoli per la grafica
+	// posizione centrale rettangolo v.assonometrica
+	asson0.x = WRETT1 + wrett2/2 + 2*DIST;
+	asson0.y = hrett2/2 + DIST; // posizione centrale rettangolo v.asson
+	// posizione centrale rettangolo v.lato
+	lato0.x = WRETT1 + wrett3 + wrett4/2 + 2*DIST;
+	lato0.y = hrett2 + hrett3/2 + DIST;
+	lato0.y += DIST;
+	// posizione centrale rettangolo v.alto
+	alto0.x = WRETT1 + wrett3/2 + 2*DIST;
+	alto0.y = hrett2 + hrett3/2 + DIST;
+	alto0.y += DIST;
+	// reset viste
+	resetasson.x1 = WRETT1 + 2*DIST + 1;
+	resetasson.y1 = DIST + 1;
+	resetasson.y1 += 2*DIST;
+	resetasson.x2 = WRETT1 + wrett2 + 2*DIST - 1;
+	resetasson.y2 = hrett2 + DIST - 1;
+	resetalto.x1 = WRETT1 + 2*DIST + 1;
+	resetalto.y1 = hrett2 + DIST + 1;
+	resetalto.y1 += 2*DIST;
+	resetalto.x2 = WRETT1 + wrett3 + 2*DIST - 1;
+	resetalto.y2 = hrett2 + hrett3 + DIST - 1;
+	resetlato.x1 = WRETT1 + wrett3 + 2*DIST + 1;
+	resetlato.y1 = hrett2 + DIST + 1;
+	resetlato.y1 += 2*DIST;
+	resetlato.x2 = WRETT1 + wrett3 + wrett4 + 2*DIST - 1;
+	resetlato.y2 = hrett2 + hrett4 + DIST - 1;
+
+	return 0;
+}
+
+void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
+	// ref
+	textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
+	sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref.alpha, INCR_ANG);
+	textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
+	// state
+	textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
+	sprintf(alphastr, "alpha = %5.2f    ", state.alpha);
+	textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
+	sprintf(thetastr, "theta = %5.2f    ", state.theta);
+	textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
+	sprintf(voltagestr, "Volt = %5.2f V", state.voltage);
+	textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
+	// par_control
+	textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
+	sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control.up_kp_alpha, par_control.up_kd_alpha);
+	textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
+	sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control.up_kp_theta, par_control.up_kd_theta);
+	textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
+	sprintf(parcontrstralphadown, "Alpha, basso: Kp = %5.2f v/b, Kd = %5.2f n/m  ", par_control.down_kp_alpha, par_control.down_kd_alpha);
+	textout_ex(scrbuf, font, parcontrstralphadown,scritte.x, scritte.y[12], col.scr, col.bck);
+	// par_dn e dn
+	textout_ex(scrbuf, font, "Disturbo, rumore e ritardi:", scritte.x, scritte.y[13], col.scr, col.bck);
+	sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2hu x/c, Rit: %2hhu r/t ", par_dn.dist_amp, par_dn.noise_amp, dn.delay);
+	textout_ex(scrbuf, font, pardnstr, scritte.x, scritte.y[14], col.scr, col.bck);
+	
+	// deadline_miss
+	textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[16], col.scr, col.bck);
+	sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
+	textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[17], col.scr, col.bck);
+	sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
+	textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[18], col.scr, col.bck);
+	
+	// swingup
+	if(ref_pc.swingup){
+		sprintf(swingup_str, "Controllore Swingup attivo!  ");
+	}else{
+		sprintf(swingup_str, "Controllore Swingup disattivo");
+	}
+	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[20], col.scr, col.bck);
+	
+}
 
 
+//----------- gui_draw
+void gui_draw(state_pc_t state,ref_t ref, view_t view, par_ctrl_t par_control){
+	
+	vista_alto(state.alpha, ref.alpha);
+	vista_lato(state.theta, ref.theta);
+	vista_asson(state.alpha, ref.alpha, state.theta, ref.theta, view.lon, view.lat);
+	scritte_draw(state, ref, par_control);
+	
+	blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+
+}
 
 
 
