@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.265
+ * Model version                  : 1.266
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Fri Jan  3 22:32:25 2020
+ * C/C++ source code generated on : Sun Jan  5 00:55:44 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -460,6 +460,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
     /* Transition: '<S4>:142' */
     slow_DW.is_c5_slow = slow_IN_Sliding_mode_controller;
 
+    /* Entry 'Sliding_mode_controller': '<S4>:138' */
     /* Entry Internal 'Sliding_mode_controller': '<S4>:138' */
     /* Transition: '<S4>:109' */
     slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
@@ -474,6 +475,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         /* Transition: '<S4>:7' */
         slow_DW.is_c5_slow = slow_IN_Sliding_mode_controller;
 
+        /* Entry 'Sliding_mode_controller': '<S4>:138' */
         /* Entry Internal 'Sliding_mode_controller': '<S4>:138' */
         /* Transition: '<S4>:109' */
         slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
@@ -499,6 +501,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         /* Transition: '<S4>:16' */
         slow_DW.is_c5_slow = slow_IN_Sliding_mode_controller;
 
+        /* Entry 'Sliding_mode_controller': '<S4>:138' */
         /* Entry Internal 'Sliding_mode_controller': '<S4>:138' */
         /* Transition: '<S4>:109' */
         slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
@@ -533,15 +536,23 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         slow_DW.K[2] = par_ctrl.up_kd_alpha;
         slow_DW.K[3] = par_ctrl.up_kd_theta;
 
-        /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
         /* '<S4>:5:7' ref_gen(alpha_ref,q(1),int8(1)); */
         /* Simulink Function 'ref_gen': '<S4>:148' */
+        q = deg_to_rad;
+        alpha = rtb_pos_meas[0];
+        reset = 1;
+
+        /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
         slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &DiscreteTransferFcn,
                      &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
 
         /* End of Outputs for SubSystem: '<S4>/ref_gen' */
         /* '<S4>:5:8' theta_ref = round(q(2)/single(2*pi))*single(2*pi); */
-        slow_DW.theta_ref = q * 6.28318548F;
+        slow_DW.theta_ref = roundf(rtb_pos_meas[1] / 6.28318548F) * 6.28318548F;
+
+        /* '<S4>:5:10' contr_pd; */
+        slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
+                      &reset, &DiscreteTransferFcn);
       } else {
         /* '<S4>:29:1' sf_internal_predicateOutput = swingup == 0; */
         if (rtu_swingup == 0) {
@@ -560,38 +571,53 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
           slow_DW.K[2] = par_ctrl.down_kd_alpha;
           slow_DW.K[3] = 0.0F;
 
-          /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
           /* '<S4>:4:7' ref_gen(alpha_ref,q(1),int8(1)); */
           /* Simulink Function 'ref_gen': '<S4>:148' */
+          q = deg_to_rad;
+          alpha = rtb_pos_meas[0];
+          reset = 1;
+
+          /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
           slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &DiscreteTransferFcn,
                        &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
 
           /* End of Outputs for SubSystem: '<S4>/ref_gen' */
-        } else if (slow_DW.is_Sliding_mode_controller == slow_IN_Idle) {
-          /* During 'Idle': '<S4>:28' */
-          /* '<S4>:95:1' sf_internal_predicateOutput = energy(q) < 0; */
-          if (slow_energy(TmpSignalConversionAtSFunctionI) < 0.0F) {
-            /* Transition: '<S4>:95' */
-            slow_DW.is_Sliding_mode_controller = slow_IN_Swing_up;
+          /* '<S4>:4:9' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
+          slow_DW.theta_ref = (roundf(rtb_pos_meas[1] / 6.28318548F + 0.5F) -
+                               0.5F) * 6.28318548F;
 
-            /* Entry 'Swing_up': '<S4>:1' */
-            /* '<S4>:1:3' contr_su; */
-            slow_contr_su(TmpSignalConversionAtSFunctionI);
-          } else {
-            /* '<S4>:28:3' volt = 0; */
-            slow_DW.volt = 0.0F;
-          }
+          /* '<S4>:4:10' contr_pd; */
+          slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
+                        &reset, &DiscreteTransferFcn);
         } else {
-          /* During 'Swing_up': '<S4>:1' */
-          /* '<S4>:17:1' sf_internal_predicateOutput = energy(q) >= 0; */
-          if (slow_energy(TmpSignalConversionAtSFunctionI) >= 0.0F) {
-            /* Transition: '<S4>:17' */
-            slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
+          /* '<S4>:138:3' theta_ref = round(q(2)/single(2*pi))*single(2*pi); */
+          slow_DW.theta_ref = q * 6.28318548F;
+          if (slow_DW.is_Sliding_mode_controller == slow_IN_Idle) {
+            /* During 'Idle': '<S4>:28' */
+            /* '<S4>:95:1' sf_internal_predicateOutput = energy(q) < 0; */
+            if (slow_energy(TmpSignalConversionAtSFunctionI) < 0.0F) {
+              /* Transition: '<S4>:95' */
+              slow_DW.is_Sliding_mode_controller = slow_IN_Swing_up;
 
-            /* Entry 'Idle': '<S4>:28' */
+              /* Entry 'Swing_up': '<S4>:1' */
+              /* '<S4>:1:3' contr_su; */
+              slow_contr_su(TmpSignalConversionAtSFunctionI);
+            } else {
+              /* '<S4>:28:3' volt = 0; */
+              slow_DW.volt = 0.0F;
+            }
           } else {
-            /* '<S4>:1:3' contr_su; */
-            slow_contr_su(TmpSignalConversionAtSFunctionI);
+            /* During 'Swing_up': '<S4>:1' */
+            /* '<S4>:17:1' sf_internal_predicateOutput = energy(q) >= 0; */
+            if (slow_energy(TmpSignalConversionAtSFunctionI) >= 0.0F) {
+              /* Transition: '<S4>:17' */
+              slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
+
+              /* Entry 'Idle': '<S4>:28' */
+            } else {
+              /* '<S4>:1:3' contr_su; */
+              slow_contr_su(TmpSignalConversionAtSFunctionI);
+            }
           }
         }
       }

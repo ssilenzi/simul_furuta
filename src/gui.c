@@ -2,9 +2,9 @@
 
 
 // Variabili extern
-extern ref_t 					ref_pc;
+extern ref_t 				ref_pc;
 extern pthread_mutex_t 		mux_ref_pc;			// mutual exclusion for ref
-extern state_pc_t 				state_pc;
+extern state_pc_t 			state_pc;
 extern pthread_mutex_t 		mux_state_pc;
 extern view_t 				view;
 extern pthread_mutex_t 		mux_view;			// mutual exclusion for view
@@ -18,8 +18,6 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
-//extern int 					brake;
-//extern int 					swingup;
 extern dn_t dn;
 extern par_dn_t par_dn;
 
@@ -41,6 +39,11 @@ static struct{
 	int x;
 	int y[(int)(HSCREEN/DIST - 2)];
 } scritte; // array per scrivere "parametricamente" le scritte
+
+static state_pc_t state_new = {0, 0, 0};
+static ref_t ref_new = {0, 0, 0};
+static view_t view_new = {0, 0};
+static par_ctrl_t par_control_new = {0, 0, 0, 0, 0, 0, 0, {0, 0}, {0, 0}};
 
 //----------- init gui
 int gui_init(){
@@ -195,31 +198,21 @@ void* gui(void* arg){
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
-	
-		
-	
-	
-	static state_pc_t state_old = 
-		{ALPHA_0+1,
-		THETA_0+1,
-		VOLTAGE_0+1,
-		};
-	static state_pc_t state_new;
-    static ref_t ref_old = {1, 1, 1};
-	static ref_t ref_new = {1, 1, 1};
-	static view_t view_old = {1, 1};
-	static view_t view_new = {1, 1};
 
-	static par_ctrl_t par_control_new;
-	static par_ctrl_t par_control_old;
-
+//	static state_pc_t state_old = {0, 0, 0};
+//	static state_pc_t state_new = {0, 0, 0};
+//  static ref_t ref_old = {0, 0, 0};
+//	static ref_t ref_new = {0, 0, 0};
+//	static view_t view_old = {0, 0};
+//	static view_t view_new = {0, 0};
+//	static par_ctrl_t par_control_new = {0, 0, 0, 0, 0, 0, 0, {0, 0}, {0, 0}};
+//	static par_ctrl_t par_control_old = {0, 0, 0, 0, 0, 0, 0, {0, 0}, {0, 0}};
 
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; // stringhe di comunicazione che vengono aggiornate
 	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[54];//,parcontrstrsu[34];	
-	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
-	//char motor_str[18];
+	char dl_miss_pc_str[50], dl_miss_board_str[50];
 	char swingup_str[31];
-	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
+//	int draw = 0;		// flag per ridisegnare o meno l'interfaccia
 	
 	while(!end){
 		
@@ -239,36 +232,36 @@ void* gui(void* arg){
 	
 		
 		//--------- ANIMAZIONE
-		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
+//		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha) {
 			vista_alto(state_new.alpha, ref_new.alpha);
 			
-			draw = 1;
-		}
+//			draw = 1;
+//		}
 
-		if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
+//		if (state_new.theta != state_old.theta || ref_new.theta != ref_old.theta) {
 			vista_lato(state_new.theta, ref_new.theta);
-			draw = 1;
-		}
+//			draw = 1;
+//		}
 
-		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
-			ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
+//		if (state_new.alpha != state_old.alpha || ref_new.alpha != ref_old.alpha || state_new.theta != state_old.theta ||
+//			ref_new.theta != ref_old.theta || view_new.lon != view_old.lon || view_new.lat != view_old.lat) {
 			vista_asson(state_new.alpha, ref_new.alpha, state_new.theta, ref_new.theta, view_new.lon, view_new.lat);
-			draw = 1;
-		}
+//			draw = 1;
+//		}
 
 		//--------- SCRITTE
-		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.up_kp_alpha != par_control_old.up_kp_alpha || par_control_new.up_kd_alpha != par_control_old.up_kd_alpha || par_control_new.up_kp_theta != par_control_old.up_kp_theta || par_control_new.up_kd_theta != par_control_old.up_kd_theta || par_control_new.down_kd_alpha != par_control_old.down_kd_alpha || par_control_new.down_kp_alpha != par_control_old.down_kp_alpha) 
-		{
+//		if (state_new.alpha != state_old.alpha || state_new.theta != state_old.theta || ref_new.alpha != ref_old.alpha || par_control_new.up_kp_alpha != par_control_old.up_kp_alpha || par_control_new.up_kd_alpha != par_control_old.up_kd_alpha || par_control_new.up_kp_theta != par_control_old.up_kp_theta || par_control_new.up_kd_theta != par_control_old.up_kd_theta || par_control_new.down_kd_alpha != par_control_old.down_kd_alpha || par_control_new.down_kp_alpha != par_control_old.down_kp_alpha)
+//		{
 
 			// ref
 			textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
-			sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref_new.alpha, INCR_ANG);
+			sprintf(refalphastr, "alpha = %5.2f deg, a/s -+%d  ", ref_new.alpha, INCR_ANG);
 			textout_ex(scrbuf, font, refalphastr, scritte.x, scritte.y[2], col.scr, col.bck);
 			// state
 			textout_ex(scrbuf, font, "Stato:", scritte.x, scritte.y[4], col.scr, col.bck);
-			sprintf(alphastr, "alpha = %5.2f    ", state_new.alpha);
+			sprintf(alphastr, "alpha = %5.2f deg    ", state_new.alpha);
 			textout_ex(scrbuf, font, alphastr, scritte.x, scritte.y[5], col.scr, col.bck);
-			sprintf(thetastr, "theta = %5.2f    ", state_new.theta);
+			sprintf(thetastr, "theta = %5.2f deg    ", state_new.theta);
 			textout_ex(scrbuf, font, thetastr,scritte.x, scritte.y[6], col.scr, col.bck);
 			sprintf(voltagestr, "Volt = %5.2f V", state_new.voltage);
 			textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
@@ -282,7 +275,7 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, parcontrstralphadown,scritte.x, scritte.y[12], col.scr, col.bck);
 			// par_dn
 			textout_ex(scrbuf, font, "Ampiezza del disturbo e del rumore:", scritte.x, scritte.y[13], col.scr, col.bck);
-			sprintf(pardnstr, "Disturbo:%5.2f N f/g, Rumore: %5.2f x/c    ", par_dn.dist_amp, par_dn.noise_amp);
+			sprintf(pardnstr, "Disturbo:%5.2f N f/g, Rumore: %u x/c    ", par_dn.dist_amp, par_dn.noise_amp);
 			textout_ex(scrbuf, font, pardnstr, scritte.x, scritte.y[14], col.scr, col.bck);
 
 			// deadline_miss
@@ -291,17 +284,7 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[17], col.scr, col.bck);
 			sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
 			textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[18], col.scr, col.bck);
-			
-			/*
-			// motor
-			if(brake){
-				sprintf(motor_str, "Motore disattivo.");
-			}else{
-				sprintf(motor_str, "Motore attivo!   ");
-			}
-			textout_ex(scrbuf, font, motor_str,scritte.x, scritte.y[18], col.scr, col.bck);
-			
-			*/
+
 			// swingup
 			if(ref_pc.swingup){
 				sprintf(swingup_str, "Controllore Swingup attivo!  ");
@@ -311,11 +294,12 @@ void* gui(void* arg){
 			textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[20], col.scr, col.bck);
 			
 			
-			draw = 1;
-		}
+//			draw = 1;
+//		}
 
-		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old = par_control_new;
+//		if (draw) blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+//		state_old = state_new; ref_old = ref_new; view_old = view_new; par_control_old = par_control_new;
 		
 		//--------- end task
 		if(deadline_miss(id)){
@@ -365,8 +349,6 @@ void circlerif_alpha(BITMAP *bmp, Point C, int r, AngleSinCos Lon, AngleSinCos L
 
 	step = 2*M_PI/NUM_POINTS;
 	
-//	alpha = ((int)alpha)%360;
-	
 	if (alpha < refalpha) {
 		initial = rad(alpha);
 		final = rad(refalpha);
@@ -391,11 +373,6 @@ void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, Ang
 	Vect P; Point PAlleg;
 
 	step = 2*M_PI/NUM_POINTS;
-	
-//	float theta_loc;
-//	theta_loc = theta;
-//	if(theta_loc>350){theta_loc -= 360;}
-//	if(theta_loc<-350){theta_loc += 360;}
 	
 	if (theta < reftheta) {
 		initial = rad(theta);
@@ -575,11 +552,6 @@ void vista_lato(float theta, float reftheta) {
 	int l2 = L2_LATO;
 	AngleSinCos Theta, RefTheta;
 	TwoPoints riflink2lato, link2lato;
-	
-//	float theta_loc;
-//	theta_loc = theta;
-//	if(theta_loc>350){theta_loc -= 360;}
-//	if(theta_loc<-350){theta_loc += 360;}
 	
 	Theta.sin = sinf(rad(theta));	Theta.cos = cosf(rad(theta));
 	RefTheta.sin = sinf(rad(reftheta)); RefTheta.cos = cosf(rad(reftheta));

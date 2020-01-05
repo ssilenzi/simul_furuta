@@ -5,15 +5,11 @@
 #include <pthread.h>
 #include "rtwtypes.h" //conversioni matlab
 #include "zero_crossing_types.h"
-//#include "controller.h"
 
 //----------- costanti, definizioni
 // stato, _0 iniziale 
 #define ALPHA_0				0
-#define ALPHADOT_0			0
 #define THETA_0				180
-#define THETADOT_0			0
-#define CURRENT_0			0
 #define VOLTAGE_0			0
 #define CCR_0				2625 // meta` del range 0-5250
 #define CNT_ALPHA_0			0
@@ -45,8 +41,8 @@
 #define COL_BCK				makecol(190, 190, 190) 	// colore background
 #define COL_RETT			makecol(0, 0, 179)		// colore rettangoli
 #define COL_SCR				makecol(0, 0, 0)		// colore scritte
-#define COL_MDL				makecol(255, 0, 0)		// colore link
-#define COL_MDL2			makecol(255, 204, 0)	// colore link 2
+#define COL_MDL				makecol(255, 204, 0)	// colore link
+#define COL_MDL2			makecol(255, 0, 0)  	// colore link 2
 #define COL_VERT            makecol(0,0,0)			// colore base (sezione verticale)
 #define COL_RIF				makecol(128, 128, 128)	// colore riferimenti
 
@@ -60,7 +56,6 @@
 #define DPOLE_REF			0.990049839F
 #define REF_GEN_NUM			{ 0.00995016098F, 0.0F }
 #define REF_GEN_DEN			{ 1.0F, -0.990049839F }
-//#define KSU_DEF 			1
 #define INCR_K				0.5 // incremento da tastiera 
 
 // dn
@@ -104,7 +99,7 @@
 // gui
 #define ID_GUI				100
 #define PRIO_GUI			20
-#define FPS					40
+#define FPS					25
 
 // keys
 #define ID_KEYS				200
@@ -179,11 +174,6 @@ typedef struct {
     int lat;
 } view_t; 		// structure della vista
 
-
-
-//------ structure generate da Matlab
-
-
 typedef struct
 {
     uint16_T CNT_alpha;
@@ -219,7 +209,7 @@ typedef struct {
 
 typedef struct {
     real32_T dist_amp;
-    real32_T noise_amp;
+    uint16_T noise_amp;
 } par_dn_t;
 
 typedef struct {
@@ -228,12 +218,15 @@ typedef struct {
     uint8_T swingup;
 } ref_t;
 
+//------ structure generate da Matlab
+
 /* Block signals and states (default storage) for system '<Root>' */
 typedef struct {
-  real32_T Delay_DSTATE[4];            /* '<S6>/Delay' */
-  real32_T DiscreteTimeIntegrator_DSTATE[4];/* '<S6>/Discrete-Time Integrator' */
-  real32_T Delay_DSTATE_c;             /* '<S2>/Delay' */
-  real32_T DiscreteStateSpace_DSTATE;  /* '<S2>/Discrete State-Space' */
+    real32_T Delay_DSTATE[4];            /* '<S6>/Delay' */
+    real32_T DiscreteTimeIntegrator_DSTATE[4];/* '<S6>/Discrete-Time Integrator' */
+    real32_T Delay_DSTATE_j;             /* '<S3>/Delay' */
+    real32_T Delay_DSTATE_c;             /* '<S2>/Delay' */
+    real32_T DiscreteStateSpace_DSTATE;  /* '<S2>/Discrete State-Space' */
 } DW_fast_T;
 
 /* Block signals and states (default storage) for system '<S4>/ref_gen' */
@@ -272,19 +265,5 @@ typedef struct {
 typedef struct {
   ZCE_ref_gen_slow_T ref_gen;          /* '<S4>/ref_gen' */
 } PrevZCX_slow_T;
-
-
-
-/*
- * alla fine non l'ho usato
-typedef struct{
-	int brake;
-	State state;
-	Par_control par_control;
-	Ref ref;
-} Buffer;
-
-// magari ci andrebbe messo swingup?
-*/
 
 #endif //CONDIVISO_H

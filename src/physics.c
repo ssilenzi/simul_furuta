@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'fast'.
  *
- * Model version                  : 1.247
+ * Model version                  : 1.249
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Sat Jan  4 11:34:21 2020
+ * C/C++ source code generated on : Sun Jan  5 00:56:40 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -30,6 +30,9 @@ void physics_Init(void)
   fast_DW.Delay_DSTATE[1] = 3.14159274F;
   fast_DW.Delay_DSTATE[2] = 0.0F;
   fast_DW.Delay_DSTATE[3] = 0.0F;
+
+  /* InitializeConditions for Delay: '<S3>/Delay' */
+  fast_DW.Delay_DSTATE_j = 3.14159274F;
 
   /* InitializeConditions for DiscreteIntegrator: '<S6>/Discrete-Time Integrator' */
   fast_DW.DiscreteTimeIntegrator_DSTATE[0] = 0.0F;
@@ -53,8 +56,8 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
   real32_T rtb_q_d_idx_0;
   real32_T rtb_q_d_idx_1;
   real32_T rtb_q_d_idx_2;
-  real32_T q_idx_2;
   real32_T q_idx_1;
+  real32_T q_idx_2;
   real32_T q_idx_3;
   real32_T rtb_q_d_idx_2_tmp;
   real32_T rtb_q_d_idx_2_tmp_0;
@@ -63,7 +66,7 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
   /* DataTypeConversion: '<S5>/Cast1' */
   /* MATLAB Function 'Physics/Disturbance_generator/dist_gen': '<S7>:1' */
   /* '<S7>:1:3' tau_1 = F*Larm; */
-  /* '<S7>:1:4' tau_2 = F*Lp; */
+  /* '<S7>:1:4' tau_2 = F*cos(theta)*Lp; */
   rtb_current = rtu_CCR;
 
   /* Fcn: '<S5>/Fcn1' */
@@ -84,13 +87,15 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
   }
 
   /* SignalConversion generated from: '<S9>/ SFunction ' incorporates:
+   *  Delay: '<S3>/Delay'
    *  Gain: '<S2>/Gain3'
    *  MATLAB Function: '<S3>/dist_gen'
    *  MATLAB Function: '<S6>/f_mecc'
    *  Sum: '<S6>/Sum2'
    */
   rtb_TmpSignalConversionAtSFun_0 = 0.48384F * rtb_current + rtu_dist * 0.216F;
-  rtb_TmpSignalConversionAtSFun_1 = rtu_dist * 0.337F;
+  rtb_TmpSignalConversionAtSFun_1 = rtu_dist * cosf(fast_DW.Delay_DSTATE_j) *
+    0.337F;
 
   /* MATLAB Function: '<S6>/f_mecc' incorporates:
    *  Delay: '<S6>/Delay'
@@ -212,6 +217,9 @@ void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T rtu_noise[2],
   fast_DW.Delay_DSTATE[1] = q_idx_1;
   fast_DW.Delay_DSTATE[2] = q_idx_2;
   fast_DW.Delay_DSTATE[3] = q_idx_3;
+
+  /* Update for Delay: '<S3>/Delay' */
+  fast_DW.Delay_DSTATE_j = q_idx_1;
 
   /* Update for Delay: '<S2>/Delay' */
   fast_DW.Delay_DSTATE_c = q_idx_2;

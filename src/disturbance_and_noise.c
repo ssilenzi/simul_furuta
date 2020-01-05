@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.265
+ * Model version                  : 1.267
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Fri Jan  3 22:32:25 2020
+ * C/C++ source code generated on : Sun Jan  5 02:08:59 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -21,13 +21,14 @@
  */
 
 #include "disturbance_and_noise.h"
+
+/* Include model header file for global data */
 #include "rt_urand_Upu32_Yd_f_pw.h"
 
 /* Named constants for Chart: '<S2>/Disturbance_generator' */
 #define slow_IN_Off                    ((uint8_T)1U)
 #define slow_IN_On                     ((uint8_T)2U)
 #define slow_IN_Reset                  ((uint8_T)3U)
-
 
 /* System initialize for atomic system: '<Root>/Disturbance_and_noise' */
 void disturbance_and_noise_Init(real32_T *rty_dist)
@@ -60,8 +61,8 @@ void disturbance_and_noise(uint8_T rtu_kick, real32_T *rty_dist, real32_T
   rty_noise[1] = 0.00153398083F * (real32_T)slow_DW.Noise_generator1_NextOutput;
 
   /* Gain: '<S10>/Gain1' */
-  rty_noise[0] *= par_dn.noise_amp;
-  rty_noise[1] *= par_dn.noise_amp;
+  rty_noise[0] *= (real32_T)par_dn.noise_amp;
+  rty_noise[1] *= (real32_T)par_dn.noise_amp;
 
   /* Chart: '<S2>/Disturbance_generator' */
   /* Gateway: Disturbance_and_noise/Disturbance_generator */

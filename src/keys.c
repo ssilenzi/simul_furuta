@@ -15,10 +15,6 @@ extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t 			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
-//extern int 					brake;
-//extern pthread_mutex_t 		mux_brake;
-//extern int 					swingup;
-//extern pthread_mutex_t		mux_swingup;
 extern dn_t dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
@@ -200,10 +196,10 @@ void* keys(void* arg){
 				par_dn.dist_amp += -INCR_K/2;
 			}
 			if(scan == KEY_X){
-				par_dn.noise_amp += INCR_K/2;
+				par_dn.noise_amp += 1;
 			}
-			if(scan == KEY_C){
-				par_dn.noise_amp += -INCR_K/2;
+			if(scan == KEY_C && par_dn.noise_amp != 0){
+				par_dn.noise_amp += -1;
 			}
 			if(scan == KEY_1){
 				par_dn.dist_amp = DIST_AMP_DEF;

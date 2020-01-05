@@ -176,8 +176,6 @@ void* control(void* arg){
 	set_activation(id);
 	
 	// init
-	//PrevZCX_slow_T slow_PrevZCX;
-	//slow_PrevZCX.ref_gen.DiscreteTransferFcn_Reset_ZCE = UNINITIALIZED_ZCSIG;
 	par_ctrl = par_control_board;
 	controller_Init();
 	disturbance_and_noise_Init(&slow_DW.dist);
