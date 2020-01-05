@@ -211,7 +211,7 @@ void key_action(char scan){
 			dn.delay += 1;
 		pthread_mutex_unlock(&mux_dn);
 	}
-	if(scan == KEY_T){
+	if(scan == KEY_T && dn.delay != 0){
 		pthread_mutex_lock(&mux_dn);
 			dn.delay += -1;
 		pthread_mutex_unlock(&mux_dn);
