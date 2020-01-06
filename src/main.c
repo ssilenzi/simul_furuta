@@ -66,6 +66,8 @@
  * 
  */
 
+unsigned int period_control = PERIOD_CONTROL;
+
 state_pc_t state_pc=
 {	ALPHA_0,
 	THETA_0,
@@ -96,6 +98,7 @@ par_ctrl_t par_control_reset =
 	REF_GEN_NUM_DEF,
 	REF_GEN_DEN_DEF};
 pthread_mutex_t 	mux_parcontr_pc = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
+float pole_ref = POLE_REF_DEF;
 
 //----------- disturbance and noise
 par_dn_t par_dn = {

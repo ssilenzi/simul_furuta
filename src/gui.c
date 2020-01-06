@@ -2,6 +2,7 @@
 
 
 //----------- variabili extern
+extern unsigned int         period_control;
 extern ref_t 				ref_pc;
 extern pthread_mutex_t 		mux_ref_pc;
 extern state_pc_t 			state_pc;
@@ -11,6 +12,7 @@ extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
+extern float                pole_ref;
 extern dn_t 				dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t 			par_dn;
@@ -28,9 +30,6 @@ extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
 extern long ex_sum[6];
 #endif
-
-float pole_ref = 2.0F;
-unsigned int period_control = PERIOD_CONTROL;
 
 //----------- variabili usate solo in gui.c
 static BITMAP *scrbuf;

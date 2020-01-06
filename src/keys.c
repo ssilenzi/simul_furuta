@@ -108,7 +108,7 @@ void key_action(){
         dn.delay += 1;
         pthread_mutex_unlock(&mux_dn);
     }
-    if(scan == KEY_E && dn.delay != 0){
+    if(scan == KEY_E && dn.delay > 0){
         pthread_mutex_lock(&mux_dn);
         dn.delay += -1;
         pthread_mutex_unlock(&mux_dn);
@@ -304,7 +304,7 @@ void key_par_control(){
 	if(scan == KEY_X){
 		par_dn.noise_amp += 1;
 	}
-	if(scan == KEY_C && par_dn.noise_amp != 0){
+	if(scan == KEY_C && par_dn.noise_amp > 0){
 		par_dn.noise_amp += -1;
 	}
 	if(scan == KEY_4){
