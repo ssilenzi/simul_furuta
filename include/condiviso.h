@@ -53,12 +53,10 @@
 #define KD_UP_THETA_DEF 	-2.67355F
 #define KP_DOWN_ALPHA_DEF	0.9F
 #define KD_DOWN_ALPHA_DEF	0.0F
-
-#define POLE_REF			2.0F
-#define DPOLE_REF			expf(- POLE_REF * 0.005F)		//0.990049839F
-#define REF_GEN_NUM			{ 1.0F - DPOLE_REF, 0.0F }	//{ 0.00995016098F, 0.0F }
-#define REF_GEN_DEN			{ 1.0F, - DPOLE_REF }		//{ 1.0F, -0.990049839F }
-
+#define POLE_REF_DEF		2.0F
+#define DPOLE_REF_DEF		0.990049839F	// Generatore di riferimenti
+#define REF_GEN_NUM_DEF		{ 0.00995016098F, 0.0F }
+#define REF_GEN_DEN_DEF		{ 1.0F, -0.990049839F }
 #define INCR_K				0.5 // incremento da tastiera per i parametri del controllore
 
 // dn
@@ -71,12 +69,10 @@
 #define DIST_AMP_DEF		1
 #define NOISE_AMP_DEF		0
 
-
 //ref
 #define ALPHA_REF			0
 #define THETA_REF			0
 #define SWINGUP_DEF			0
-
 
 //----------- tasks, in ordine di priorita`
 // state_update
@@ -115,81 +111,20 @@
 
 	
 //----------- types, definizioni
-// types per gui
-
-typedef struct {
-    int x;
-    int y;
-} Point; 
-
-typedef struct {
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-} TwoPoints;
-
-typedef struct {
-    float x;
-    float y;
-    float z;
-} Vect;
-
-typedef struct {
-    float sin;
-    float cos;
-} AngleSinCos;
-
-// types usati da piu` task
-/* OLD
-typedef struct {
-    float alpha;		// angolo con asta orizzontale
-	float alphadot;		// velocita` di alpha 
-    float theta;		// angolo con asta verticale
-	float thetadot;		// velocita` di theta
-	float current;		// corrente motore
-    float voltage;		// voltaggio motore
-	int ccr;			// capture compare register (per settare duty cicle del pwm del motore)
-	float enc_alpha;	// lettura encoder per l'angolo alpha
-	float enc_theta;	// lettura encoder per l'angolo theta
-} State;	// structure dello stato
-*/
-
-/* OLD
-typedef struct {
-    float alpha;
-    float theta;
-} Ref;		// structure del riferimento
-*/
-
-/* OLD
-typedef struct{
-	float alpha_kp;		// guadagno proporzionale controllore su alpha
-	float alpha_kd;		// guadagno derivativo controllore su alpha
-	float theta_kp;		// guadagno proporzionale controllore su theta
-	float theta_kd;		// guadagno derivativo controllore su theta
-	float ksu;			// guadagno del controllore di swing up
-} Par_control;	// structure dei parametri di controllo
-*/
-
-typedef struct {
-    int lon;
-    int lat;
-} view_t; 		// structure della vista
 
 typedef struct
 {
     uint16_T CNT_alpha;
     uint16_T CNT_theta;
     uint16_T CCR;
-} state_board_t;
+} state_board_t; // struttura dello stato lato scheda
 
 
 typedef struct {
     real32_T alpha;
     real32_T theta;
     real32_T voltage;
-} state_pc_t;
+} state_pc_t; // struttura dello stato lato pc
 
 typedef struct {
     real32_T up_kp_alpha;
@@ -201,14 +136,14 @@ typedef struct {
     real32_T dpole_ref;
     real32_T ref_gen_num[2];
     real32_T ref_gen_den[2];
-} par_ctrl_t;
+} par_ctrl_t; // struttura per i parametri dei controllori
 
 typedef struct {
     uint8_T kick;
     real32_T dist;
     real32_T noise[2];
     uint8_T delay;
-} dn_t;// disturb and noise
+} dn_t; // struttura per disturb and noise
 
 typedef struct {
     real32_T dist_amp;
@@ -219,10 +154,14 @@ typedef struct {
     real32_T alpha;
     real32_T theta;
     uint8_T swingup;
-} ref_t;
+} ref_t; // struttura per riferimenti
+
+typedef struct {
+    int lon;
+    int lat;
+} view_t; // struttura per la vista assonometrica
 
 //------ structure generate da Matlab
-
 /* Block signals and states (default storage) for system '<Root>' */
 typedef struct {
     real32_T Delay_DSTATE[4];            /* '<S6>/Delay' */

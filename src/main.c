@@ -36,8 +36,8 @@
 
 /*	TO DO LIST
  *  - scrivere il sottotitolo
- * 	- pulire codice
  * 	- commentare ogni funzione
+ * 	- disegnare tempi di esecuzione
  */
 
 
@@ -82,9 +82,9 @@ par_ctrl_t par_control_pc =
 	KD_UP_THETA_DEF,
 	KP_DOWN_ALPHA_DEF,
 	KD_DOWN_ALPHA_DEF,
-	DPOLE_REF,
-	REF_GEN_NUM,
-	REF_GEN_DEN};// struct con parmetri del controllore di default
+	DPOLE_REF_DEF,
+	REF_GEN_NUM_DEF,
+	REF_GEN_DEN_DEF};// struct con parmetri del controllore di default
 par_ctrl_t par_control_reset =
 {KP_UP_ALPHA_DEF,
 	KP_UP_THETA_DEF,
@@ -92,10 +92,12 @@ par_ctrl_t par_control_reset =
 	KD_UP_THETA_DEF,
 	KP_DOWN_ALPHA_DEF,
 	KD_DOWN_ALPHA_DEF,
-	DPOLE_REF,
-	REF_GEN_NUM,
-	REF_GEN_DEN};
+	DPOLE_REF_DEF,
+	REF_GEN_NUM_DEF,
+	REF_GEN_DEN_DEF};
 pthread_mutex_t 	mux_parcontr_pc = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
+
+float pole_ref = 2.0F;
 
 //----------- disturbance and noise
 par_dn_t par_dn = {
@@ -137,7 +139,7 @@ int init(){
 int task_creation(){
 	printf("Creazione task...\n");
 	// Info creazione tasks
-	// int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
+	// int task_create(void* (*task)(void *), int i, int period, int drel, int prio);
 	// period = drel
 		
 	// task fisica

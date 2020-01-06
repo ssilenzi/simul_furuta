@@ -3,9 +3,6 @@
 
 //----------- Variabili extern 
 extern int 					end;
-//extern int 					brake;
-//extern int 					swingup;
-//extern pthread_mutex_t 		mux_brake;
 extern state_pc_t			state_pc;
 extern pthread_mutex_t		mux_state_pc;
 extern ref_t				ref_pc;
@@ -24,35 +21,17 @@ extern par_dn_t par_dn;
 
 
 //---------------- Variabili Board
-/*
- * State state_board=
-	{ALPHA_0, 
-	ALPHADOT_0,
-	THETA_0,
-	THETADOT_0,
-	CURRENT_0,
-	VOLTAGE_0,
-	CCR_0,
-	ENC_ALPHA_0,
-	ENC_THETA_0
-	}; 
-*/
-
 state_board_t state_board=
 	{CNT_ALPHA_0,
 	CNT_THETA_0,
 	CCR_0,
 	};
-
 pthread_mutex_t 	mux_state_board = PTHREAD_MUTEX_INITIALIZER;
-
 state_board_t 	state_board_reset =
 	{CNT_ALPHA_0,
     CNT_THETA_0,
     CCR_0,
 	};
-	
-
 par_ctrl_t par_control_board =
 {KP_UP_ALPHA_DEF,
 	KP_UP_THETA_DEF,
@@ -60,48 +39,20 @@ par_ctrl_t par_control_board =
 	KD_UP_THETA_DEF,
 	KP_DOWN_ALPHA_DEF,
 	KD_DOWN_ALPHA_DEF,
-	DPOLE_REF,
-	REF_GEN_NUM,
-	REF_GEN_DEN}; // parametri per il controllo scheda
-	
-par_ctrl_t par_ctrl; // da rinominare nel file controller.c
-
-/* OLD
-Par_control par_control_board = 
-	{KP_ALPHA_DEF, 
-	KD_ALPHA_DEF, 
-	KP_THETA_DEF, 
-	KD_THETA_DEF, 
-	KSU_DEF};	// struct con parametri del controllore
-*/
+	DPOLE_REF_DEF,
+	REF_GEN_NUM_DEF,
+	REF_GEN_DEN_DEF}; // parametri per il controllo scheda
 pthread_mutex_t 	mux_parcontr_board = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per par_control
-
-//Ref ref_board;
-//pthread_mutex_t 	mux_ref_board = PTHREAD_MUTEX_INITIALIZER;
 ref_t ref_board = {ALPHA_REF, THETA_REF, SWINGUP_DEF};		// struct riferimento 
 pthread_mutex_t 	mux_ref_board = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per ref
 
 //---------- Variabili Buffer
-/*
-State state_buffer=
-	{ALPHA_0, 
-	ALPHADOT_0,
-	THETA_0,
-	THETADOT_0,
-	CURRENT_0,
-	VOLTAGE_0,
-	CCR_0,
-	CNT_ALPHA_0,
-	CNT_THETA_0
-	}; 
-	*/
 state_pc_t state_buffer=
 {	ALPHA_0,
 	THETA_0,
 	VOLTAGE_0
 }; 	
 pthread_mutex_t 	mux_state_buffer = PTHREAD_MUTEX_INITIALIZER;
-
 par_ctrl_t par_control_buffer =
 {KP_UP_ALPHA_DEF,
 	KP_UP_THETA_DEF,
@@ -109,26 +60,24 @@ par_ctrl_t par_control_buffer =
 	KD_UP_THETA_DEF,
 	KP_DOWN_ALPHA_DEF,
 	KD_DOWN_ALPHA_DEF,
-	DPOLE_REF,
-	REF_GEN_NUM,
-	REF_GEN_DEN};
+	DPOLE_REF_DEF,
+	REF_GEN_NUM_DEF,
+	REF_GEN_DEN_DEF};
 pthread_mutex_t 	mux_parcontr_buffer = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
 ref_t ref_buffer = {ALPHA_REF, THETA_REF, SWINGUP_DEF};					// struct riferimento 
 pthread_mutex_t 	mux_ref_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusion per ref
 
 //----------- Variabili locali
-
 ref_t ref= {ALPHA_REF, THETA_REF, SWINGUP_DEF};
 real32_T rtb_rad_to_deg1[2]; // variabile locale che condiene il valore di alpha e theta in gradi.
 real32_T voltage;
+par_ctrl_t par_ctrl;
+dn_t dn_su;
+dn_t dn_ctrl;
 
 DW_fast_T fast_DW;
 DW_slow_T slow_DW;
-
 PrevZCX_slow_T slow_PrevZCX;
-
-dn_t dn_su;
-dn_t dn_ctrl;
 
 #ifdef extime
 int ex_time[6] = {0};
@@ -143,7 +92,6 @@ void* state_update(void* arg){
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
-	
 	
 	// init
 	physics_Init();
@@ -161,8 +109,6 @@ void* state_update(void* arg){
 			dn_su = dn;
 		pthread_mutex_unlock(&mux_dn);
 		
-		
-		// do stuff
 		physics(CCR_local, dn_su.dist, dn_su.noise, rtb_Cast2);
 		
 		pthread_mutex_lock(&mux_ref_board);
@@ -181,7 +127,6 @@ void* state_update(void* arg){
 	}
 	return 0;
 }
-
 
 //---------- control
 void* control(void* arg){
@@ -242,7 +187,6 @@ void* compc(void* arg){
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
 	
-	
 	while(!end){
 #ifdef extime
         start_extime(2, PERIOD_COMPC);
@@ -279,12 +223,11 @@ void* compc(void* arg){
         stop_extime(2);
 #endif
 		wait_for_period(id);		// wait to next period
-
 	}
 	return 0;
 }
 
-// task di comunicazione scheda, scrive state su buffer, legge par_control e ref da buffer			DA SISTEMARE!!!!!!!!!!!!!!!!!!!!!!!
+// task di comunicazione scheda, scrive state su buffer, legge par_control e ref da buffer
 void* comboard(void* arg){
     cpu_set(1);
 	int id;							// task index
@@ -313,8 +256,6 @@ void* comboard(void* arg){
 		pthread_mutex_unlock(&mux_parcontr_buffer);
 		
 		// scrittura di state_board su buffer
-		
-		
 		pthread_mutex_lock(&mux_state_buffer);
 			pthread_mutex_lock(&mux_state_board);
 				state_buffer.alpha = rtb_rad_to_deg1[0];

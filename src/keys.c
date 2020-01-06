@@ -13,6 +13,7 @@ extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t 			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
+extern float pole_ref;
 extern dn_t dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
@@ -45,6 +46,7 @@ void* keys(void* arg){
 			key_action(scan);
 			
 		}else{
+			//reset kick
 			pthread_mutex_lock(&mux_dn);
 				dn.kick = 0;
 			pthread_mutex_unlock(&mux_dn);
@@ -57,7 +59,7 @@ void* keys(void* arg){
 #ifdef extime
         stop_extime(5);
 #endif
-	wait_for_period(id);			// wait to next period
+	wait_for_period(id);	// wait to next period
 	
 	}
 	return 0;
@@ -75,45 +77,7 @@ void get_keycodes(char *scan, char *ascii)
 	*scan = k >> 8; // get scan code
 }
 
-
-
-// key_action, a seconda del tasto premuto compie un'azione
-void key_action(char scan){
-	// ESC, end Threads e conseguente chiusura del programma
-	if (scan==KEY_ESC) {
-		end = 1;
-	}
-	
-	// 1, reset state_pc e ref_pc
-	if (scan == KEY_1) {
-		pthread_mutex_lock(&mux_ref_pc);
-			ref_pc.alpha = ALPHA_0;
-			ref_pc.theta = THETA_0;
-		pthread_mutex_unlock(&mux_ref_pc);
-		
-	}
-	
-	// W, kick
-	if (scan == KEY_W){
-		pthread_mutex_lock(&mux_dn);
-		dn.kick = 1;
-		pthread_mutex_unlock(&mux_dn);
-
-	}
-
-	
-	// Q, regola swingup
-	if (scan == KEY_Q){
-		pthread_mutex_lock(&mux_ref_pc);
-		if(ref_pc.swingup){
-			ref_pc.swingup = 0;
-		}else{
-			ref_pc.swingup = 1;
-		}
-		pthread_mutex_unlock(&mux_ref_pc);
-
-	}
-	
+void key_par_control(char scan){
 	/*
 	* Par_control
 	*/
@@ -196,6 +160,31 @@ void key_action(char scan){
 		pthread_mutex_unlock(&mux_parcontr_pc);
 	}
 	
+	//gen_ref_online
+	if(scan == KEY_0){
+		pole_ref += INCR_K;
+		pthread_mutex_lock(&mux_parcontr_pc);
+			par_control_pc.dpole_ref = expf(- pole_ref * 0.005F);
+			par_control_pc.ref_gen_num[0] = 1.0F - par_control_pc.dpole_ref;
+			par_control_pc.ref_gen_num[1] = 0.0F;
+			par_control_pc.ref_gen_den[0] = 1.0F;
+			par_control_pc.ref_gen_den[1] = - par_control_pc.dpole_ref;
+		pthread_mutex_unlock(&mux_parcontr_pc);
+		
+	}
+	if(scan == KEY_9){
+		pole_ref += -INCR_K;
+		pthread_mutex_lock(&mux_parcontr_pc);
+			par_control_pc.dpole_ref = expf(- pole_ref * 0.005F);
+			par_control_pc.ref_gen_num[0] = 1.0F - par_control_pc.dpole_ref;
+			par_control_pc.ref_gen_num[1] = 0.0F;
+			par_control_pc.ref_gen_den[0] = 1.0F;
+			par_control_pc.ref_gen_den[1] = - par_control_pc.dpole_ref;
+		pthread_mutex_unlock(&mux_parcontr_pc);
+		
+	}
+	
+	
 	/*
 	*	par_dn
 	*/
@@ -214,7 +203,57 @@ void key_action(char scan){
 	if(scan == KEY_4){
 		par_dn.dist_amp = DIST_AMP_DEF;
 		par_dn.noise_amp = NOISE_AMP_DEF;
+		
+		pthread_mutex_lock(&mux_dn);
+		dn.delay = 0;
+		pthread_mutex_unlock(&mux_dn);
 	}
+	
+	
+}
+
+// key_action, a seconda del tasto premuto compie un'azione
+void key_action(char scan){
+	
+	key_par_control(scan);
+	
+	
+	// ESC, end Threads e conseguente chiusura del programma
+	if (scan==KEY_ESC) {
+		end = 1;
+	}
+	
+	// 1, reset state_pc e ref_pc
+	if (scan == KEY_1) {
+		pthread_mutex_lock(&mux_ref_pc);
+			ref_pc.alpha = ALPHA_0;
+			ref_pc.theta = THETA_0;
+		pthread_mutex_unlock(&mux_ref_pc);
+		
+	}
+	
+	// W, kick
+	if (scan == KEY_W){
+		pthread_mutex_lock(&mux_dn);
+		dn.kick = 1;
+		pthread_mutex_unlock(&mux_dn);
+
+	}
+
+	
+	// Q, regola swingup
+	if (scan == KEY_Q){
+		pthread_mutex_lock(&mux_ref_pc);
+		if(ref_pc.swingup){
+			ref_pc.swingup = 0;
+		}else{
+			ref_pc.swingup = 1;
+		}
+		pthread_mutex_unlock(&mux_ref_pc);
+
+	}
+	
+	
 	
 	/*
 		* 	DELAY

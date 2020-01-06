@@ -1,7 +1,3 @@
-//
-// Foglioche si occupa di aggiornare le scritte e aggiornare l'animazione in funzione dello stato
-//
-
 #ifndef SIMUL_FURUTA_GUI_H
 #define SIMUL_FURUTA_GUI_H
 
@@ -14,15 +10,38 @@
 #include "os.h"
 
 
+// types per gui
+typedef struct {
+    int x;
+    int y;
+} Point; 
+
+typedef struct {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+} TwoPoints;
+
+typedef struct {
+    float x;
+    float y;
+    float z;
+} Vect;
+
+typedef struct {
+    float sin;
+    float cos;
+} AngleSinCos;
+
+
+
 //inizializza gui
 int gui_init();
 
 // GUI
 void* gui(void* arg);
 
-
-
-// FUNZIONI INTERNE
 // rad
 float rad(float ang);
 

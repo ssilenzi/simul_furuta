@@ -11,6 +11,7 @@ extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
+extern float pole_ref;
 extern dn_t 				dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t 			par_dn;
@@ -21,6 +22,7 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
+
 #ifdef extime
 extern int ex_time[6];
 extern struct timespec monotime_i[6], monotime_f[6];
@@ -50,7 +52,7 @@ static struct{
 
 // stringhe di comunicazione che vengono aggiornate
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; 
-	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65];
+	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65], pole_ref_str[49];
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	char swingup_str[31];
 
@@ -165,12 +167,7 @@ void circlerif_theta(BITMAP *bmp, Point C, int r, int l1, AngleSinCos Alpha, Ang
 	Vect P; Point PAlleg;
 
 	step = 2*M_PI/NUM_POINTS;
-	
-//	float theta_loc;
-//	theta_loc = theta;
-//	if(theta_loc>350){theta_loc -= 360;}
-//	if(theta_loc<-350){theta_loc += 360;}
-	
+
 	if (theta < reftheta) {
 		initial = rad(theta);
 		final = rad(reftheta);
@@ -350,11 +347,6 @@ void vista_lato(float theta, float reftheta) {
 	AngleSinCos Theta, RefTheta;
 	TwoPoints riflink2lato, link2lato;
 	
-//	float theta_loc;
-//	theta_loc = theta;
-//	if(theta_loc>350){theta_loc -= 360;}
-//	if(theta_loc<-350){theta_loc += 360;}
-	
 	Theta.sin = sinf(rad(theta));	Theta.cos = cosf(rad(theta));
 	RefTheta.sin = sinf(rad(reftheta)); RefTheta.cos = cosf(rad(reftheta));
 
@@ -397,7 +389,6 @@ void vista_alto(float alpha, float refalpha) {
 	circlerif_parup(scrbuf, alto0, l1, -alpha, -refalpha, col.rif); // rif angolo alpha
 	thick_line(scrbuf, link1alto.x1, link1alto.y1, link1alto.x2, link1alto.y2, THICK, col.mdl); // link alto
 }
-
 
 //----------- init gui
 int gui_init(){
@@ -575,13 +566,17 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	textout_ex(scrbuf, font, "Disturbo, rumore e ritardi:", scritte.x, scritte.y[13], col.scr, col.bck);
 	sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2hu x/c, Rit: %2hhu r/t ", par_dn.dist_amp, par_dn.noise_amp, dn.delay);
 	textout_ex(scrbuf, font, pardnstr, scritte.x, scritte.y[14], col.scr, col.bck);
+	// pole gen ref_loc
+	sprintf(pole_ref_str, "Polo generatore di riferimento: %5.1f 9/0  ", pole_ref);
+	textout_ex(scrbuf, font, pole_ref_str, scritte.x, scritte.y[15], col.scr, col.bck);
+	
 	
 	// deadline_miss
-	textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[16], col.scr, col.bck);
+	textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[17], col.scr, col.bck);
 	sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
-	textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[17], col.scr, col.bck);
+	textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[18], col.scr, col.bck);
 	sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
-	textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[18], col.scr, col.bck);
+	textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[19], col.scr, col.bck);
 	
 	// swingup
 	if(ref_pc.swingup){
@@ -589,7 +584,7 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	}else{
 		sprintf(swingup_str, "Controllore Swingup disattivo");
 	}
-	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[20], col.scr, col.bck);
+	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[21], col.scr, col.bck);
 	
 }
 
