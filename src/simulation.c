@@ -79,7 +79,7 @@ DW_fast_T fast_DW;
 DW_slow_T slow_DW;
 PrevZCX_slow_T slow_PrevZCX;
 
-#ifdef extime
+#ifdef EXTIME
 /* ex_time[6]:
 	 * state_update 0
 	 * control 1
@@ -107,7 +107,7 @@ void* state_update(void* arg){
 	uint16_T CCR_local;
 	
 	while(!end){
-#ifdef extime
+#ifdef EXTIME
         start_extime(0, PERIOD_STATE_UPDATE);
 #endif
 		pthread_mutex_lock(&mux_ref_board);
@@ -128,7 +128,7 @@ void* state_update(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_state_update+=1;
 		}
-#ifdef extime
+#ifdef EXTIME
         stop_extime(0);
 #endif
 		wait_for_period(id);		// wait to next period
@@ -149,7 +149,7 @@ void* control(void* arg){
 	disturbance_and_noise_Init(&slow_DW.dist);
 	
 	while(!end){
-#ifdef extime
+#ifdef EXTIME
         start_extime(1, PERIOD_CONTROL);
 #endif
 		pthread_mutex_lock(&mux_parcontr_board);
@@ -179,7 +179,7 @@ void* control(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_control+=1;
 		}
-#ifdef extime
+#ifdef EXTIME
         stop_extime(1);
 #endif
 		wait_for_period(id);		// wait to next period
@@ -196,7 +196,7 @@ void* compc(void* arg){
 	set_activation(id);
 	
 	while(!end){
-#ifdef extime
+#ifdef EXTIME
         start_extime(2, PERIOD_COMPC);
 #endif
 		// scrittura di ref_pc su buffer
@@ -227,7 +227,7 @@ void* compc(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_compc+=1;
 		}
-#ifdef extime
+#ifdef EXTIME
         stop_extime(2);
 #endif
 		wait_for_period(id);		// wait to next period
@@ -244,7 +244,7 @@ void* comboard(void* arg){
 	
 	
 	while(!end){
-#ifdef extime
+#ifdef EXTIME
         start_extime(3, PERIOD_COMBOARD);
 #endif
 		// lettura di ref da buffer, scrittura di ref_board
@@ -276,7 +276,7 @@ void* comboard(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_comboard+=1;
 		}
-#ifdef extime
+#ifdef EXTIME
         stop_extime(3);
 #endif
 		wait_for_period(id);		// wait to next period

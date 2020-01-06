@@ -2,7 +2,7 @@
 
 #include "ptask.h"
 
-#ifdef extime
+#ifdef EXTIME
 extern int ex_time[6];
 extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
@@ -113,7 +113,7 @@ int cpu_set(int cpu){
     return sched_setaffinity(0, sizeof(cpuset), &cpuset);
 }
 
-#ifdef extime
+#ifdef EXTIME
 void start_extime(int i, int period){
     if (ex_cnt[i] >= 1000 / period) {
         ex_time[i] = ex_sum[i] / ex_cnt[i];

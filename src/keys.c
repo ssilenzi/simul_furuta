@@ -19,7 +19,7 @@ extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
 extern int dl_miss_keys;
 extern int end;
-#ifdef extime
+#ifdef EXTIME
 extern int ex_time[6];
 extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
@@ -38,7 +38,7 @@ void* keys(void* arg){
 	
 	
 	while(!end){
-#ifdef extime
+#ifdef EXTIME
         start_extime(5, PERIOD_KEYS);
 #endif
 		if (keypressed()) {
@@ -56,7 +56,7 @@ void* keys(void* arg){
 	if(deadline_miss(id)){
 			dl_miss_keys+=1;
 	}
-#ifdef extime
+#ifdef EXTIME
         stop_extime(5);
 #endif
 	wait_for_period(id);	// wait to next period

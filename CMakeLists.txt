@@ -11,22 +11,6 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}")
 find_package(Allegro REQUIRED)
 include_directories("${ALLEGRO_INCLUDE_DIR}")
 
-# Varianti per diversi sistemi operativi
-if(WIN32)
-	set(GRAFICA GRAFICA_WIN32)
-	file(COPY "${ALLEGRO_SHARED}" DESTINATION "${PROJECT_BINARY_DIR}")
-    install(FILES "${ALLEGRO_SHARED}" DESTINATION "${PROJECT_SOURCE_DIR}/bin")
-else()
-	set(GRAFICA GRAFICA_LINUX)
-endif()
-configure_file("${PROJECT_SOURCE_DIR}/include/os.h.in" "${PROJECT_BINARY_DIR}/include/os.h")
-
-# Misura tempi esecuzione task
-option(EXTIME "Misura tempi esecuzione dei task" OFF)
-if(EXTIME)
-	add_compile_definitions(extime)
-endif()
-
 # Compila e genera eseguibile
 include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
 file(GLOB SRC "${PROJECT_SOURCE_DIR}/src/*.c" "${PROJECT_SOURCE_DIR}/src/*.cpp")

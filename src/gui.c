@@ -23,7 +23,7 @@ extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
 
-#ifdef extime
+#ifdef EXTIME
 extern int ex_time[6];
 extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
@@ -56,7 +56,7 @@ static struct{
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	char swingup_str[31];
 
-#ifdef extime
+#ifdef EXTIME
 	char time_exec_str1[61], time_exec_str2[68];
 #endif
 	
@@ -78,7 +78,7 @@ void* gui(void* arg){
 	static par_ctrl_t par_control_loc;
 	
 	while(!end){
-#ifdef extime
+#ifdef EXTIME
         start_extime(4, 1000/FPS);
 #endif
 		pthread_mutex_lock(&mux_state_pc);
@@ -100,7 +100,7 @@ void* gui(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_gui+=1;
 		}
-#ifdef extime
+#ifdef EXTIME
         stop_extime(4);
 #endif
 		wait_for_period(id);		// wait to next period
@@ -419,7 +419,7 @@ int gui_init(){
 		scritte.y[i] = DIST * (i+1);
 	} //popolo l'array scritte con le posizioni xy delle scritte
 
-	if (set_gfx_mode(GRAFICA, WSCREEN, HSCREEN, 0, 0) != 0) {
+	if (set_gfx_mode(GRAPHICS, WSCREEN, HSCREEN, 0, 0) != 0) {
 		set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
 		allegro_message("Unable to set any graphic mode\n%s\n", allegro_error);
 		return 1;
@@ -592,12 +592,12 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[21], col.scr, col.bck);
 	
 	
-#ifdef extime
+#ifdef EXTIME
 	
 	textout_ex(scrbuf, font, "Tempi di esecuzione:", scritte.x, scritte.y[23], col.scr, col.bck);
-	sprintf(time_exec_str1, "state_update:%3.1d, control:%3.1d, comboard:%3.1d  ", ex_time[0], ex_time[1], ex_time[3]);
+	sprintf(time_exec_str1, "state_update:%3d, control:%3d, comboard:%3d  ", ex_time[0], ex_time[1], ex_time[3]);
 	textout_ex(scrbuf, font, time_exec_str1,scritte.x, scritte.y[24], col.scr, col.bck);
-	sprintf(time_exec_str2, "compc:%3.1d,  gui:%3.1d, keys:%3.1d  ", ex_time[2], ex_time[4],  ex_time[5]);
+	sprintf(time_exec_str2, "compc:%3d,  gui:%5d, keys:%3d  ", ex_time[2], ex_time[4],  ex_time[5]);
 	textout_ex(scrbuf, font, time_exec_str2,scritte.x, scritte.y[25], col.scr, col.bck);
 	
 #endif

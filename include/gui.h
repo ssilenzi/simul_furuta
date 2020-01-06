@@ -7,7 +7,6 @@
 
 #include "ptask.h"
 #include "condiviso.h"
-#include "os.h"
 
 
 // types per gui

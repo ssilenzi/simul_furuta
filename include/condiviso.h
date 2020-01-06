@@ -7,7 +7,7 @@
 #include "zero_crossing_types.h"
 
 
-#define extime //opzione di debug per leggere i tempi di esecuzione dei task
+#define EXTIME //opzione di debug per leggere i tempi di esecuzione dei task
 
 
 //----------- costanti, definizioni
@@ -26,8 +26,7 @@
 #define INCR_ANG			5
 
 // gui
-#define GRAFICA_LINUX		GFX_AUTODETECT_WINDOWED
-#define GRAFICA_WIN32		GFX_GDI
+#define GRAPHICS            GFX_AUTODETECT_WINDOWED
 #define WSCREEN				1024	// larghezza finestra
 #define HSCREEN				768		// altezza finestra
 #define COLOR_DEPTH			32		// numero colori

@@ -64,7 +64,7 @@ long time_dist(	struct timespec *t1, 		// return time distance in nanoseconds, n
 
 int cpu_set(int cpu);
 
-#ifdef extime
+#ifdef EXTIME
 void start_extime(int i, int period);
 void stop_extime(int i);
 #endif
