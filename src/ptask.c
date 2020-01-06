@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#define MAX_THREAD	1001
 
 #include "ptask.h"
 
@@ -8,6 +9,21 @@ extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
 extern long ex_sum[6];
 #endif
+
+struct task_par{				// parametri del task
+    int arg;					// task index
+    long wcet;					// in microseconds
+    unsigned int period;		// in milliseconds
+    unsigned int deadline;		// relative (ms)
+    unsigned int priority;		// in [0-99]
+    unsigned int dmiss;			// # of misses
+    struct timespec at;			// next activ time
+    struct timespec dl;			// abs deadline
+};
+
+struct timespec t;				// time variable
+struct task_par tp[MAX_THREAD];   // task parameters
+pthread_t tid[MAX_THREAD];        // thread id
 
 // Functions definitions
 int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
@@ -31,8 +47,6 @@ int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
 	tret = pthread_create(&tid[i], &myatt, task, (void*)(&tp[i]));				// create thread
 	return tret;
 }
-
-
 
 int get_task_index(void* arg){
 	struct task_par *tp;
@@ -60,9 +74,7 @@ int deadline_miss(int i){
 }
 
 void wait_for_period(int i){
-	// // gestione della dl miss
-	// if(deadline_miss(i)){
-	// }
+	// gestione della dl miss
 	clock_nanosleep(CLOCK_MONOTONIC,
 					TIMER_ABSTIME, &(tp[i].at), NULL);
 	time_add_ms(&(tp[i].at), tp[i].period);
@@ -71,7 +83,6 @@ void wait_for_period(int i){
 
 void wait_for_task_end(int i){
 	pthread_join(tid[i], NULL);
-	//pthread_join(tp[i].tid, NULL);
 }
 
 unsigned int task_period(int i){
@@ -111,6 +122,10 @@ int cpu_set(int cpu){
     CPU_ZERO(&cpuset);
     CPU_SET(cpu, &cpuset);
     return sched_setaffinity(0, sizeof(cpuset), &cpuset);
+}
+
+void set_period(int i, unsigned int period){
+    tp[i].period = period;
 }
 
 #ifdef EXTIME

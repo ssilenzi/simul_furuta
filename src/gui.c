@@ -11,7 +11,6 @@ extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
-extern float pole_ref;
 extern dn_t 				dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t 			par_dn;
@@ -30,6 +29,8 @@ extern int ex_cnt[6];
 extern long ex_sum[6];
 #endif
 
+float pole_ref = 2.0F;
+unsigned int period_control = PERIOD_CONTROL;
 
 //----------- variabili usate solo in gui.c
 static BITMAP *scrbuf;
@@ -72,10 +73,10 @@ void* gui(void* arg){
 	//gui_init();
 
 	// variabili
-	static state_pc_t state_loc;
-	static ref_t ref_loc = {1, 1, 1};
-	static view_t view_loc = {1, 1};
-	static par_ctrl_t par_control_loc;
+	static state_pc_t state_loc = {0};
+	static ref_t ref_loc = {0};
+	static view_t view_loc = {0};
+	static par_ctrl_t par_control_loc = {0};
 	
 	while(!end){
 #ifdef EXTIME

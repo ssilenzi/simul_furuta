@@ -13,12 +13,13 @@ extern pthread_mutex_t 		mux_view;
 extern par_ctrl_t 			par_control_pc;
 extern par_ctrl_t 			par_control_reset;
 extern pthread_mutex_t 		mux_parcontr_pc;
-extern float pole_ref;
 extern dn_t dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
 extern int dl_miss_keys;
 extern int end;
+extern float pole_ref;
+extern unsigned int period_control;
 #ifdef EXTIME
 extern int ex_time[6];
 extern struct timespec monotime_i[6], monotime_f[6];
@@ -43,9 +44,9 @@ void* keys(void* arg){
 #endif
 		if (keypressed()) {
 			get_keycodes(&scan, &ascii);
-			key_action(scan);
-			
-		}else{
+			key_action();
+            key_par_control();
+		} else {
 			//reset kick
 			pthread_mutex_lock(&mux_dn);
 				dn.kick = 0;
@@ -65,19 +66,126 @@ void* keys(void* arg){
 	return 0;
 }
 
+// key_action, a seconda del tasto premuto compie un'azione
+void key_action(){
 
-// get_keycodes
-void get_keycodes(char *scan, char *ascii)
-{
-	// The following function waits for a key pressed and extracts
-	// the corresponding ASCII code and scan code:
-	int k;
-	k = readkey(); // block until a key is pressed
-	*ascii = k; // get ASCII code
-	*scan = k >> 8; // get scan code
+    // ESC, end Threads e conseguente chiusura del programma
+    if (scan == KEY_ESC) {
+        end = 1;
+    }
+
+    // 1, reset state_pc e ref_pc
+    if (scan == KEY_1) {
+        pthread_mutex_lock(&mux_ref_pc);
+        ref_pc.alpha = ALPHA_0;
+        ref_pc.theta = THETA_0;
+        pthread_mutex_unlock(&mux_ref_pc);
+    }
+
+    // W, kick
+    if (scan == KEY_D){
+        pthread_mutex_lock(&mux_dn);
+        dn.kick = 1;
+        pthread_mutex_unlock(&mux_dn);
+    }
+
+    // Q, regola swingup
+    if (scan == KEY_Q){
+        pthread_mutex_lock(&mux_ref_pc);
+        if(ref_pc.swingup){
+            ref_pc.swingup = 0;
+        }else{
+            ref_pc.swingup = 1;
+        }
+        pthread_mutex_unlock(&mux_ref_pc);
+    }
+
+    /*
+        * 	DELAY
+        */
+    if(scan == KEY_W){
+        pthread_mutex_lock(&mux_dn);
+        dn.delay += 1;
+        pthread_mutex_unlock(&mux_dn);
+    }
+    if(scan == KEY_E && dn.delay != 0){
+        pthread_mutex_lock(&mux_dn);
+        dn.delay += -1;
+        pthread_mutex_unlock(&mux_dn);
+    }
+    if(scan == KEY_5){
+        pthread_mutex_lock(&mux_dn);
+        dn.delay = 0;
+        pthread_mutex_unlock(&mux_dn);
+    }
+
+    /*
+    *	RIFERIMENTO
+    */
+    // A, incrementa riferimento di alpha
+    if (scan==KEY_A) {
+        pthread_mutex_lock(&mux_ref_pc);
+        ref_pc.alpha += INCR_ANG;
+        pthread_mutex_unlock(&mux_ref_pc);
+    }
+    // S, diminuisce riferimento di alpha
+    if (scan==KEY_S) {
+        pthread_mutex_lock(&mux_ref_pc);
+        ref_pc.alpha += -INCR_ANG;
+        pthread_mutex_unlock(&mux_ref_pc);
+    }
+
+    // 9, incrementa il periodo del task di controllo
+    if(scan == KEY_9) {
+        period_control += 1;
+        set_period(ID_CONTROL, period_control);
+    }
+    // 0, diminuisce il periodo del task di controllo
+    if(scan == KEY_0 && period_control > 1) {
+        period_control -= 1;
+        set_period(ID_CONTROL, period_control);
+    }
+
+    /*
+    *      VIEW
+    */
+    // reset vista
+    if (scan==KEY_2) {
+        pthread_mutex_lock(&mux_view);
+        view.lon = LON_0;
+        view.lat = LAT_0;
+        pthread_mutex_unlock(&mux_view);
+    }
+
+    //VIEW_LAT up down
+    if (scan==KEY_UP) {
+        pthread_mutex_lock(&mux_view);
+        if (view.lat + INCR_ANG <= LAT_MAX) {
+            view.lat += INCR_ANG;
+        }
+        pthread_mutex_unlock(&mux_view);
+    }
+    if (scan==KEY_DOWN) {
+        pthread_mutex_lock(&mux_view);
+        if (view.lat + -INCR_ANG >= -LAT_MAX) {
+            view.lat += -INCR_ANG;
+        }
+        pthread_mutex_unlock(&mux_view);
+    }
+    // VIEW_LON left right
+    if (scan==KEY_LEFT) {
+        pthread_mutex_lock(&mux_view);
+        view.lon += -INCR_ANG;
+        pthread_mutex_unlock(&mux_view);
+    }
+    if (scan==KEY_RIGHT) {
+        pthread_mutex_lock(&mux_view);
+        view.lon += +INCR_ANG;
+        pthread_mutex_unlock(&mux_view);
+    }
 }
 
-void key_par_control(char scan){
+void key_par_control(){
 	/*
 	* Par_control
 	*/
@@ -160,7 +268,7 @@ void key_par_control(char scan){
 		pthread_mutex_unlock(&mux_parcontr_pc);
 	}
 	
-	//gen_ref_online
+	// ref_gen_online
 	if(scan == KEY_I){
 		pole_ref += INCR_K;
 		pthread_mutex_lock(&mux_parcontr_pc);
@@ -183,8 +291,7 @@ void key_par_control(char scan){
 		pthread_mutex_unlock(&mux_parcontr_pc);
 		
 	}
-	
-	
+
 	/*
 	*	par_dn
 	*/
@@ -208,130 +315,15 @@ void key_par_control(char scan){
 		dn.delay = 0;
 		pthread_mutex_unlock(&mux_dn);
 	}
-	
-	
 }
 
-// key_action, a seconda del tasto premuto compie un'azione
-void key_action(char scan){
-	
-	key_par_control(scan);
-	
-	
-	// ESC, end Threads e conseguente chiusura del programma
-	if (scan==KEY_ESC) {
-		end = 1;
-	}
-	
-	// 1, reset state_pc e ref_pc
-	if (scan == KEY_1) {
-		pthread_mutex_lock(&mux_ref_pc);
-			ref_pc.alpha = ALPHA_0;
-			ref_pc.theta = THETA_0;
-		pthread_mutex_unlock(&mux_ref_pc);
-		
-	}
-	
-	// W, kick
-	if (scan == KEY_D){
-		pthread_mutex_lock(&mux_dn);
-		dn.kick = 1;
-		pthread_mutex_unlock(&mux_dn);
-
-	}
-
-	
-	// Q, regola swingup
-	if (scan == KEY_Q){
-		pthread_mutex_lock(&mux_ref_pc);
-		if(ref_pc.swingup){
-			ref_pc.swingup = 0;
-		}else{
-			ref_pc.swingup = 1;
-		}
-		pthread_mutex_unlock(&mux_ref_pc);
-
-	}
-	
-	
-	
-	/*
-		* 	DELAY
-		*/
-	if(scan == KEY_W){
-		pthread_mutex_lock(&mux_dn);
-			dn.delay += 1;
-		pthread_mutex_unlock(&mux_dn);
-	}
-	if(scan == KEY_E && dn.delay != 0){
-		pthread_mutex_lock(&mux_dn);
-			dn.delay += -1;
-		pthread_mutex_unlock(&mux_dn);
-	}
-	
-	if(scan == KEY_5){
-		pthread_mutex_lock(&mux_dn);
-			dn.delay = 0;
-		pthread_mutex_unlock(&mux_dn);
-	}
-	
-	/*
-	*	RIFERIMENTO
-	*/
-	// A, incrementa riferimento di alpha
-	if (scan==KEY_A) {
-		pthread_mutex_lock(&mux_ref_pc);
-			ref_pc.alpha += INCR_ANG;
-		pthread_mutex_unlock(&mux_ref_pc);
-	}
-	// S, diminuisce riferimento di alpha
-	if (scan==KEY_S) {
-		pthread_mutex_lock(&mux_ref_pc);
-			ref_pc.alpha += -INCR_ANG;
-		pthread_mutex_unlock(&mux_ref_pc);
-	}
-	
-	
-	/*
-	*      VIEW
-	*/ 
-	// reset vista
-	if (scan==KEY_2) {
-		pthread_mutex_lock(&mux_view);
-			view.lon = LON_0;
-			view.lat = LAT_0;
-		pthread_mutex_unlock(&mux_view);
-		
-	}
-	
-	//VIEW_LAT up down
-	if (scan==KEY_UP) {
-		pthread_mutex_lock(&mux_view);
-		if (view.lat + INCR_ANG <= LAT_MAX) {
-			view.lat += INCR_ANG;
-		}
-		pthread_mutex_unlock(&mux_view);
-		
-	}
-	if (scan==KEY_DOWN) {
-		pthread_mutex_lock(&mux_view);
-		if (view.lat + -INCR_ANG >= -LAT_MAX) {
-			view.lat += -INCR_ANG;
-		}
-		pthread_mutex_unlock(&mux_view);
-
-	}
-	// VIEW_LON left right
-	if (scan==KEY_LEFT) {
-		pthread_mutex_lock(&mux_view);
-			view.lon += -INCR_ANG;
-		pthread_mutex_unlock(&mux_view);			
-		
-	}
-	if (scan==KEY_RIGHT) {
-	pthread_mutex_lock(&mux_view);
-		view.lon += +INCR_ANG;
-	pthread_mutex_unlock(&mux_view);				
-		}
-	
+// get_keycodes
+void get_keycodes(char *scan, char *ascii)
+{
+    // The following function waits for a key pressed and extracts
+    // the corresponding ASCII code and scan code:
+    int k;
+    k = readkey(); // block until a key is pressed
+    *ascii = k; // get ASCII code
+    *scan = k >> 8; // get scan code
 }

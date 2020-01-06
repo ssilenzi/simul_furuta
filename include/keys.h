@@ -9,8 +9,8 @@
 
 //keys
 void* keys(void* arg);
-
-void key_action(char scan);
+void key_action();
+void key_par_control();
 
 // get_keycodes
 void get_keycodes(char *scan, char *ascii);
