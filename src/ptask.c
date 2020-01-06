@@ -1,7 +1,5 @@
 #define _GNU_SOURCE
-#include <time.h>
-#include <sched.h>
-#include <pthread.h>
+
 #include "ptask.h"
 
 #ifdef extime

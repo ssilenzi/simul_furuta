@@ -6,6 +6,10 @@
 #include "rtwtypes.h" //conversioni matlab
 #include "zero_crossing_types.h"
 
+
+#define extime //opzione di debug per leggere i tempi di esecuzione dei task
+
+
 //----------- costanti, definizioni
 // stato, _0 iniziale 
 #define ALPHA_0				0

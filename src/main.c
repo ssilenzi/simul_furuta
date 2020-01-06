@@ -36,8 +36,8 @@
 
 /*	TO DO LIST
  *  - scrivere il sottotitolo
- * 	- commentare ogni funzione
- * 	- disegnare tempi di esecuzione
+ * 	- commentare ogni funzione ?
+ * 	- migliorare disegno tempi di esecuzione
  */
 
 

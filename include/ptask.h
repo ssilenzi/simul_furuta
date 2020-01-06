@@ -4,6 +4,7 @@
 #include <time.h>
 #include <sched.h>
 #include <pthread.h>
+#include "condiviso.h"
 
 //#define _POSIX_C_SOURCE 199309L		//necessario per CLOCK_MONOTONIC
 

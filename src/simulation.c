@@ -80,6 +80,14 @@ DW_slow_T slow_DW;
 PrevZCX_slow_T slow_PrevZCX;
 
 #ifdef extime
+/* ex_time[6]:
+	 * state_update 0
+	 * control 1
+	 * compc 2
+	 * comboard 3
+	 * gui 4
+	 * keys 5
+*/
 int ex_time[6] = {0};
 struct timespec monotime_i[6], monotime_f[6];
 int ex_cnt[6] = {0};

@@ -56,6 +56,11 @@ static struct{
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	char swingup_str[31];
 
+#ifdef extime
+	char time_exec_str1[61], time_exec_str2[68];
+#endif
+	
+
 //----------- gui
 void* gui(void* arg){
     cpu_set(0);
@@ -586,6 +591,17 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	}
 	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[21], col.scr, col.bck);
 	
+	
+#ifdef extime
+	
+	textout_ex(scrbuf, font, "Tempi di esecuzione:", scritte.x, scritte.y[23], col.scr, col.bck);
+	sprintf(time_exec_str1, "state_update:%3.1d, control:%3.1d, comboard:%3.1d  ", ex_time[0], ex_time[1], ex_time[3]);
+	textout_ex(scrbuf, font, time_exec_str1,scritte.x, scritte.y[24], col.scr, col.bck);
+	sprintf(time_exec_str2, "compc:%3.1d,  gui:%3.1d, keys:%3.1d  ", ex_time[2], ex_time[4],  ex_time[5]);
+	textout_ex(scrbuf, font, time_exec_str2,scritte.x, scritte.y[25], col.scr, col.bck);
+	
+#endif
+	
 }
 
 
@@ -596,7 +612,7 @@ void gui_draw(state_pc_t state,ref_t ref, view_t view, par_ctrl_t par_control){
 	vista_lato(state.theta, ref.theta);
 	vista_asson(state.alpha, ref.alpha, state.theta, ref.theta, view.lon, view.lat);
 	scritte_draw(state, ref, par_control);
-	
+
 	blit(scrbuf, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
 
