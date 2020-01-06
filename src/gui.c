@@ -24,6 +24,7 @@ extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
 
+
 #ifdef EXTIME
 extern int ex_time[6];
 extern struct timespec monotime_i[6], monotime_f[6];
@@ -52,7 +53,7 @@ static struct{
 
 // stringhe di comunicazione che vengono aggiornate
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; 
-	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65], pole_ref_str[49];
+	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65], pole_ref_str[49], control_period_str[50];
 	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	char swingup_str[31];
 
@@ -574,6 +575,10 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	// pole gen ref_loc
 	sprintf(pole_ref_str, "Polo generatore di riferimento: %5.1f i/o  ", pole_ref);
 	textout_ex(scrbuf, font, pole_ref_str, scritte.x, scritte.y[15], col.scr, col.bck);
+	// tempo di esecuzione del task di controllo
+	sprintf(control_period_str, "Periodo di control: %2u 9/0, def = 5  ", period_control);
+	textout_ex(scrbuf, font, control_period_str, scritte.x, scritte.y[16], col.scr, col.bck);
+	
 	
 	
 	// deadline_miss
