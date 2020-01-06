@@ -21,6 +21,12 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
+#ifdef extime
+extern int ex_time[6];
+extern struct timespec monotime_i[6], monotime_f[6];
+extern int ex_cnt[6];
+extern long ex_sum[6];
+#endif
 
 
 //----------- variabili usate solo in gui.c
@@ -50,6 +56,7 @@ static struct{
 
 //----------- gui
 void* gui(void* arg){
+    cpu_set(0);
 	int id;							// task index
 	id = get_task_index(arg);		// retrieve the task index
 	set_activation(id);
@@ -64,7 +71,9 @@ void* gui(void* arg){
 	static par_ctrl_t par_control_loc;
 	
 	while(!end){
-		
+#ifdef extime
+        start_extime(4, 1000/FPS);
+#endif
 		pthread_mutex_lock(&mux_state_pc);
 			state_loc = state_pc;
 		pthread_mutex_unlock(&mux_state_pc);
@@ -84,7 +93,9 @@ void* gui(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_gui+=1;
 		}
-		
+#ifdef extime
+        stop_extime(4);
+#endif
 		wait_for_period(id);		// wait to next period
 	}
 	return 0;

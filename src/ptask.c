@@ -4,6 +4,13 @@
 #include <pthread.h>
 #include "ptask.h"
 
+#ifdef extime
+extern int ex_time[6];
+extern struct timespec monotime_i[6], monotime_f[6];
+extern int ex_cnt[6];
+extern long ex_sum[6];
+#endif
+
 // Functions definitions
 int task_create(void* (*task)(void *), int i, int period, int drel, int prio){
 	pthread_attr_t myatt;				// thread attributes
@@ -107,3 +114,21 @@ int cpu_set(int cpu){
     CPU_SET(cpu, &cpuset);
     return sched_setaffinity(0, sizeof(cpuset), &cpuset);
 }
+
+#ifdef extime
+void start_extime(int i, int period){
+    if (ex_cnt[i] >= 1000 / period) {
+        ex_time[i] = ex_sum[i] / ex_cnt[i];
+        ex_sum[i] = 0;
+        ex_cnt[i] = 0;
+    }
+    ex_cnt[i]++;
+    clock_gettime(CLOCK_MONOTONIC, &monotime_i[i]);
+}
+
+
+void stop_extime(int i){
+    clock_gettime(CLOCK_MONOTONIC, &monotime_f[i]);
+    ex_sum[i] = ex_sum[i] + time_dist(&monotime_i[i], &monotime_f[i])/1000;
+}
+#endif

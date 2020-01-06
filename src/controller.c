@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.266
+ * Model version                  : 1.269
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Sun Jan  5 00:55:44 2020
+ * C/C++ source code generated on : Sun Jan  5 20:51:24 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -31,10 +31,10 @@
 #define slow_IN_Swing_up               ((uint8_T)2U)
 
 /* Forward declaration for local functions */
+static real32_T slow_energy(const real32_T state[4]);
 static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
   TmpSignalConversionAtSFunctionI[4], real32_T *alpha_ref, real32_T *alpha,
   int8_T *reset, real32_T *DiscreteTransferFcn);
-static real32_T slow_energy(const real32_T state[4]);
 static void slow_contr_su(const real32_T TmpSignalConversionAtSFunctionI[4]);
 
 /* System initialize for function-call system: '<S4>/ref_gen' */
@@ -78,6 +78,31 @@ void slow_ref_gen(real32_T rtu_alpha_ref, real32_T rtu_alpha, int8_T rtu_reset,
 
 /*
  * Function for Chart: '<S1>/Hybrid_controller'
+ * function ME = energy(state)
+ */
+static real32_T slow_energy(const real32_T state[4])
+{
+  real32_T x_tmp;
+  real32_T ME_tmp;
+  real32_T ME_tmp_0;
+
+  /* MATLAB Function 'energy': '<S4>:86' */
+  /*  Mechanical energy calculation (kinetic + potential) */
+  /* '<S4>:86:5' th = state(2); */
+  /* '<S4>:86:6' al_d = state(3); */
+  /* '<S4>:86:7' th_d = state(4); */
+  /* '<S4>:86:9' ME = (Jp*al_d^2)/2 + (Jp*th_d^2)/2 + (Larm^2*al_d^2*mp)/2 - g*lp*mp - (Jp*al_d^2*cos(th)^2)/2 + g*lp*mp*cos(th) + Larm*al_d*lp*mp*th_d*cos(th); */
+  x_tmp = cosf(state[1]);
+  ME_tmp = state[2] * state[2];
+  ME_tmp_0 = ME_tmp * 0.00429067202F;
+  return (((((ME_tmp_0 / 2.0F + state[3] * state[3] * 0.00429067202F / 2.0F) +
+             ME_tmp * 0.046656F * 0.127F / 2.0F) - 0.194355741F) - ME_tmp_0 *
+           (x_tmp * x_tmp) / 2.0F) + 0.194355741F * x_tmp) + 0.216F * state[2] *
+    0.156F * 0.127F * state[3] * x_tmp;
+}
+
+/*
+ * Function for Chart: '<S1>/Hybrid_controller'
  * function contr_pd
  */
 static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
@@ -105,31 +130,6 @@ static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
     TmpSignalConversionAtSFunctionI[1]) * slow_DW.K[1]) + (0.0F -
     TmpSignalConversionAtSFunctionI[2]) * slow_DW.K[2]) + (0.0F -
     TmpSignalConversionAtSFunctionI[3]) * slow_DW.K[3];
-}
-
-/*
- * Function for Chart: '<S1>/Hybrid_controller'
- * function ME = energy(state)
- */
-static real32_T slow_energy(const real32_T state[4])
-{
-  real32_T x_tmp;
-  real32_T ME_tmp;
-  real32_T ME_tmp_0;
-
-  /* MATLAB Function 'energy': '<S4>:86' */
-  /*  Mechanical energy calculation (kinetic + potential) */
-  /* '<S4>:86:5' th = state(2); */
-  /* '<S4>:86:6' al_d = state(3); */
-  /* '<S4>:86:7' th_d = state(4); */
-  /* '<S4>:86:9' ME = (Jp*al_d^2)/2 + (Jp*th_d^2)/2 + (Larm^2*al_d^2*mp)/2 - g*lp*mp - (Jp*al_d^2*cos(th)^2)/2 + g*lp*mp*cos(th) + Larm*al_d*lp*mp*th_d*cos(th); */
-  x_tmp = cosf(state[1]);
-  ME_tmp = state[2] * state[2];
-  ME_tmp_0 = ME_tmp * 0.00429067202F;
-  return (((((ME_tmp_0 / 2.0F + state[3] * state[3] * 0.00429067202F / 2.0F) +
-             ME_tmp * 0.046656F * 0.127F / 2.0F) - 0.194355741F) - ME_tmp_0 *
-           (x_tmp * x_tmp) / 2.0F) + 0.194355741F * x_tmp) + 0.216F * state[2] *
-    0.156F * 0.127F * state[3] * x_tmp;
 }
 
 /*
@@ -482,9 +482,18 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
         /* Entry 'Idle': '<S4>:28' */
       } else {
-        /* '<S4>:4:9' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
+        /* '<S4>:4:5' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
         slow_DW.theta_ref = (roundf(rtb_pos_meas[1] / 6.28318548F + 0.5F) - 0.5F)
           * 6.28318548F;
+
+        /* '<S4>:4:6' K = [par_ctrl.down_kp_alpha,... */
+        /* '<S4>:4:7'     single(0),... */
+        /* '<S4>:4:8'     par_ctrl.down_kd_alpha,... */
+        /* '<S4>:4:9'     single(0)]; */
+        slow_DW.K[0] = par_ctrl.down_kp_alpha;
+        slow_DW.K[1] = 0.0F;
+        slow_DW.K[2] = par_ctrl.down_kd_alpha;
+        slow_DW.K[3] = 0.0F;
 
         /* '<S4>:4:10' contr_pd; */
         slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
@@ -508,6 +517,15 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
         /* Entry 'Idle': '<S4>:28' */
       } else {
+        /* '<S4>:5:6' K = [par_ctrl.up_kp_alpha,... */
+        /* '<S4>:5:7'     par_ctrl.up_kp_theta,... */
+        /* '<S4>:5:8'     par_ctrl.up_kd_alpha,... */
+        /* '<S4>:5:9'     par_ctrl.up_kd_theta]; */
+        slow_DW.K[0] = par_ctrl.up_kp_alpha;
+        slow_DW.K[1] = par_ctrl.up_kp_theta;
+        slow_DW.K[2] = par_ctrl.up_kd_alpha;
+        slow_DW.K[3] = par_ctrl.up_kd_theta;
+
         /* '<S4>:5:10' contr_pd; */
         slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
                       &reset, &DiscreteTransferFcn);
@@ -527,16 +545,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         slow_DW.is_c5_slow = slow_IN_PD_controller_up;
 
         /* Entry 'PD_controller_up': '<S4>:5' */
-        /* '<S4>:5:3' K = [par_ctrl.up_kp_alpha,... */
-        /* '<S4>:5:4'     par_ctrl.up_kp_theta,... */
-        /* '<S4>:5:5'     par_ctrl.up_kd_alpha,... */
-        /* '<S4>:5:6'     par_ctrl.up_kd_theta]; */
-        slow_DW.K[0] = par_ctrl.up_kp_alpha;
-        slow_DW.K[1] = par_ctrl.up_kp_theta;
-        slow_DW.K[2] = par_ctrl.up_kd_alpha;
-        slow_DW.K[3] = par_ctrl.up_kd_theta;
-
-        /* '<S4>:5:7' ref_gen(alpha_ref,q(1),int8(1)); */
+        /* '<S4>:5:3' ref_gen(alpha_ref,q(1),int8(1)); */
         /* Simulink Function 'ref_gen': '<S4>:148' */
         q = deg_to_rad;
         alpha = rtb_pos_meas[0];
@@ -547,8 +556,17 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
                      &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
 
         /* End of Outputs for SubSystem: '<S4>/ref_gen' */
-        /* '<S4>:5:8' theta_ref = round(q(2)/single(2*pi))*single(2*pi); */
+        /* '<S4>:5:4' theta_ref = round(q(2)/single(2*pi))*single(2*pi); */
         slow_DW.theta_ref = roundf(rtb_pos_meas[1] / 6.28318548F) * 6.28318548F;
+
+        /* '<S4>:5:6' K = [par_ctrl.up_kp_alpha,... */
+        /* '<S4>:5:7'     par_ctrl.up_kp_theta,... */
+        /* '<S4>:5:8'     par_ctrl.up_kd_alpha,... */
+        /* '<S4>:5:9'     par_ctrl.up_kd_theta]; */
+        slow_DW.K[0] = par_ctrl.up_kp_alpha;
+        slow_DW.K[1] = par_ctrl.up_kp_theta;
+        slow_DW.K[2] = par_ctrl.up_kd_alpha;
+        slow_DW.K[3] = par_ctrl.up_kd_theta;
 
         /* '<S4>:5:10' contr_pd; */
         slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
@@ -562,16 +580,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
           slow_DW.is_c5_slow = slow_IN_PD_controller_down;
 
           /* Entry 'PD_controller_down': '<S4>:4' */
-          /* '<S4>:4:3' K = [par_ctrl.down_kp_alpha,... */
-          /* '<S4>:4:4'     single(0),... */
-          /* '<S4>:4:5'     par_ctrl.down_kd_alpha,... */
-          /* '<S4>:4:6'     single(0)]; */
-          slow_DW.K[0] = par_ctrl.down_kp_alpha;
-          slow_DW.K[1] = 0.0F;
-          slow_DW.K[2] = par_ctrl.down_kd_alpha;
-          slow_DW.K[3] = 0.0F;
-
-          /* '<S4>:4:7' ref_gen(alpha_ref,q(1),int8(1)); */
+          /* '<S4>:4:3' ref_gen(alpha_ref,q(1),int8(1)); */
           /* Simulink Function 'ref_gen': '<S4>:148' */
           q = deg_to_rad;
           alpha = rtb_pos_meas[0];
@@ -582,9 +591,18 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
                        &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
 
           /* End of Outputs for SubSystem: '<S4>/ref_gen' */
-          /* '<S4>:4:9' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
+          /* '<S4>:4:5' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
           slow_DW.theta_ref = (roundf(rtb_pos_meas[1] / 6.28318548F + 0.5F) -
                                0.5F) * 6.28318548F;
+
+          /* '<S4>:4:6' K = [par_ctrl.down_kp_alpha,... */
+          /* '<S4>:4:7'     single(0),... */
+          /* '<S4>:4:8'     par_ctrl.down_kd_alpha,... */
+          /* '<S4>:4:9'     single(0)]; */
+          slow_DW.K[0] = par_ctrl.down_kp_alpha;
+          slow_DW.K[1] = 0.0F;
+          slow_DW.K[2] = par_ctrl.down_kd_alpha;
+          slow_DW.K[3] = 0.0F;
 
           /* '<S4>:4:10' contr_pd; */
           slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,

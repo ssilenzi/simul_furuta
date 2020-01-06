@@ -130,6 +130,12 @@ PrevZCX_slow_T slow_PrevZCX;
 dn_t dn_su;
 dn_t dn_ctrl;
 
+#ifdef extime
+int ex_time[6] = {0};
+struct timespec monotime_i[6], monotime_f[6];
+int ex_cnt[6] = {0};
+long ex_sum[6] = {0};
+#endif
 
 //----------- state_update
 void* state_update(void* arg){
@@ -145,7 +151,9 @@ void* state_update(void* arg){
 	uint16_T CCR_local;
 	
 	while(!end){
-		
+#ifdef extime
+        start_extime(0, PERIOD_STATE_UPDATE);
+#endif
 		pthread_mutex_lock(&mux_ref_board);
 			CCR_local = state_board.CCR;
 		pthread_mutex_unlock(&mux_ref_board);
@@ -166,6 +174,9 @@ void* state_update(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_state_update+=1;
 		}
+#ifdef extime
+        stop_extime(0);
+#endif
 		wait_for_period(id);		// wait to next period
 	}
 	return 0;
@@ -185,7 +196,9 @@ void* control(void* arg){
 	disturbance_and_noise_Init(&slow_DW.dist);
 	
 	while(!end){
-		
+#ifdef extime
+        start_extime(1, PERIOD_CONTROL);
+#endif
 		pthread_mutex_lock(&mux_parcontr_board);
 			par_ctrl = par_control_board;
 		pthread_mutex_unlock(&mux_parcontr_board);
@@ -213,7 +226,9 @@ void* control(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_control+=1;
 		}
-		
+#ifdef extime
+        stop_extime(1);
+#endif
 		wait_for_period(id);		// wait to next period
 	}
 	
@@ -229,6 +244,9 @@ void* compc(void* arg){
 	
 	
 	while(!end){
+#ifdef extime
+        start_extime(2, PERIOD_COMPC);
+#endif
 		// scrittura di ref_pc su buffer
 		pthread_mutex_lock(&mux_ref_buffer);
 			pthread_mutex_lock(&mux_ref_pc);
@@ -257,6 +275,9 @@ void* compc(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_compc+=1;
 		}
+#ifdef extime
+        stop_extime(2);
+#endif
 		wait_for_period(id);		// wait to next period
 
 	}
@@ -272,7 +293,9 @@ void* comboard(void* arg){
 	
 	
 	while(!end){
-		
+#ifdef extime
+        start_extime(3, PERIOD_COMBOARD);
+#endif
 		// lettura di ref da buffer, scrittura di ref_board
 		pthread_mutex_lock(&mux_ref_buffer);
 			pthread_mutex_lock(&mux_ref_board);
@@ -304,6 +327,9 @@ void* comboard(void* arg){
 		if(deadline_miss(id)){
 			dl_miss_comboard+=1;
 		}
+#ifdef extime
+        stop_extime(3);
+#endif
 		wait_for_period(id);		// wait to next period
 
 	}

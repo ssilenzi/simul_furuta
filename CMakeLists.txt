@@ -16,10 +16,16 @@ if(WIN32)
 	set(GRAFICA GRAFICA_WIN32)
 	file(COPY "${ALLEGRO_SHARED}" DESTINATION "${PROJECT_BINARY_DIR}")
     install(FILES "${ALLEGRO_SHARED}" DESTINATION "${PROJECT_SOURCE_DIR}/bin")
-else(WIN32)
+else()
 	set(GRAFICA GRAFICA_LINUX)
-endif(WIN32)
+endif()
 configure_file("${PROJECT_SOURCE_DIR}/include/os.h.in" "${PROJECT_BINARY_DIR}/include/os.h")
+
+# Misura tempi esecuzione task
+option(EXTIME "Misura tempi esecuzione dei task" OFF)
+if(EXTIME)
+	add_compile_definitions(extime)
+endif()
 
 # Compila e genera eseguibile
 include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")

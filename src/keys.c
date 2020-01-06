@@ -18,6 +18,13 @@ extern pthread_mutex_t		mux_dn;
 extern par_dn_t par_dn;
 extern int dl_miss_keys;
 extern int end;
+#ifdef extime
+extern int ex_time[6];
+extern struct timespec monotime_i[6], monotime_f[6];
+extern int ex_cnt[6];
+extern long ex_sum[6];
+#endif
+
 // variabili usate da keys
 char ascii, scan;
 
@@ -30,6 +37,9 @@ void* keys(void* arg){
 	
 	
 	while(!end){
+#ifdef extime
+        start_extime(5, PERIOD_KEYS);
+#endif
 		if (keypressed()) {
 			get_keycodes(&scan, &ascii);
 			key_action(scan);
@@ -44,6 +54,9 @@ void* keys(void* arg){
 	if(deadline_miss(id)){
 			dl_miss_keys+=1;
 	}
+#ifdef extime
+        stop_extime(5);
+#endif
 	wait_for_period(id);			// wait to next period
 	
 	}

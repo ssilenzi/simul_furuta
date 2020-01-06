@@ -10,8 +10,6 @@
 #include <allegro.h>
 #include "ptask.h"
 #include "condiviso.h"
-#include "simulation.h"
-
 
 //keys
 void* keys(void* arg);

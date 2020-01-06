@@ -31,7 +31,7 @@
 #define WRETT1				400		//
 #define L1_ASSON			133		// lunghezza link 1 vista assonometrica
 #define L2_ASSON			100		// lunghezza link 2 vista assonometrica
-#define L1_ALTO				 100		// lunghezza link 1 vista dall'alto
+#define L1_ALTO		    	100		// lunghezza link 1 vista dall'alto
 #define L2_LATO				100		// lunghezza link 2 vista di lato
 #define LX_GRID				180		// lunghezza lungo x griglia nella vista assonometrica
 #define LY_GRID				200		// lunghezza lungo y griglia nella vista assonometrica
@@ -41,7 +41,7 @@
 #define COL_BCK				makecol(190, 190, 190) 	// colore background
 #define COL_RETT			makecol(0, 0, 179)		// colore rettangoli
 #define COL_SCR				makecol(0, 0, 0)		// colore scritte
-#define COL_MDL				makecol(255, 204, 0)	// colore link
+#define COL_MDL				makecol(0, 153, 0)  	// colore link
 #define COL_MDL2			makecol(255, 0, 0)  	// colore link 2
 #define COL_VERT            makecol(0,0,0)			// colore base (sezione verticale)
 #define COL_RIF				makecol(128, 128, 128)	// colore riferimenti
@@ -54,8 +54,8 @@
 #define KP_DOWN_ALPHA_DEF	0.9F
 #define KD_DOWN_ALPHA_DEF	0.0F
 
-#define W_REF				2.0F
-#define DPOLE_REF			expf(- W_REF * 0.005F)		//0.990049839F
+#define POLE_REF			2.0F
+#define DPOLE_REF			expf(- POLE_REF * 0.005F)		//0.990049839F
 #define REF_GEN_NUM			{ 1.0F - DPOLE_REF, 0.0F }	//{ 0.00995016098F, 0.0F }
 #define REF_GEN_DEN			{ 1.0F, - DPOLE_REF }		//{ 1.0F, -0.990049839F }
 
@@ -243,30 +243,31 @@ typedef struct {
     ZCSigState DiscreteTransferFcn_Reset_ZCE;/* '<S7>/Discrete Transfer Fcn' */
 } ZCE_ref_gen_slow_T;
 
+/* Block signals and states (default storage) for system '<Root>' */
 typedef struct {
-  DW_ref_gen_slow_T ref_gen;           /* '<S4>/ref_gen' */
-  real_T Noise_generator_NextOutput;   /* '<S10>/Noise_generator' */
-  real_T Noise_generator1_NextOutput;  /* '<S10>/Noise_generator1' */
-  real32_T Delay_DSTATE[2];            /* '<S5>/Delay' */
-  real32_T vel_estim_DSTATE[2];        /* '<S5>/vel_estim' */
-  real32_T K[4];                       /* '<S1>/Hybrid_controller' */
-  real32_T dist;                       /* '<S2>/Disturbance_generator' */
-  real32_T volt;                       /* '<S1>/Hybrid_controller' */
-  real32_T theta_ref;                  /* '<S1>/Hybrid_controller' */
-  uint32_T RandSeed;                   /* '<S10>/Noise_generator' */
-  uint32_T RandSeed_b;                 /* '<S10>/Noise_generator1' */
-  uint16_T Delay_DSTATE_n[255];        /* '<S1>/Delay' */
-  uint8_T is_active_c7_slow;           /* '<S2>/Disturbance_generator' */
-  uint8_T is_c7_slow;                  /* '<S2>/Disturbance_generator' */
-  uint8_T temporalCounter_i1;          /* '<S2>/Disturbance_generator' */
-  uint8_T is_active_c5_slow;           /* '<S1>/Hybrid_controller' */
-  uint8_T is_c5_slow;                  /* '<S1>/Hybrid_controller' */
-  uint8_T is_Sliding_mode_controller;  /* '<S1>/Hybrid_controller' */
+    DW_ref_gen_slow_T ref_gen;           /* '<S4>/ref_gen' */
+    real_T Noise_generator_NextOutput;   /* '<S10>/Noise_generator' */
+    real_T Noise_generator1_NextOutput;  /* '<S10>/Noise_generator1' */
+    real32_T Delay_DSTATE[2];            /* '<S5>/Delay' */
+    real32_T vel_estim_DSTATE[2];        /* '<S5>/vel_estim' */
+    real32_T K[4];                       /* '<S1>/Hybrid_controller' */
+    real32_T dist;                       /* '<S2>/Disturbance_generator' */
+    real32_T volt;                       /* '<S1>/Hybrid_controller' */
+    real32_T theta_ref;                  /* '<S1>/Hybrid_controller' */
+    uint32_T RandSeed;                   /* '<S10>/Noise_generator' */
+    uint32_T RandSeed_b;                 /* '<S10>/Noise_generator1' */
+    uint16_T Delay_DSTATE_n[255];        /* '<S1>/Delay' */
+    uint8_T is_active_c7_slow;           /* '<S2>/Disturbance_generator' */
+    uint8_T is_c7_slow;                  /* '<S2>/Disturbance_generator' */
+    uint8_T temporalCounter_i1;          /* '<S2>/Disturbance_generator' */
+    uint8_T is_active_c5_slow;           /* '<S1>/Hybrid_controller' */
+    uint8_T is_c5_slow;                  /* '<S1>/Hybrid_controller' */
+    uint8_T is_Sliding_mode_controller;  /* '<S1>/Hybrid_controller' */
 } DW_slow_T;
 
 /* Zero-crossing (trigger) state */
 typedef struct {
-  ZCE_ref_gen_slow_T ref_gen;          /* '<S4>/ref_gen' */
+    ZCE_ref_gen_slow_T ref_gen;          /* '<S4>/ref_gen' */
 } PrevZCX_slow_T;
 
 #endif //CONDIVISO_H
