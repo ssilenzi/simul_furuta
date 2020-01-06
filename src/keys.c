@@ -161,7 +161,7 @@ void key_par_control(char scan){
 	}
 	
 	//gen_ref_online
-	if(scan == KEY_0){
+	if(scan == KEY_9){
 		pole_ref += INCR_K;
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.dpole_ref = expf(- pole_ref * 0.005F);
@@ -172,7 +172,7 @@ void key_par_control(char scan){
 		pthread_mutex_unlock(&mux_parcontr_pc);
 		
 	}
-	if(scan == KEY_9){
+	if(scan == KEY_0 && pole_ref > 0.5F){
 		pole_ref += -INCR_K;
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.dpole_ref = expf(- pole_ref * 0.005F);

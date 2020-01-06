@@ -57,9 +57,9 @@
 #define KP_DOWN_ALPHA_DEF	0.9F
 #define KD_DOWN_ALPHA_DEF	0.0F
 #define POLE_REF_DEF		2.0F
-#define DPOLE_REF_DEF		0.990049839F	// Generatore di riferimenti
-#define REF_GEN_NUM_DEF		{ 0.00995016098F, 0.0F }
-#define REF_GEN_DEN_DEF		{ 1.0F, -0.990049839F }
+#define DPOLE_REF_DEF		expf(- POLE_REF_DEF * 0.005F)	// Generatore di riferimenti
+#define REF_GEN_NUM_DEF		{ 1.0F - DPOLE_REF_DEF, 0.0F }
+#define REF_GEN_DEN_DEF		{ 1.0F, - DPOLE_REF_DEF }
 #define INCR_K				0.5 // incremento da tastiera per i parametri del controllore
 
 // dn

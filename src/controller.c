@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.269
+ * Model version                  : 1.273
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Sun Jan  5 20:51:24 2020
+ * C/C++ source code generated on : Mon Jan  6 15:18:05 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -52,16 +52,18 @@ void slow_ref_gen(real32_T rtu_alpha_ref, real32_T rtu_alpha, int8_T rtu_reset,
   real32_T DiscreteTransferFcn_tmp;
 
   /* DiscreteTransferFcn: '<S7>/Discrete Transfer Fcn' incorporates:
-   *  Fcn: '<S7>/Fcn'
+   *  MATLAB Function: '<S7>/initial_cond'
    */
+  /* MATLAB Function 'Controller/Hybrid_controller/ref_gen/initial_cond': '<S8>:1' */
+  /* '<S8>:1:3' x0 = 1/par_ctrl.dpole_ref*(alpha/(1-par_ctrl.dpole_ref)-alpha_ref); */
   if (rt_I32ZCFcn(FALLING_ZERO_CROSSING,&localZCE->DiscreteTransferFcn_Reset_ZCE,
                   (rtu_reset)) != NO_ZCEVENT) {
     localDW->DiscreteTransferFcn_icLoad = 1U;
   }
 
   if (localDW->DiscreteTransferFcn_icLoad != 0) {
-    localDW->DiscreteTransferFcn_states = (rtu_alpha / 0.00995016098F -
-      rtu_alpha_ref) * 1.01005018F;
+    localDW->DiscreteTransferFcn_states = (rtu_alpha / (1.0F -
+      par_ctrl.dpole_ref) - rtu_alpha_ref) * (1.0F / par_ctrl.dpole_ref);
   }
 
   DiscreteTransferFcn_tmp = (rtu_alpha_ref - par_ctrl.ref_gen_den[1] *
@@ -112,7 +114,7 @@ static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
   /* MATLAB Function 'contr_pd': '<S4>:73' */
   /*  PD controller with reference generator */
   /* '<S4>:73:5' q_ref = [ref_gen(alpha_ref,q(1),int8(0)); theta_ref; 0; 0]; */
-  /* Simulink Function 'ref_gen': '<S4>:148' */
+  /* Simulink Function 'ref_gen': '<S4>:153' */
   *alpha_ref = *deg_to_rad;
   *alpha = TmpSignalConversionAtSFunctionI[0];
   *reset = 0;
@@ -224,11 +226,11 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   rty_alpha[1] = rtu_CNT_theta;
 
   /* Gain: '<S3>/CNT_to_rad' */
-  /* MATLAB Function 'Controller/State_estimator/pos_estim': '<S8>:1' */
-  /* '<S8>:1:3' sect = @(th)mod(int8(floor(th/single(pi/2))),int8(4)); */
-  /* '<S8>:1:5' pos_meas = floor(pos_old/single(2*pi))*single(2*pi) +... */
-  /* '<S8>:1:6'            mod(rad,single(2*pi)); */
-  /* '<S8>:1:8' for k=1:2 */
+  /* MATLAB Function 'Controller/State_estimator/pos_estim': '<S9>:1' */
+  /* '<S9>:1:3' sect = @(th)mod(int8(floor(th/single(pi/2))),int8(4)); */
+  /* '<S9>:1:5' pos_meas = floor(pos_old/single(2*pi))*single(2*pi) +... */
+  /* '<S9>:1:6'            mod(rad,single(2*pi)); */
+  /* '<S9>:1:8' for k=1:2 */
   rty_alpha[0] *= 0.00153398083F;
 
   /* MATLAB Function: '<S5>/pos_estim' incorporates:
@@ -257,7 +259,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
   rtb_pos_meas[0] = rtb_pos_meas[0] * 6.28318548F + deg_to_rad;
 
-  /* '<S8>:1:9' if sect(pos_old(k)) == int8(3) && sect(rad(k)) == int8(0) */
+  /* '<S9>:1:9' if sect(pos_old(k)) == int8(3) && sect(rad(k)) == int8(0) */
   deg_to_rad = floorf(slow_DW.Delay_DSTATE[0] / 1.57079637F);
   if (deg_to_rad < 128.0F) {
     if (deg_to_rad >= -128.0F) {
@@ -283,7 +285,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
     }
 
     if ((int8_T)(reset - ((reset >> 2) << 2)) == 0) {
-      /* '<S8>:1:10' pos_meas(k) = pos_meas(k) + single(2*pi); */
+      /* '<S9>:1:10' pos_meas(k) = pos_meas(k) + single(2*pi); */
       rtb_pos_meas[0] += 6.28318548F;
     } else {
       guard1 = true;
@@ -316,8 +318,8 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
       }
 
       if ((int8_T)(reset - ((reset >> 2) << 2)) == 3) {
-        /* '<S8>:1:11' elseif sect(pos_old(k)) == int8(0) && sect(rad(k)) == int8(3) */
-        /* '<S8>:1:12' pos_meas(k) = pos_meas(k) - single(2*pi); */
+        /* '<S9>:1:11' elseif sect(pos_old(k)) == int8(0) && sect(rad(k)) == int8(3) */
+        /* '<S9>:1:12' pos_meas(k) = pos_meas(k) - single(2*pi); */
         rtb_pos_meas[0] -= 6.28318548F;
       }
     }
@@ -352,7 +354,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
   rtb_pos_meas[1] = rtb_pos_meas[1] * 6.28318548F + deg_to_rad;
 
-  /* '<S8>:1:9' if sect(pos_old(k)) == int8(3) && sect(rad(k)) == int8(0) */
+  /* '<S9>:1:9' if sect(pos_old(k)) == int8(3) && sect(rad(k)) == int8(0) */
   deg_to_rad = floorf(slow_DW.Delay_DSTATE[1] / 1.57079637F);
   if (deg_to_rad < 128.0F) {
     if (deg_to_rad >= -128.0F) {
@@ -378,7 +380,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
     }
 
     if ((int8_T)(reset - ((reset >> 2) << 2)) == 0) {
-      /* '<S8>:1:10' pos_meas(k) = pos_meas(k) + single(2*pi); */
+      /* '<S9>:1:10' pos_meas(k) = pos_meas(k) + single(2*pi); */
       rtb_pos_meas[1] += 6.28318548F;
     } else {
       guard1 = true;
@@ -411,8 +413,8 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
       }
 
       if ((int8_T)(reset - ((reset >> 2) << 2)) == 3) {
-        /* '<S8>:1:11' elseif sect(pos_old(k)) == int8(0) && sect(rad(k)) == int8(3) */
-        /* '<S8>:1:12' pos_meas(k) = pos_meas(k) - single(2*pi); */
+        /* '<S9>:1:11' elseif sect(pos_old(k)) == int8(0) && sect(rad(k)) == int8(3) */
+        /* '<S9>:1:12' pos_meas(k) = pos_meas(k) - single(2*pi); */
         rtb_pos_meas[1] -= 6.28318548F;
       }
     }
@@ -546,7 +548,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
         /* Entry 'PD_controller_up': '<S4>:5' */
         /* '<S4>:5:3' ref_gen(alpha_ref,q(1),int8(1)); */
-        /* Simulink Function 'ref_gen': '<S4>:148' */
+        /* Simulink Function 'ref_gen': '<S4>:153' */
         q = deg_to_rad;
         alpha = rtb_pos_meas[0];
         reset = 1;
@@ -581,7 +583,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
           /* Entry 'PD_controller_down': '<S4>:4' */
           /* '<S4>:4:3' ref_gen(alpha_ref,q(1),int8(1)); */
-          /* Simulink Function 'ref_gen': '<S4>:148' */
+          /* Simulink Function 'ref_gen': '<S4>:153' */
           q = deg_to_rad;
           alpha = rtb_pos_meas[0];
           reset = 1;
