@@ -471,7 +471,7 @@ int gui_init(){
 	sprintf(reset2, "Up, down, left, right per modificare la vista");
 	textout_ex(scrbuf, font, reset2, scritte.x, scritte.y[qdistvert-7], col.scr, col.bck);
 
-	sprintf(dist_pause, "W disturba il sistema");
+	sprintf(dist_pause, "D disturba il sistema");
 	textout_ex(scrbuf, font, dist_pause, scritte.x, scritte.y[qdistvert-8], col.scr, col.bck);
 	
 	sprintf(swingup_pause, "Q attiva/disattiva swingup, default attivo");
@@ -561,7 +561,7 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	textout_ex(scrbuf, font, voltagestr,scritte.x, scritte.y[7], col.scr, col.bck);
 	// par_control
 	textout_ex(scrbuf, font, "Parametri dei controllori:", scritte.x, scritte.y[9], col.scr, col.bck);
-	sprintf(parcontrstralpha, "Alpha: Kp = %5.2f y/u, Kd = %5.2f i/o    ", par_control.up_kp_alpha, par_control.up_kd_alpha);
+	sprintf(parcontrstralpha, "Alpha: Kp = %5.2f r/t, Kd = %5.2f y/u    ", par_control.up_kp_alpha, par_control.up_kd_alpha);
 	textout_ex(scrbuf, font, parcontrstralpha,scritte.x, scritte.y[10], col.scr, col.bck);
 	sprintf(parcontrstrtheta, "Theta: Kp = %5.2f h/j, Kd = %5.2f k/l    ", par_control.up_kp_theta, par_control.up_kd_theta);
 	textout_ex(scrbuf, font, parcontrstrtheta,scritte.x, scritte.y[11], col.scr, col.bck);
@@ -569,10 +569,10 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	textout_ex(scrbuf, font, parcontrstralphadown,scritte.x, scritte.y[12], col.scr, col.bck);
 	// par_dn e dn
 	textout_ex(scrbuf, font, "Disturbo, rumore e ritardi:", scritte.x, scritte.y[13], col.scr, col.bck);
-	sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2hu x/c, Rit: %2hhu r/t ", par_dn.dist_amp, par_dn.noise_amp, dn.delay);
+	sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2hu x/c, Rit: %2hhu w/e ", par_dn.dist_amp, par_dn.noise_amp, dn.delay);
 	textout_ex(scrbuf, font, pardnstr, scritte.x, scritte.y[14], col.scr, col.bck);
 	// pole gen ref_loc
-	sprintf(pole_ref_str, "Polo generatore di riferimento: %5.1f 9/0  ", pole_ref);
+	sprintf(pole_ref_str, "Polo generatore di riferimento: %5.1f i/o  ", pole_ref);
 	textout_ex(scrbuf, font, pole_ref_str, scritte.x, scritte.y[15], col.scr, col.bck);
 	
 	

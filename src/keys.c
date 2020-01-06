@@ -83,23 +83,23 @@ void key_par_control(char scan){
 	*/
 	// controllore UP
 	// alpha kp
-	if(scan == KEY_Y){
+	if(scan == KEY_R){
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.up_kp_alpha += INCR_K;
 		pthread_mutex_unlock(&mux_parcontr_pc);
 	}
-	if(scan == KEY_U){
+	if(scan == KEY_T){
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.up_kp_alpha += -INCR_K;
 		pthread_mutex_unlock(&mux_parcontr_pc);
 	}
 	// alpha kd
-	if(scan == KEY_I){
+	if(scan == KEY_Y){
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.up_kd_alpha += INCR_K;
 		pthread_mutex_unlock(&mux_parcontr_pc);
 	}
-	if(scan == KEY_O){
+	if(scan == KEY_U){
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.up_kd_alpha += -INCR_K;
 		pthread_mutex_unlock(&mux_parcontr_pc);
@@ -161,7 +161,7 @@ void key_par_control(char scan){
 	}
 	
 	//gen_ref_online
-	if(scan == KEY_9){
+	if(scan == KEY_I){
 		pole_ref += INCR_K;
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.dpole_ref = expf(- pole_ref * 0.005F);
@@ -172,7 +172,7 @@ void key_par_control(char scan){
 		pthread_mutex_unlock(&mux_parcontr_pc);
 		
 	}
-	if(scan == KEY_0 && pole_ref > 0.5F){
+	if(scan == KEY_O && pole_ref > 0.5F){
 		pole_ref += -INCR_K;
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc.dpole_ref = expf(- pole_ref * 0.005F);
@@ -233,7 +233,7 @@ void key_action(char scan){
 	}
 	
 	// W, kick
-	if (scan == KEY_W){
+	if (scan == KEY_D){
 		pthread_mutex_lock(&mux_dn);
 		dn.kick = 1;
 		pthread_mutex_unlock(&mux_dn);
@@ -258,12 +258,12 @@ void key_action(char scan){
 	/*
 		* 	DELAY
 		*/
-	if(scan == KEY_R){
+	if(scan == KEY_W){
 		pthread_mutex_lock(&mux_dn);
 			dn.delay += 1;
 		pthread_mutex_unlock(&mux_dn);
 	}
-	if(scan == KEY_T && dn.delay != 0){
+	if(scan == KEY_E && dn.delay != 0){
 		pthread_mutex_lock(&mux_dn);
 			dn.delay += -1;
 		pthread_mutex_unlock(&mux_dn);
