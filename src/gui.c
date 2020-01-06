@@ -594,7 +594,7 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	
 #ifdef EXTIME
 	
-	textout_ex(scrbuf, font, "Tempi di esecuzione:", scritte.x, scritte.y[23], col.scr, col.bck);
+	textout_ex(scrbuf, font, "Tempi di esecuzione in microsecondi:", scritte.x, scritte.y[23], col.scr, col.bck);
 	sprintf(time_exec_str1, "state_update:%3d, control:%3d, comboard:%3d  ", ex_time[0], ex_time[1], ex_time[3]);
 	textout_ex(scrbuf, font, time_exec_str1,scritte.x, scritte.y[24], col.scr, col.bck);
 	sprintf(time_exec_str2, "compc:%3d,  gui:%5d, keys:%3d  ", ex_time[2], ex_time[4],  ex_time[5]);
