@@ -56,13 +56,7 @@ static struct{
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; 
 	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65], pole_ref_str[49], control_period_str[50];
 	char swingup_str[31];
-#ifndef EXTIME
-	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
-#endif
-
-#ifdef EXTIME
 	char realtime_str[60];
-#endif
 	
 
 //----------- gui
@@ -593,16 +587,24 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	
 #ifndef EXTIME
 	// deadline_miss
-	textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[19], col.scr, col.bck);
-	sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
-	textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[20], col.scr, col.bck);
-	sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
-	textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[21], col.scr, col.bck);
+	textout_ex(scrbuf, font, "Task,       ndmiss:", scritte.x, scritte.y[19], col.scr, col.bck);
+	sprintf(realtime_str, "state_update:  %4d", dl_miss_state_update);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[20], col.scr, col.bck);
+	sprintf(realtime_str, "control:       %4d", dl_miss_control);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[21], col.scr, col.bck);
+	sprintf(realtime_str, "compc:         %4d", dl_miss_compc);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[22], col.scr, col.bck);
+	sprintf(realtime_str, "comboard:      %4d", dl_miss_comboard);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[23], col.scr, col.bck);
+	sprintf(realtime_str, "gui:           %4d", dl_miss_gui);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[24], col.scr, col.bck);
+	sprintf(realtime_str, "keys:          %4d", dl_miss_keys);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[25], col.scr, col.bck);
+
 #endif
 	
 	
 #ifdef EXTIME
-	wc_extime_update();
 	
 	textout_ex(scrbuf, font, "Task,        ndmiss, et us, wcet:", scritte.x, scritte.y[19], col.scr, col.bck);
 	sprintf(realtime_str, "state_update:  %4d,  %4d,  %4d", dl_miss_state_update, ex_time[0], wc_extime[0]);

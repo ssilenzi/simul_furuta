@@ -35,7 +35,6 @@ void set_period(int i, unsigned int period);
 #ifdef EXTIME
 void start_extime(int i, int period);
 void stop_extime(int i);
-void wc_extime_update();
 
 #endif
 	
