@@ -263,6 +263,7 @@ void key_par_control(){
 	
 	// 3, reset par_control_pc
 	if(scan == KEY_3){
+		pole_ref = 2.0F;
 		pthread_mutex_lock(&mux_parcontr_pc);
 			par_control_pc = par_control_reset;
 		pthread_mutex_unlock(&mux_parcontr_pc);
@@ -315,6 +316,9 @@ void key_par_control(){
 		dn.delay = 0;
 		pthread_mutex_unlock(&mux_dn);
 	}
+	
+
+	
 }
 
 // get_keycodes

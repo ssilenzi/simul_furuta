@@ -89,6 +89,7 @@ PrevZCX_slow_T slow_PrevZCX;
 	 * keys 5
 */
 int ex_time[6] = {0};
+int wc_extime[6] = {0};
 struct timespec monotime_i[6], monotime_f[6];
 int ex_cnt[6] = {0};
 long ex_sum[6] = {0};

@@ -27,6 +27,7 @@ extern int 					end;
 
 #ifdef EXTIME
 extern int ex_time[6];
+extern int wc_extime[6];
 extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
 extern long ex_sum[6];
@@ -54,11 +55,13 @@ static struct{
 // stringhe di comunicazione che vengono aggiornate
 	char refalphastr[30], alphastr[30], thetastr[30],voltagestr[15]; 
 	char parcontrstralpha[42], parcontrstrtheta[42], parcontrstralphadown[59], pardnstr[65], pole_ref_str[49], control_period_str[50];
-	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
 	char swingup_str[31];
+#ifndef EXTIME
+	char dl_miss_pc_str[50], dl_miss_board_str[50]; 
+#endif
 
 #ifdef EXTIME
-	char time_exec_str1[61], time_exec_str2[68];
+	char realtime_str[60];
 #endif
 	
 
@@ -579,32 +582,42 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	sprintf(control_period_str, "Periodo di control: %2u 9/0, def = 5  ", period_control);
 	textout_ex(scrbuf, font, control_period_str, scritte.x, scritte.y[16], col.scr, col.bck);
 	
-	
-	
-	// deadline_miss
-	textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[17], col.scr, col.bck);
-	sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
-	textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[18], col.scr, col.bck);
-	sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
-	textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[19], col.scr, col.bck);
-	
 	// swingup
 	if(ref_pc.swingup){
 		sprintf(swingup_str, "Controllore Swingup attivo!  ");
 	}else{
 		sprintf(swingup_str, "Controllore Swingup disattivo");
 	}
-	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[21], col.scr, col.bck);
+	textout_ex(scrbuf, font, swingup_str,scritte.x, scritte.y[17], col.scr, col.bck);
+	
+	
+#ifndef EXTIME
+	// deadline_miss
+	textout_ex(scrbuf, font, "Deadline miss:", scritte.x, scritte.y[19], col.scr, col.bck);
+	sprintf(dl_miss_pc_str, "gui %d, keys %d, compc %d   ", dl_miss_gui, dl_miss_keys, dl_miss_compc);
+	textout_ex(scrbuf, font, dl_miss_pc_str,scritte.x, scritte.y[20], col.scr, col.bck);
+	sprintf(dl_miss_board_str, "state update %d, control %d, comboard %d ", dl_miss_state_update, dl_miss_control, dl_miss_comboard);
+	textout_ex(scrbuf, font, dl_miss_board_str,scritte.x, scritte.y[21], col.scr, col.bck);
+#endif
 	
 	
 #ifdef EXTIME
+	wc_extime_update();
 	
-	textout_ex(scrbuf, font, "Tempi di esecuzione in microsecondi:", scritte.x, scritte.y[23], col.scr, col.bck);
-	sprintf(time_exec_str1, "state_update:%3d, control:%3d, comboard:%3d  ", ex_time[0], ex_time[1], ex_time[3]);
-	textout_ex(scrbuf, font, time_exec_str1,scritte.x, scritte.y[24], col.scr, col.bck);
-	sprintf(time_exec_str2, "compc:%3d,  gui:%5d, keys:%3d  ", ex_time[2], ex_time[4],  ex_time[5]);
-	textout_ex(scrbuf, font, time_exec_str2,scritte.x, scritte.y[25], col.scr, col.bck);
-	
+	textout_ex(scrbuf, font, "Task,        ndmiss, et us, wcet:", scritte.x, scritte.y[19], col.scr, col.bck);
+	sprintf(realtime_str, "state_update:  %4d,  %4d,  %4d", dl_miss_state_update, ex_time[0], wc_extime[0]);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[20], col.scr, col.bck);
+	sprintf(realtime_str, "control:       %4d,  %4d,  %4d", dl_miss_control, ex_time[1], wc_extime[1]);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[21], col.scr, col.bck);
+	sprintf(realtime_str, "compc:         %4d,  %4d,  %4d", dl_miss_compc, ex_time[2], wc_extime[2]);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[22], col.scr, col.bck);
+	sprintf(realtime_str, "comboard:      %4d,  %4d,  %4d", dl_miss_comboard, ex_time[3], wc_extime[3]);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[23], col.scr, col.bck);
+	sprintf(realtime_str, "gui:           %4d,  %4d,  %4d", dl_miss_gui, ex_time[4], wc_extime[4]);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[24], col.scr, col.bck);
+	sprintf(realtime_str, "keys:          %4d,  %4d,  %4d", dl_miss_keys, ex_time[5], wc_extime[5]);
+	textout_ex(scrbuf, font, realtime_str,scritte.x, scritte.y[25], col.scr, col.bck);
+
 #endif
 	
 }

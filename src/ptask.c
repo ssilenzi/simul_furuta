@@ -5,6 +5,7 @@
 
 #ifdef EXTIME
 extern int ex_time[6];
+extern int wc_extime[6];
 extern struct timespec monotime_i[6], monotime_f[6];
 extern int ex_cnt[6];
 extern long ex_sum[6];
@@ -129,6 +130,7 @@ void set_period(int i, unsigned int period){
 }
 
 #ifdef EXTIME
+
 void start_extime(int i, int period){
     if (ex_cnt[i] >= 1000 / period) {
         ex_time[i] = ex_sum[i] / ex_cnt[i];
@@ -144,4 +146,13 @@ void stop_extime(int i){
     clock_gettime(CLOCK_MONOTONIC, &monotime_f[i]);
     ex_sum[i] = ex_sum[i] + time_dist(&monotime_i[i], &monotime_f[i])/1000;
 }
+
+void wc_extime_update(){
+		for(int i = 0; i < 6; i++){
+			if( ex_time[i] > wc_extime[i]){
+				wc_extime[i] = ex_time[i];
+			}
+		}
+}
+
 #endif
