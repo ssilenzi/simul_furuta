@@ -17,8 +17,13 @@ extern dn_t                 dn;
 extern pthread_mutex_t		mux_dn;
 extern par_dn_t             par_dn;
 extern unsigned int         period_control;
-
-
+#ifdef EXTIME
+extern int ex_time[6];
+extern int wc_extime[6];
+extern struct timespec monotime_i[6], monotime_f[6];
+extern int ex_cnt[6];
+extern long ex_sum[6];
+#endif
 
 //---------------- Variabili Board
 state_board_t state_board=
@@ -78,22 +83,6 @@ dn_t dn_ctrl;
 DW_fast_T fast_DW;
 DW_slow_T slow_DW;
 PrevZCX_slow_T slow_PrevZCX;
-
-#ifdef EXTIME
-/* ex_time[6]:
-	 * state_update 0
-	 * control 1
-	 * compc 2
-	 * comboard 3
-	 * gui 4
-	 * keys 5
-*/
-int ex_time[6] = {0};
-int wc_extime[6] = {0};
-struct timespec monotime_i[6], monotime_f[6];
-int ex_cnt[6] = {0};
-long ex_sum[6] = {0};
-#endif
 
 //----------- state_update
 void* state_update(void* arg){

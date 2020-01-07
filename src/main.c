@@ -126,6 +126,22 @@ int dl_miss_control = 0;
 int dl_miss_state_update = 0;
 int dl_miss_comboard = 0;
 
+#ifdef EXTIME
+/* ex_time[6]:
+	 * state_update 0
+	 * control 1
+	 * compc 2
+	 * comboard 3
+	 * gui 4
+	 * keys 5
+*/
+int ex_time[6] = {0};
+int wc_extime[6] = {0};
+struct timespec monotime_i[6], monotime_f[6];
+int ex_cnt[6] = {0};
+long ex_sum[6] = {0};
+#endif
+
 //----------- init 
 int init(){
 	printf("Caricamento...\n");
