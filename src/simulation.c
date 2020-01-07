@@ -13,10 +13,10 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					dl_miss_compc;
-
-extern dn_t dn;
+extern dn_t                 dn;
 extern pthread_mutex_t		mux_dn;
-extern par_dn_t par_dn;
+extern par_dn_t             par_dn;
+extern unsigned int         period_control;
 
 
 
@@ -150,7 +150,7 @@ void* control(void* arg){
 	
 	while(!end){
 #ifdef EXTIME
-        start_extime(1, PERIOD_CONTROL);
+        start_extime(1, period_control);
 #endif
 		pthread_mutex_lock(&mux_parcontr_board);
 			par_ctrl = par_control_board;
