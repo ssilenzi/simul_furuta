@@ -1,0 +1,81 @@
+\input{structure.tex}
+\graphicspath{{./figs/}}
+\pgfplotsset{
+	table/search path={./figs},
+}
+
+\title{\normalfont{Simulazione e Controllo del Pendolo Inverso di Furuta}}
+\author{Francesco Petracci e Simone Silenzi} 
+
+
+\begin{document}
+	
+\begin{titlepage}
+	\centering
+	\vspace*{2 cm}
+	\textsc{\Large Universit\`a di Pisa }\\[0.5 cm]							% University Name
+	%\textsc{\Large Scuola di Ingegneria}\\[0.5 cm]		
+	\textsc{\large Corso di Laurea magistrale \\ 
+		\vspace*{3mm} in Ingegneria Robotica e dell'Automazione}\\[1 cm]		% Course Code
+	\rule{\linewidth}{0.2 mm} \\
+	{ \Large{\textbf{Simulazione e Controllo \\ del Pendolo Inverso di Furuta}}}\\
+	
+	\rule{\linewidth}{0.2 mm} \\[2.5 cm]
+%	\vspace*{1.5 cm}
+	
+	\includegraphics[height=.35\textheight]{quanser_furuta.png}
+	
+	\vspace*{2 cm}
+	\begin{minipage}{0.48\textwidth}
+		\begin{flushleft}
+			\textit{Autori:}\\
+			Francesco Petracci\\
+			Simone Silenzi
+		\end{flushleft}
+	\end{minipage}~
+	\begin{minipage}{0.48\textwidth}
+		\begin{flushright}
+			\textit{Matricola e-mail:}\\		
+			491648, \href{mailto:petracci.francesco@gmail.com}{petracci.francesco@gmail.com} \\
+			460123, \href{mailto:s.silenzi1@gmail.com}{s.silenzi1@gmail.com}
+		\end{flushright}
+	\end{minipage}\\[2 cm]
+	
+%	\textit{Autori, matricola ed email:} \\
+%	Francesco Petracci, 491648, \href{mailto:petracci.francesco@gmail.com}{petracci.francesco@gmail.com} \\
+%	Simone Silenzi, 460123, \href{mailto:s.silenzi1@gmail.com}{s.silenzi1@gmail.com} \\
+	
+	
+\end{titlepage}
+\newpage
+
+\section{Indicazioni Report}
+Project reportA  report  must  be  produced  (8-10  pages)  to  explain  the  project  details.  In  particular,  the  title  page  must  contain  the  name  of  the  course  under  which  the  project  has  been  done,  the  project  title,  an  optional  picture related  to  the  project,  the  delivery  date,  and the  author(s)  name(s)  with  contact  information (student ID number and Email). The  report  must  include  a  general  description  of  the  project,  the  physical  model  used,  the  design  choices, the user interface, the shared data structures, the tasks involved, a task-resource diagram, a discussion  on  the  task  parameters  (how they  were  defined),  and  a  set  of  experimental  results  that show  the  behavior  of  the  system  as  a  function  of  specific  variables.  Figures  and  screen  shots  are  welcome. The project code must not be included in the report, but in a separate folder.
+ 
+\section{Introduzione}
+Questo progetto consiste nella simulazione dell'interazione real-time tra il pendolo inverso di Furuta, una scheda STM32F4 Discovery e un'interfaccia utente su pc. 
+
+L'applicazione finale \`e stata sviluppata in C sfruttando principalmente le librerie Allegro e Pthread. Per quanto riguarda la simulazione del pendolo e della scheda \`e stato fatto uso del software \textsc{Matlab--Simulink} per sviluppare un modello fisico, il relativo controllo e per quindi creare in modo automatico alcune funzioni.
+
+
+\section{Modello}
+Da scrivere
+
+\section{Controllo}
+Da scrivere
+
+\section{Interfaccia}
+L'interfaccia \`e divisa in 4 zone: zona di comunicazione ...
+
+
+
+\section{Implementazione/code overview}
+Da scrivere
+\subsection{Task}
+Da scrivere
+
+\section{Conclusioni (?)}
+Da Scrivere
+
+	
+\end{document}
