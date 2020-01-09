@@ -1,6 +1,6 @@
 function dynamics()
-syms al th al_d th_d al_d2 th_d2 I V tau1 tau2
-syms marm mp Jarm_cm J0 Jp_cm Jp Larm larm lp g bma bp Kt Ke Rm Lm eta_g Kg
+syms al th al_d th_d al_d2 th_d2 I u tau1 tau2 marm mp Jarm_cm real
+syms J0 Jp_cm Jp Larm larm lp g bma bp Kt Ke Rm Lm eta_g Kg real
 
 J1m = diag([0,Jarm_cm,Jarm_cm]);
 J2m = diag([0,Jp_cm,Jp_cm]);
@@ -42,22 +42,22 @@ N = simplify(N);
 q_d = [al_d;
     th_d;
     M\([tau1;tau2]-C*[al_d;th_d]-N)];
+% new_system('Quanser_Furuta')
 % open_system('Quanser_Furuta')
 % matlabFunctionBlock('Quanser_Furuta/f_mecc',q_d,'Vars',...
 %     {[al;th;al_d;th_d],[tau1;tau2],mp,J0,Jp,Larm,lp,g,bma,bp},...
-%     'Outputs',{'qd'},'Optimize',false)
+%     'Outputs',{'q_d'},'Optimize',false)
 
 q = [al;th;al_d;th_d];
-u = V;
-q_d = subs(q_d,[tau1,tau2],[eta_g*Kg*Kt/Rm*(V-Kg*Ke*al_d),0]);
+q_d = subs(q_d,[tau1,tau2],[eta_g*Kg*Kt/Rm*(u-Kg*Ke*al_d),0]);
 A = jacobian(q_d,q);
 B = jacobian(q_d,u);
 
-% matlabFunction(q_d,'File','f_red','Vars',{[al;th;al_d;th_d],V,...
+% matlabFunction(q_d,'File','f_red','Vars',{[al;th;al_d;th_d],u,...
 %     mp,J0,Jp,Larm,lp,g,bma,bp,Kt,Ke,Rm,eta_g,Kg},'Optimize',false);
-% matlabFunction(A,'File','A_red','Vars',{[al;th;al_d;th_d],V,...
+% matlabFunction(A,'File','A_red','Vars',{[al;th;al_d;th_d],u,...
 %     mp,J0,Jp,Larm,lp,g,bma,bp,Kt,Ke,Rm,eta_g,Kg},'Optimize',false);
-% matlabFunction(B,'File','B_red','Vars',{[al;th;al_d;th_d],V,...
+% matlabFunction(B,'File','B_red','Vars',{[al;th;al_d;th_d],u,...
 %     mp,J0,Jp,Larm,lp,g,bma,bp,Kt,Ke,Rm,eta_g,Kg},'Optimize',false);
 
 end

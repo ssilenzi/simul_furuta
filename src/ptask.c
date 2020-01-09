@@ -127,6 +127,7 @@ int cpu_set(int cpu){
 
 void set_period(int i, unsigned int period){
     tp[i].period = period;
+    tp[i].deadline = period;
 }
 
 #ifdef EXTIME

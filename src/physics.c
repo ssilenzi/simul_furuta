@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'fast'.
  *
- * Model version                  : 1.249
+ * Model version                  : 1.252
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Sun Jan  5 00:56:40 2020
+ * C/C++ source code generated on : Thu Jan  9 12:52:00 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
