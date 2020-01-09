@@ -7,10 +7,10 @@ J2m = diag([0,Jp_cm,Jp_cm]);
 R2 = [cos(th),sin(th),0;-sin(th),cos(th),0;0,0,1]...
     *[0,0,1;0,1,0;-1,0,0];
 omega1 = [0;0;al_d];
-v1c = conj(cross(omega1,[larm;0;0]));
+v1c = cross(omega1,[larm;0;0]);
 omega2 = R2*omega1 + [0;0;th_d];
-v2 = R2*conj(cross(omega1,[Larm;0;0]));
-v2c = v2 + conj(cross(omega2,[lp;0;0]));
+v2 = R2*cross(omega1,[Larm;0;0]);
+v2c = v2 + cross(omega2,[lp;0;0]);
 
 T = 1/2*(v1c.'*marm*v1c + omega1.'*J1m*omega1...
     + v2c.'*mp*v2c + omega2.'*J2m*omega2);
