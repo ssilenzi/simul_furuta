@@ -58,6 +58,48 @@ Questo progetto consiste nella simulazione dell'interazione real-time tra il pen
 L'applicazione finale \`e stata sviluppata in C sfruttando principalmente le librerie Allegro e Pthread. Per quanto riguarda la simulazione del pendolo e della scheda \`e stato fatto uso del software \textsc{Matlab--Simulink} per sviluppare un modello fisico, il relativo controllo e per quindi creare in modo automatico alcune funzioni.
 
 
+\section{cose Simone}
+\begin{math}\\
+T=\frac{1}{2} \left(2 \dot{\alpha } \dot{\theta } L_{arm} \cos (\theta ) l_p
+m_p+\dot{\alpha }^2 \left(\sin ^2(\theta ) J_p+J_0\right)+\dot{\theta }^2 J_p\right)\\
+U=g l_p m_p (\cos(\theta) - 1)\\
+M=\frac{\partial^{2} T}{\partial \dot{\alpha } \partial \dot{\theta } }=\left(
+\begin{array}{cc}
+J_0+J_p \sin ^2(\theta ) & L_{arm} l_p m_p \cos (\theta ) \\
+L_{arm} l_p m_p \cos (\theta ) & J_p \\
+\end{array}
+\right)\\
+C(q,\dot{q})= % Formula (4.22) di https://www.cds.caltech.edu/~murray/books/MLS/pdf/mls94-complete.pdf
+\cdots= \left(
+\begin{array}{cc}
+\frac{1}{2} \dot{\theta } \sin (2 \theta ) J_p & \frac{1}{2} \dot{\alpha } \sin (2 \theta )
+J_p-\dot{\theta } L_{arm} \sin (\theta ) l_p m_p \\
+-\frac{1}{2} \dot{\alpha } \sin (2 \theta ) J_p & 0 \\
+\end{array}
+\right)\\
+\left(\begin{array}{c}
+\ddot{\alpha}\\
+\ddot{\theta}
+\end{array}\right) = \left(\begin{array}{c}
+\frac{2 \dot{\theta } L_{arm} b_p \cos (\theta ) l_p m_p-2 g L_{arm} \sin
+	(\theta ) \cos (\theta ) l_p^2 m_p^2+\dot{\alpha }^2 L_{arm} \sin (2 \theta )
+	(-\cos (\theta )) J_p l_p m_p+2 \dot{\theta }^2 L_{arm} \sin (\theta ) J_p l_p
+	m_p-2 \tau _2 L_{arm} \cos (\theta ) l_p m_p-2 \dot{\alpha } b_{ma} J_p-2
+	\dot{\alpha } \dot{\theta } \sin (2 \theta ) J_p^2+2 \tau _1 J_p}{2
+	\left(-L_{arm}^2 \cos ^2(\theta ) l_p^2 m_p^2+\sin ^2(\theta ) J_p^2+J_0
+	J_p\right)} \\
+\frac{2 \dot{\alpha } L_{arm} b_{ma} \cos (\theta ) l_p m_p+2 \dot{\alpha }
+	\dot{\theta } L_{arm} \sin (2 \theta ) \cos (\theta ) J_p l_p m_p-2 \tau _1
+	L_{arm} \cos (\theta ) l_p m_p-2 \dot{\theta }^2 L_{arm}^2 \sin (\theta )
+	\cos (\theta ) l_p^2 m_p^2-2 \dot{\theta } J_0 b_p-2 \dot{\theta } b_p \sin ^2(\theta )
+	J_p+2 g \sin ^3(\theta ) J_p l_p m_p+2 g J_0 \sin (\theta ) l_p m_p+\dot{\alpha }^2 \sin
+	(2 \theta ) \sin ^2(\theta ) J_p^2+\dot{\alpha }^2 J_0 \sin (2 \theta ) J_p+2 \tau _2
+	\sin ^2(\theta ) J_p+2 J_0 \tau _2}{2 \left(-L_{arm}^2 \cos ^2(\theta ) l_p^2
+	m_p^2+\sin ^2(\theta ) J_p^2+J_0 J_p\right)} \\
+\end{array}\right)
+\end{math}
+
+
 \section{Modello}
 Da scrivere
 
@@ -65,9 +107,78 @@ Da scrivere
 Da scrivere
 
 \section{Interfaccia}
-L'interfaccia \`e divisa in 4 zone: zona di comunicazione ...
+\begin{figure}
+	\centering
+	\includegraphics[height=.4\textheight]{interfaccia_in_esecuzione.png}
+	\caption{Interfaccia durante l'esecuzione}
+	\label{fig:interfaccia_in_esecuzione}
+\end{figure}
+
+L'interfaccia \`e divisa in due zone principali: quella di comunicazione con l'utente e le tre viste del pendolo.
+Per quanto riguarda la zona di comunicazione questa \`e popolata dalle variabili di interesse e di come modificarle. Si \`e quindi riportato a schermo:
+\begin{itemize}
+	\item il riferimento su $\alpha$
+	
+	\item  il vettore di stato $\left[ \alpha \ \theta \ volt\right]^T$
+	
+	\item i parametri di controllo
+	
+	\item disturbo, rumore e ritardi
+	
+	\item polo della funzione di trasferimento che genera il riferimento su $\alpha$
+	
+	\item periodo del task di \textbf{controllo}
+	
+	\item per ciascun task il numero di deadline miss, il tempo di esecuzione in $\si{\micro \second}$ e il worst-case execution time in $\si{\micro \second}$
+	
+	\item varie istruzioni su come resettare e come uscire dal programma
+	
+\end{itemize}
+
+Per quanto riguarda le viste, queste sono tre. La vista dall'alto evidenzia il primo link e quindi \`e possibile vedere $\alpha$ e il suo riferimento mentre in quella da lato $\theta$ e relativo riferimento.
+
+\begin{figure}
+	\centering
+	\includegraphics[height=.4\textheight]{pendolo_schema_TEMPORANEO.png}
+	% MANCA DA DISEGNARCI IL SISTEMA DI RIFERIMENTO FISSO 0
+	\caption{Schema del Pendolo}
+	\label{fig:pendolo_schema}
+\end{figure}
+
+Per costruire la vista assonometrica \`e stato utile strutturare il problema in coordinate omogenee e introdurre dei sistemi di riferimento. Con riferimento alla figura~\ref{fig:pendolo_schema}, intendendo con $R_i(\varphi)$ la generica rotazione intorno all'asse $i$ di un angolo $\varphi$ e con $T_{ij}$ la trasformazione in coordinate omogenee dal sistema di riferimento $i$ a quello $j$ tale che per un generico vettore $p$ valga: $p_i = T_{ij} p_j$; si pu\`o elaborare i cambi di coordinate necessari. 
+
+\begin{equation}
+T_{01}(\alpha) = \quad T_{12}(\vartheta) =
+\label{eq:cambio_coordinate}
+\end{equation}
+
+aaa
 
 
+\begin{align}
+	\mathrm{OA}& = T_{01}(\alpha) \begin{bmatrix} 0& 0 & 0& 1 \end{bmatrix}^\mathsf{T}\label{eq:from_punti_in_coord_0} \\
+	\mathrm{AP}& = T_{12}(\vartheta) \begin{bmatrix}Id & 000l_2\\ 0 &1\end{bmatrix} \\
+	\mathrm{OP}& = \mathrm{OA}+\mathrm{AP}
+\label{eq:to_punti_in_coord_0}
+\end{align}
+
+
+
+\begin{equation}
+R_{s0} = R_z (\rho)  R_y (-\lambda)  \begin{bmatrix}
+0 & 0 & -1\\
+1 & 0 & 0\\
+0 & -1 & 0
+\end{bmatrix}
+\label{eq:proiezione}
+\end{equation}
+
+
+
+
+$\lambda$ angolo latitudine , $\rho $ angolo longitudine, da~\ref{eq:from_punti_in_coord_0}  a~\ref{eq:to_punti_in_coord_0}
+
+% da decidere quanto entrare nel dettaglio
 
 \section{Implementazione/code overview}
 Da scrivere
