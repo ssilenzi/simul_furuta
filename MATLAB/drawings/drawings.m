@@ -2,12 +2,9 @@
 
 %% Geometria
 syms alpharad thetarad l1 l2 real
-zv = zeros(3,1);
-t = RpToT(Rx(-thetarad), zv);
-T01 = RpToT(Rz(alpharad), zv) * RpToT(eye(3), [l1; 0; 0]);
-pA0 = HomToVec(T01 * PosToHom(zv));
-pP1 = HomToVec(t * PosToHom([0; 0; l2]));
-pP0 = HomToVec(T01 * PosToHom(pP1));
+pA0 = Rz(alpharad)*[l1; 0; 0];
+pP1 = Rx(-thetarad)*[0; 0; l2];
+pP0 = Rz(alpharad)*([l1; 0; 0]+pP1);
 
 
 %% Vista lato
@@ -70,30 +67,12 @@ OC10 = pC10
 %% Cerchio di angolo theta
 % C2 è il generico punto della circonferenza relativa all'angolo theta
 pC21 = [0; r*sin(t); r*cos(t)];
-pC20 = HomToVec(T01 * PosToHom(pC21));
+pC20 = Rz(alpharad)*([l1; 0; 0] + pC21);
 OC20 = pC20
 % OC20 =
 %  l1*cos(alpharad) - r*sin(alpharad)*sin(t)
 %  l1*sin(alpharad) + r*cos(alpharad)*sin(t)
 %  r*cos(t)
-
-function w = HomToVec(v)
-
-w = v(1:3);
-
-end
-
-function w = PosToHom(v)
-
-w = [v; 1];
-
-end
-
-function T = RpToT(R,p)
-
-T = [R, p; 0, 0, 0, 1];
-
-end
 
 function R = Rx(angolo)
 
@@ -110,11 +89,5 @@ end
 function R = Rz(angolo)
 
 R = [cos(angolo), -sin(angolo), 0; sin(angolo), cos(angolo), 0; 0, 0, 1];
-
-end
-
-function w = VelToHom(v)
-
-w = [v; 0];
 
 end
