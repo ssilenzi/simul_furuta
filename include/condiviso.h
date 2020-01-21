@@ -7,7 +7,7 @@
 #include "zero_crossing_types.h"
 
 
-#define EXTIME //opzione di debug per leggere i tempi di esecuzione dei task
+#define EXTIME //opzione di debug per leggere info aggiuntive sui task
 
 
 //----------- costanti, definizioni
@@ -98,15 +98,15 @@
 #define PRIO_COMBOARD		30
 #define PERIOD_COMBOARD		5
 
-// gui
-#define ID_GUI				100
-#define PRIO_GUI			20
-#define FPS					25
-
 // keys
 #define ID_KEYS				200
-#define PRIO_KEYS			10
+#define PRIO_KEYS			20
 #define PERIOD_KEYS			20
+
+// gui
+#define ID_GUI				100
+#define PRIO_GUI			10
+#define FPS					25 //period 40
 
 //----------- parametri scheda
 #define CCR_MAX				5250 //PWM CCR 0-5250, 0 corrisponde a -6 Volt, 5250 a +6 Volt
@@ -151,7 +151,7 @@ typedef struct {
 typedef struct {
     real32_T dist_amp;
     uint16_T noise_amp;
-} par_dn_t;
+} par_dn_t; // struttura per i parametri del disturbo e del rumore
 
 typedef struct {
     real32_T alpha;

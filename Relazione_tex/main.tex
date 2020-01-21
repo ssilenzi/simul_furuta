@@ -9,206 +9,55 @@
 
 
 \begin{document}
-	
-\begin{titlepage}
-	\centering
-	\vspace*{2 cm}
-	\textsc{\Large Universit\`a di Pisa }\\[0.5 cm]							% University Name
-	%\textsc{\Large Scuola di Ingegneria}\\[0.5 cm]		
-	\textsc{\large Corso di Laurea magistrale \\ 
-		\vspace*{3mm} in Ingegneria Robotica e dell'Automazione}\\[1 cm]		% Course Code
-	\rule{\linewidth}{0.2 mm} \\
-	{ \Large{\textbf{Simulazione e Controllo \\ del Pendolo Inverso di Furuta}}}\\
-	
-	\rule{\linewidth}{0.2 mm} \\[2.5 cm]
-%	\vspace*{1.5 cm}
-	
-	\includegraphics[height=.35\textheight]{quanser_furuta.png}
-	
-	\vspace*{2 cm}
-	\begin{minipage}{0.48\textwidth}
-		\begin{flushleft}
-			\textit{Autori:}\\
-			Francesco Petracci\\
-			Simone Silenzi
-		\end{flushleft}
-	\end{minipage}~
-	\begin{minipage}{0.48\textwidth}
-		\begin{flushright}
-			\textit{Matricola e-mail:}\\		
-			491648, \href{mailto:petracci.francesco@gmail.com}{petracci.francesco@gmail.com} \\
-			460123, \href{mailto:s.silenzi1@gmail.com}{s.silenzi1@gmail.com}
-		\end{flushright}
-	\end{minipage}\\[2 cm]
-	
-%	\textit{Autori, matricola ed email:} \\
-%	Francesco Petracci, 491648, \href{mailto:petracci.francesco@gmail.com}{petracci.francesco@gmail.com} \\
-%	Simone Silenzi, 460123, \href{mailto:s.silenzi1@gmail.com}{s.silenzi1@gmail.com} \\
-	
-	
-\end{titlepage}
-\newpage
+
+\input{title.tex}
 
 \section{Indicazioni Report}
 Project reportA  report  must  be  produced  (8-10  pages)  to  explain  the  project  details.  In  particular,  the  title  page  must  contain  the  name  of  the  course  under  which  the  project  has  been  done,  the  project  title,  an  optional  picture related  to  the  project,  the  delivery  date,  and the  author(s)  name(s)  with  contact  information (student ID number and Email). The  report  must  include  a  general  description  of  the  project,  the  physical  model  used,  the  design  choices, the user interface, the shared data structures, the tasks involved, a task-resource diagram, a discussion  on  the  task  parameters  (how they  were  defined),  and  a  set  of  experimental  results  that show  the  behavior  of  the  system  as  a  function  of  specific  variables.  Figures  and  screen  shots  are  welcome. The project code must not be included in the report, but in a separate folder.
+
+TO DO LIST:
+\begin{itemize}
+	\item RIFARE SCHEMA PENDOLO,primo link da rifare il cilindro finale
+	\item AGGIORNARE la parte sulla grafica in modo da rispiecchiare drawings.m
+	\item Conclusioni
+\end{itemize}
  
 \section{Introduzione}
 Questo progetto consiste nella simulazione dell'interazione real-time tra il pendolo inverso di Furuta, una scheda STM32F4 Discovery e un'interfaccia utente su pc. 
 
 L'applicazione finale \`e stata sviluppata in C sfruttando principalmente le librerie Allegro e Pthread. Per quanto riguarda la simulazione del pendolo e della scheda \`e stato fatto uso del software \textsc{Matlab--Simulink} per sviluppare un modello fisico, il relativo controllo e per quindi creare in modo automatico alcune funzioni.
 
-
-\section{cose Simone}
-\begin{math}\\
-T=\dfrac{1}{2} \left(2  L_{arm} l_p m_p \dot{\alpha } \dot{\theta } \cos (\theta ) + \left(J_0 + J_p\sin ^2(\theta )\right) \dot{\alpha }^2+ J_p \dot{\theta }^2\right)\\
-U=g l_p m_p (\cos(\theta) - 1)\\
-M(q)\ddot{q}+C(q,\dot{q})\dot{q}+N(q,\dot{q})=\tau\\
-q=\left( \begin{array}{cc}\alpha & \theta\\\end{array}\right)^{T}\\
-M(q)=\left(\begin{array}{cc}\dfrac{\partial^{2} T}{\partial \dot{\alpha }^{2} } & \dfrac{\partial^{2} T}{\partial \dot{\alpha } \partial \dot{\theta } }\\
-\dfrac{\partial^{2} T}{\partial \dot{\alpha } \partial \dot{\theta } } & \dfrac{\partial^{2} T}{\partial \dot{\theta }^{2} }\\
-\end{array}\right)=\left(\begin{array}{cc}
-J_0+J_p \sin ^2(\theta ) & L_{arm} l_p m_p \cos (\theta ) \\
-L_{arm} l_p m_p \cos (\theta ) & J_p \\
-\end{array}\right)\\
-C(q,\dot{q})= \dfrac{1}{2}\left(
-\begin{array}{cc}
-\dfrac{\partial M_{11}}{\partial \alpha}\dot{\alpha } + \dfrac{\partial M_{11}}{\partial \theta}\dot{\theta } &
-\dfrac{\partial M_{11}}{\partial \theta}\dot{\alpha } + (2 \dfrac{\partial M_{12}}{\partial \theta} - \dfrac{\partial M_{22}}{\partial \alpha})\dot{\theta } \\
-(2 \dfrac{\partial M_{21}}{\partial \alpha} - \dfrac{\partial M_{11}}{\partial \theta}) \dot{\alpha } + \dfrac{\partial M_{22}}{\partial \alpha} \dot{\theta } &
-\dfrac{\partial M_{22}}{\partial \alpha} \dot{\alpha } + \dfrac{\partial M_{22}}{\partial \theta} \dot{\theta }\\
-\end{array}\right) = \left(	\begin{array}{cc}\dfrac{1}{2} J_p \dot{\theta } \sin (2 \theta )& \dfrac{1}{2} J_p \dot{\alpha } \sin (2 \theta )-L_{arm} l_p m_p\dot{\theta } \sin (\theta ) \\
--\dfrac{1}{2} J_p \dot{\alpha } \sin (2 \theta ) & 0 \\
-\end{array}
-\right)\\
-N(q,\dot{q})=\left(\begin{array}{c}b_{ma}\dot{\alpha } + \dfrac{\partial U}{\partial \alpha }\\
-b_p \dot{\theta } + \dfrac{\partial U}{\partial \theta }\\
-\end{array}\right)=\left(\begin{array}{c}
-b_{ma} \dot{\alpha }\\
-b_p \dot{\theta } -g l_p m_p \sin (\theta )\\
-\end{array}\right)\\
-\ddot{q}={M(q)}^{-1}(\tau-C(q,\dot{q})\dot{q}-N(q,\dot{q}))\\
-\left(\begin{array}{c}\ddot{\alpha}\\
-\ddot{\theta}\\
-\end{array}\right) ={\left(\begin{array}{cc}
-	J_0+J_p \sin ^2(\theta ) & L_{arm} l_p m_p \cos (\theta ) \\
-	L_{arm} l_p m_p \cos (\theta ) & J_p \\
-	\end{array}\right)}^{-1}\left(\left(\begin{array}{c}\tau_1\\\tau_2\\\end{array}\right)-\left(
-\begin{array}{cc}\dfrac{1}{2} J_p \dot{\theta } \sin (2 \theta )&\dfrac{1}{2} J_p \dot{\alpha } \sin (2 \theta )-L_{arm} l_p m_p\dot{\theta } \sin (\theta ) \\
--\dfrac{1}{2} J_p \dot{\alpha } \sin (2 \theta ) & 0 \\
-\end{array}
-\right)\left( \begin{array}{c}\dot{\alpha}\\
-\dot{\theta}\\
-\end{array}\right)-\left(\begin{array}{c}
-b_{ma} \dot{\alpha }\\
-b_p \dot{\theta } -g l_p m_p \sin (\theta )\\
-\end{array}\right)\right)
-%	=\\=\left(\begin{array}{c}
-%		\dfrac{2 \dot{\theta } L_{arm} b_p \cos (\theta ) l_p m_p-2 g L_{arm} \sin
-%			(\theta ) \cos (\theta ) l_p^2 m_p^2+\dot{\alpha }^2 L_{arm} \sin (2 \theta )
-%			(-\cos (\theta )) J_p l_p m_p+2 \dot{\theta }^2 L_{arm} \sin (\theta ) J_p l_p
-%			m_p-2 \tau _2 L_{arm} \cos (\theta ) l_p m_p-2 \dot{\alpha } b_{ma} J_p-2
-%			\dot{\alpha } \dot{\theta } \sin (2 \theta ) J_p^2+2 \tau _1 J_p}{2
-%			\left(-L_{arm}^2 \cos ^2(\theta ) l_p^2 m_p^2+\sin ^2(\theta ) J_p^2+J_0
-%			J_p\right)} \\
-%		\dfrac{2 \dot{\alpha } L_{arm} b_{ma} \cos (\theta ) l_p m_p+2 \dot{\alpha }
-%			\dot{\theta } L_{arm} \sin (2 \theta ) \cos (\theta ) J_p l_p m_p-2 \tau _1
-%			L_{arm} \cos (\theta ) l_p m_p-2 \dot{\theta }^2 L_{arm}^2 \sin (\theta )
-%			\cos (\theta ) l_p^2 m_p^2-2 \dot{\theta } J_0 b_p-2 \dot{\theta } b_p \sin ^2(\theta )
-%			J_p+2 g \sin ^3(\theta ) J_p l_p m_p+2 g J_0 \sin (\theta ) l_p m_p+\dot{\alpha }^2 \sin
-%			(2 \theta ) \sin ^2(\theta ) J_p^2+\dot{\alpha }^2 J_0 \sin (2 \theta ) J_p+2 \tau _2
-%			\sin ^2(\theta ) J_p+2 J_0 \tau _2}{2 \left(-L_{arm}^2 \cos ^2(\theta ) l_p^2
-%			m_p^2+\sin ^2(\theta ) J_p^2+J_0 J_p\right)} \\
-%	\end{array}\right)
-\end{math}
-
+\input{formule.tex}
 
 \section{Modello}
+\label{sez:modello}
 Da scrivere
 
 \section{Controllo}
+\label{sez:controllo}
 Da scrivere
 
 \section{Interfaccia}
-\begin{figure}
-	\centering
-	\includegraphics[height=.4\textheight]{interfaccia_in_esecuzione.png}
-	\caption{Interfaccia durante l'esecuzione}
-	\label{fig:interfaccia_in_esecuzione}
-\end{figure}
-
-L'interfaccia \`e divisa in due zone principali: quella di comunicazione con l'utente e le tre viste del pendolo.
-Per quanto riguarda la zona di comunicazione questa \`e popolata dalle variabili di interesse e di come modificarle. Si \`e quindi riportato a schermo:
-\begin{itemize}
-	\item il riferimento su $\alpha$
-	
-	\item  il vettore di stato $\left[ \alpha \ \theta \ volt\right]^T$
-	
-	\item i parametri di controllo
-	
-	\item disturbo, rumore e ritardi
-	
-	\item polo della funzione di trasferimento che genera il riferimento su $\alpha$
-	
-	\item periodo del task di \textbf{controllo}
-	
-	\item per ciascun task il numero di deadline miss, il tempo di esecuzione in $\si{\micro \second}$ e il worst-case execution time in $\si{\micro \second}$
-	
-	\item varie istruzioni su come resettare e come uscire dal programma
-	
-\end{itemize}
-
-Per quanto riguarda le viste, queste sono tre. La vista dall'alto evidenzia il primo link e quindi \`e possibile vedere $\alpha$ e il suo riferimento mentre in quella da lato $\theta$ e relativo riferimento.
-
-\begin{figure}
-	\centering
-	\includegraphics[height=.4\textheight]{pendolo_schema_TEMPORANEO.png}
-	% MANCA DA DISEGNARCI IL SISTEMA DI RIFERIMENTO FISSO 0
-	\caption{Schema del Pendolo}
-	\label{fig:pendolo_schema}
-\end{figure}
-
-Per costruire la vista assonometrica \`e stato utile strutturare il problema in coordinate omogenee e introdurre dei sistemi di riferimento. Con riferimento alla figura~\ref{fig:pendolo_schema}, intendendo con $R_i(\varphi)$ la generica rotazione intorno all'asse $i$ di un angolo $\varphi$ e con $T_{ij}$ la trasformazione in coordinate omogenee dal sistema di riferimento $i$ a quello $j$ tale che per un generico vettore $p$ valga: $p_i = T_{ij} p_j$; si pu\`o elaborare i cambi di coordinate necessari. 
-
-\begin{equation}
-T_{01}(\alpha) = \quad T_{12}(\vartheta) =
-\label{eq:cambio_coordinate}
-\end{equation}
-
-aaa
+\input{interfaccia.tex}
 
 
-\begin{align}
-	\mathrm{OA}& = T_{01}(\alpha) \begin{bmatrix} 0& 0 & 0& 1 \end{bmatrix}^\mathsf{T}\label{eq:from_punti_in_coord_0} \\
-	\mathrm{AP}& = T_{12}(\vartheta) \begin{bmatrix}Id & 000l_2\\ 0 &1\end{bmatrix} \\
-	\mathrm{OP}& = \mathrm{OA}+\mathrm{AP}
-\label{eq:to_punti_in_coord_0}
-\end{align}
+\section{Overview del codice}
 
+Il software \`e stato sviluppato in C usando principalmente \textsc{Allegro} 4.4, \textsc{pthread} e l'Embedded Coder di \textsc{Simulink--Matlab}. La cartella principale ha 3 principali sotto--cartelle: \textit{Matlab} contiene i file \textit{Matlab} sviluppati per elaborare il modello fisico e le viste, \textit{include} gli header utilizzati e infine \textit{src} i file sorgente. Una cartella aggiuntiva, \textit{build}, viene creata al momento della compilazione e contiene i file object e il file binario.
 
+Una parte dei file sorgenti e dei file header sono stati generati in modo automatico tramite l'utilizzo appunto dell'Embedded Coder. Questi sono stati contrassegnati ad inizio file da un'intestazione e sono stati inoltre descritti brevemente nella prima parte del file \texttt{main.c}.
 
-\begin{equation}
-R_{s0} = R_z (\rho)  R_y (-\lambda)  \begin{bmatrix}
-0 & 0 & -1\\
-1 & 0 & 0\\
-0 & -1 & 0
-\end{bmatrix}
-\label{eq:proiezione}
-\end{equation}
+\texttt{Altro?}
 
+\subsection{Data structures}
+\input{resource.tex}
 
-
-
-$\lambda$ angolo latitudine , $\rho $ angolo longitudine, da~\ref{eq:from_punti_in_coord_0}  a~\ref{eq:to_punti_in_coord_0}
-
-% da decidere quanto entrare nel dettaglio
-
-\section{Implementazione/code overview}
-Da scrivere
 \subsection{Task}
-Da scrivere
+\input{task.tex}
+\FloatBarrier
 
 \section{Conclusioni (?)}
-Da Scrivere
+Da Scrivere?
 
 	
 \end{document}

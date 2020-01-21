@@ -4,41 +4,36 @@
 *	Titolo: Inverted Pendulum
 *
 *	Descrizione generale e funzionalita`.
-* 			Il programma simula l'interazione BLABLABLA SCRIVIMI
+* 			Il programma simula l'interazione tra un microprocessore e il pendolo di Furuta prodotto da Quanser. 
 *		
 * 		Task:
 * 		PC
-* 			- gui BLABLABLA SCRIVIMI
-* 			- keys BLABLABLA SCRIVIMI
-* 			- compc BLABLABLA SCRIVIMI
+* 			- gui, si occupa di disegnare l'interfaccia
+* 			- keys, modifica delle variabili secondo il tasto premuto
+* 			- compc, comunica con il buffer condiviso
 * 
 * 		Scheda
-* 			- control BLABLABLA SCRIVIMI
-*			- comboard BLABLABLA SCRIVIMI
+* 			- control, modifica l'azione di controllo e aggiorna disturbi e rumori
+*			- comboard, comunica con il buffer condiviso
 * 		Fisica
-* 			- state_update BLABLABLA SCRIVIMI
+* 			- state_update, aggiorna lo stato del pendolo
 * 
 * 	Files.
-* 	Scritti da noi:
-* 	main.c, 
-* 	condiviso.h,
-* 	gui.c, gui.h,
-* 	keys.c, keys.h,
-* 	simulation.c,
+* 	Sviluppati da noi:
+* 	main.c, contiene varie inizializzazioni, procedure per la chiusura e la funzione main
+* 	condiviso.h, contiene le definizioni condivise da piu` file
+* 	gui.c, gui.h, contengono le funzioni necessarie al task gui
+* 	keys.c, keys.h, contengono le funzioni necessarie al task keys
+* 	simulation.c, simulation.h, contengono lo scheletro dei task state_update, control e comboard
 * 	
 * 	Generati da Matlab:
-* 	
-* 
-* 
-* 
-* 
+* 	disturbance_and_noise.c, disturbance_and_noise.h, contengono il necessario per generare disturbo e rumore all'interno del task control
+* 	rt_i32zcfcn.c, rt_i32zcfcn.h, contiene il necessario per la funzione che gestisce i "zero crossing signals and events"
+* 	rt_urand_Upu32_Yd_f_pw.c, rt_urand_Upu32_Yd_f_pw.h, contiene il necessario per la generazione di un numero random tra 0 e 1
+* 	rtwtypes.h, contiene le conversione dei tipi che utilizza Matlab
+* 	solver_zc.h, zero_crossing_types.h,  tipi e definizioni relativi a "zero crossing signals and events"
+*
 *--------------------------------------------------------------------------------------------------------------------------*/
-
-/*	TO DO LIST
- *  - scrivere il sottotitolo
- * 	- commentare ogni funzione ?
- * 	- migliorare disegno tempi di esecuzione
- */
 
 
 
