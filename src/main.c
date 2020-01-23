@@ -1,22 +1,10 @@
 /*------------------------------------------------------------------------------------------------------
+*	simul_furuta
+*
+*	Simulatore del Quanser Rotary Inverted Pendulum
+*
 *	Autori: Francesco Petracci, Simone Silenzi
 *	
-*	Titolo: Inverted Pendulum
-*
-* 	Files.
-* 	Scritti da noi:
-* 	main.c, 
-* 	condiviso.h,
-* 	gui.c, gui.h,
-* 	keys.c, keys.h,
-* 	simulation.c,
-* 	
-* 	Generati da Matlab:
-* 	gli altri
-* 
-* 
-* 
-* 
 *--------------------------------------------------------------------------------------------------------------------------*/
 
 
