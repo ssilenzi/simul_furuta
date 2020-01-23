@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.273
+ * Model version                  : 1.281
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Mon Jan  6 15:18:05 2020
+ * C/C++ source code generated on : Sun Jan 19 21:44:51 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -23,25 +23,28 @@
 #include "controller.h"
 
 /* Named constants for Chart: '<S1>/Hybrid_controller' */
-#define slow_IN_Idle                   ((uint8_T)1U)
+#define slow_IN_Hard_controller        ((uint8_T)1U)
 #define slow_IN_NO_ACTIVE_CHILD        ((uint8_T)0U)
 #define slow_IN_PD_controller_down     ((uint8_T)1U)
 #define slow_IN_PD_controller_up       ((uint8_T)2U)
 #define slow_IN_Sliding_mode_controller ((uint8_T)3U)
-#define slow_IN_Swing_up               ((uint8_T)2U)
+#define slow_IN_Soft_controller        ((uint8_T)2U)
 
 /* Forward declaration for local functions */
 static real32_T slow_energy(const real32_T state[4]);
-static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
-  TmpSignalConversionAtSFunctionI[4], real32_T *alpha_ref, real32_T *alpha,
-  int8_T *reset, real32_T *DiscreteTransferFcn);
-static void slow_contr_su(const real32_T TmpSignalConversionAtSFunctionI[4]);
+static void slow_contr_su_soft(real32_T *volt, const real32_T
+  TmpSignalConversionAtSFunctionI[4]);
+static void slow_contr_pd(real32_T *volt, const real32_T *deg_to_rad, const
+  real32_T TmpSignalConversionAtSFunctionI[4], real32_T *alpha_ref, real32_T
+  *alpha, int8_T *reset);
+static void slow_contr_su_hard(real32_T *volt, const real32_T
+  TmpSignalConversionAtSFunctionI[4]);
 
 /* System initialize for function-call system: '<S4>/ref_gen' */
 void slow_ref_gen_Init(DW_ref_gen_slow_T *localDW)
 {
-  /* InitializeConditions for DiscreteTransferFcn: '<S7>/Discrete Transfer Fcn' */
-  localDW->DiscreteTransferFcn_icLoad = 1U;
+  /* InitializeConditions for DiscreteTransferFcn: '<S7>/ref_gen' */
+  localDW->ref_gen_icLoad = 1U;
 }
 
 /* Output and update for function-call system: '<S4>/ref_gen' */
@@ -49,33 +52,33 @@ void slow_ref_gen(real32_T rtu_alpha_ref, real32_T rtu_alpha, int8_T rtu_reset,
                   real32_T *rty_out, DW_ref_gen_slow_T *localDW,
                   ZCE_ref_gen_slow_T *localZCE)
 {
-  real32_T DiscreteTransferFcn_tmp;
+  real32_T ref_gen_tmp;
 
-  /* DiscreteTransferFcn: '<S7>/Discrete Transfer Fcn' incorporates:
+  /* DiscreteTransferFcn: '<S7>/ref_gen' incorporates:
    *  MATLAB Function: '<S7>/initial_cond'
    */
   /* MATLAB Function 'Controller/Hybrid_controller/ref_gen/initial_cond': '<S8>:1' */
   /* '<S8>:1:3' x0 = 1/par_ctrl.dpole_ref*(alpha/(1-par_ctrl.dpole_ref)-alpha_ref); */
-  if (rt_I32ZCFcn(FALLING_ZERO_CROSSING,&localZCE->DiscreteTransferFcn_Reset_ZCE,
+  if (rt_I32ZCFcn(FALLING_ZERO_CROSSING,&localZCE->ref_gen_Reset_ZCE,
                   (rtu_reset)) != NO_ZCEVENT) {
-    localDW->DiscreteTransferFcn_icLoad = 1U;
+    localDW->ref_gen_icLoad = 1U;
   }
 
-  if (localDW->DiscreteTransferFcn_icLoad != 0) {
-    localDW->DiscreteTransferFcn_states = (rtu_alpha / (1.0F -
-      par_ctrl.dpole_ref) - rtu_alpha_ref) * (1.0F / par_ctrl.dpole_ref);
+  if (localDW->ref_gen_icLoad != 0) {
+    localDW->ref_gen_states = (rtu_alpha / (1.0F - par_ctrl.dpole_ref) -
+      rtu_alpha_ref) * (1.0F / par_ctrl.dpole_ref);
   }
 
-  DiscreteTransferFcn_tmp = (rtu_alpha_ref - par_ctrl.ref_gen_den[1] *
-    localDW->DiscreteTransferFcn_states) / par_ctrl.ref_gen_den[0];
-  *rty_out = par_ctrl.ref_gen_num[0] * DiscreteTransferFcn_tmp +
-    par_ctrl.ref_gen_num[1] * localDW->DiscreteTransferFcn_states;
+  ref_gen_tmp = rtu_alpha_ref - par_ctrl.ref_gen_den[1] *
+    localDW->ref_gen_states;
+  *rty_out = par_ctrl.ref_gen_num[0] * ref_gen_tmp + par_ctrl.ref_gen_num[1] *
+    localDW->ref_gen_states;
 
-  /* End of DiscreteTransferFcn: '<S7>/Discrete Transfer Fcn' */
+  /* End of DiscreteTransferFcn: '<S7>/ref_gen' */
 
-  /* Update for DiscreteTransferFcn: '<S7>/Discrete Transfer Fcn' */
-  localDW->DiscreteTransferFcn_icLoad = 0U;
-  localDW->DiscreteTransferFcn_states = DiscreteTransferFcn_tmp;
+  /* Update for DiscreteTransferFcn: '<S7>/ref_gen' */
+  localDW->ref_gen_icLoad = 0U;
+  localDW->ref_gen_states = ref_gen_tmp;
 }
 
 /*
@@ -84,32 +87,64 @@ void slow_ref_gen(real32_T rtu_alpha_ref, real32_T rtu_alpha, int8_T rtu_reset,
  */
 static real32_T slow_energy(const real32_T state[4])
 {
-  real32_T x_tmp;
-  real32_T ME_tmp;
-  real32_T ME_tmp_0;
-
   /* MATLAB Function 'energy': '<S4>:86' */
   /*  Mechanical energy calculation (kinetic + potential) */
   /* '<S4>:86:5' th = state(2); */
   /* '<S4>:86:6' al_d = state(3); */
   /* '<S4>:86:7' th_d = state(4); */
-  /* '<S4>:86:9' ME = (Jp*al_d^2)/2 + (Jp*th_d^2)/2 + (Larm^2*al_d^2*mp)/2 - g*lp*mp - (Jp*al_d^2*cos(th)^2)/2 + g*lp*mp*cos(th) + Larm*al_d*lp*mp*th_d*cos(th); */
-  x_tmp = cosf(state[1]);
-  ME_tmp = state[2] * state[2];
-  ME_tmp_0 = ME_tmp * 0.00429067202F;
-  return (((((ME_tmp_0 / 2.0F + state[3] * state[3] * 0.00429067202F / 2.0F) +
-             ME_tmp * 0.046656F * 0.127F / 2.0F) - 0.194355741F) - ME_tmp_0 *
-           (x_tmp * x_tmp) / 2.0F) + 0.194355741F * x_tmp) + 0.216F * state[2] *
-    0.156F * 0.127F * state[3] * x_tmp;
+  /* '<S4>:86:9' ME = (Jp*th_d^2)/2 - g*lp*mp + g*lp*mp*cos(th); */
+  return (state[3] * state[3] * 0.00429067202F / 2.0F - 0.194355741F) +
+    0.194355741F * cosf(state[1]);
+}
+
+/*
+ * Function for Chart: '<S1>/Hybrid_controller'
+ * function contr_su_soft
+ */
+static void slow_contr_su_soft(real32_T *volt, const real32_T
+  TmpSignalConversionAtSFunctionI[4])
+{
+  real32_T sgn;
+
+  /* MATLAB Function 'contr_su_soft': '<S4>:154' */
+  /*  Swing-up controller */
+  /* '<S4>:154:5' th = q(2); */
+  /* '<S4>:154:6' th_d = q(4); */
+  /* '<S4>:154:8' if th_d*cos(th) == 0 */
+  sgn = TmpSignalConversionAtSFunctionI[3] * cosf
+    (TmpSignalConversionAtSFunctionI[1]);
+  if (sgn == 0.0F) {
+    /* '<S4>:154:9' sgn = sign(th); */
+    if (TmpSignalConversionAtSFunctionI[1] < 0.0F) {
+      sgn = -1.0F;
+    } else if (TmpSignalConversionAtSFunctionI[1] > 0.0F) {
+      sgn = 1.0F;
+    } else {
+      sgn = TmpSignalConversionAtSFunctionI[1];
+    }
+  } else {
+    /* '<S4>:154:10' else */
+    /* '<S4>:154:11' sgn = sign(th_d*cos(th)); */
+    if (sgn < 0.0F) {
+      sgn = -1.0F;
+    } else {
+      if (sgn > 0.0F) {
+        sgn = 1.0F;
+      }
+    }
+  }
+
+  /* '<S4>:154:14' volt = volt_max/(4*mp*g*lp)*energy(q)*sgn; */
+  *volt = 7.71780634F * slow_energy(TmpSignalConversionAtSFunctionI) * sgn;
 }
 
 /*
  * Function for Chart: '<S1>/Hybrid_controller'
  * function contr_pd
  */
-static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
-  TmpSignalConversionAtSFunctionI[4], real32_T *alpha_ref, real32_T *alpha,
-  int8_T *reset, real32_T *DiscreteTransferFcn)
+static void slow_contr_pd(real32_T *volt, const real32_T *deg_to_rad, const
+  real32_T TmpSignalConversionAtSFunctionI[4], real32_T *alpha_ref, real32_T
+  *alpha, int8_T *reset)
 {
   /* MATLAB Function 'contr_pd': '<S4>:73' */
   /*  PD controller with reference generator */
@@ -120,29 +155,31 @@ static void slow_contr_pd(const real32_T *deg_to_rad, const real32_T
   *reset = 0;
 
   /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
-  slow_ref_gen(*alpha_ref, *alpha, *reset, DiscreteTransferFcn, &slow_DW.ref_gen,
+  slow_ref_gen(*alpha_ref, *alpha, *reset, &slow_DW.ref_gen_c, &slow_DW.ref_gen,
                &slow_PrevZCX.ref_gen);
 
   /* End of Outputs for SubSystem: '<S4>/ref_gen' */
 
   /* '<S4>:73:6' error = q_ref - q; */
   /* '<S4>:73:7' volt = K * error; */
-  slow_DW.volt = (((*DiscreteTransferFcn - TmpSignalConversionAtSFunctionI[0]) *
-                   slow_DW.K[0] + (slow_DW.theta_ref -
-    TmpSignalConversionAtSFunctionI[1]) * slow_DW.K[1]) + (0.0F -
-    TmpSignalConversionAtSFunctionI[2]) * slow_DW.K[2]) + (0.0F -
-    TmpSignalConversionAtSFunctionI[3]) * slow_DW.K[3];
+  *volt = (((slow_DW.ref_gen_c - TmpSignalConversionAtSFunctionI[0]) *
+            slow_DW.K[0] + (slow_DW.theta_ref - TmpSignalConversionAtSFunctionI
+             [1]) * slow_DW.K[1]) + (0.0F - TmpSignalConversionAtSFunctionI[2]) *
+           slow_DW.K[2]) + (0.0F - TmpSignalConversionAtSFunctionI[3]) *
+    slow_DW.K[3];
 }
 
 /*
  * Function for Chart: '<S1>/Hybrid_controller'
- * function contr_su
+ * function contr_su_hard
  */
-static void slow_contr_su(const real32_T TmpSignalConversionAtSFunctionI[4])
+static void slow_contr_su_hard(real32_T *volt, const real32_T
+  TmpSignalConversionAtSFunctionI[4])
 {
   real32_T sgn;
+  real32_T x;
 
-  /* MATLAB Function 'contr_su': '<S4>:71' */
+  /* MATLAB Function 'contr_su_hard': '<S4>:71' */
   /*  Swing-up controller */
   /* '<S4>:71:5' th = q(2); */
   /* '<S4>:71:6' th_d = q(4); */
@@ -170,8 +207,17 @@ static void slow_contr_su(const real32_T TmpSignalConversionAtSFunctionI[4])
     }
   }
 
-  /* '<S4>:71:14' volt = -volt_max*sgn; */
-  slow_DW.volt = -6.0F * sgn;
+  /* '<S4>:71:14' volt = volt_max*sign(energy(q))*sgn; */
+  x = slow_energy(TmpSignalConversionAtSFunctionI);
+  if (x < 0.0F) {
+    x = -1.0F;
+  } else {
+    if (x > 0.0F) {
+      x = 1.0F;
+    }
+  }
+
+  *volt = 6.0F * x * sgn;
 }
 
 /* System initialize for atomic system: '<Root>/Controller' */
@@ -216,9 +262,9 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   uint16_T rtb_CCR;
   real32_T deg_to_rad;
   real32_T TmpSignalConversionAtSFunctionI[4];
+  real32_T alpha_ref;
   real32_T alpha;
   int8_T reset;
-  real32_T DiscreteTransferFcn;
   boolean_T guard1 = false;
 
   /* DataTypeConversion: '<S3>/Cast4' */
@@ -260,10 +306,10 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   rtb_pos_meas[0] = rtb_pos_meas[0] * 6.28318548F + deg_to_rad;
 
   /* '<S9>:1:9' if sect(pos_old(k)) == int8(3) && sect(rad(k)) == int8(0) */
-  deg_to_rad = floorf(slow_DW.Delay_DSTATE[0] / 1.57079637F);
-  if (deg_to_rad < 128.0F) {
-    if (deg_to_rad >= -128.0F) {
-      reset = (int8_T)deg_to_rad;
+  q = floorf(slow_DW.Delay_DSTATE[0] / 1.57079637F);
+  if (q < 128.0F) {
+    if (q >= -128.0F) {
+      reset = (int8_T)q;
     } else {
       reset = MIN_int8_T;
     }
@@ -273,10 +319,10 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
   guard1 = false;
   if ((int8_T)(reset - ((reset >> 2) << 2)) == 3) {
-    q = floorf(rty_alpha[0] / 1.57079637F);
-    if (q < 128.0F) {
-      if (q >= -128.0F) {
-        reset = (int8_T)q;
+    deg_to_rad = floorf(rty_alpha[0] / 1.57079637F);
+    if (deg_to_rad < 128.0F) {
+      if (deg_to_rad >= -128.0F) {
+        reset = (int8_T)deg_to_rad;
       } else {
         reset = MIN_int8_T;
       }
@@ -295,9 +341,9 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   }
 
   if (guard1) {
-    if (deg_to_rad < 128.0F) {
-      if (deg_to_rad >= -128.0F) {
-        reset = (int8_T)deg_to_rad;
+    if (q < 128.0F) {
+      if (q >= -128.0F) {
+        reset = (int8_T)q;
       } else {
         reset = MIN_int8_T;
       }
@@ -306,10 +352,10 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
     }
 
     if ((int8_T)(reset - ((reset >> 2) << 2)) == 0) {
-      deg_to_rad = floorf(rty_alpha[0] / 1.57079637F);
-      if (deg_to_rad < 128.0F) {
-        if (deg_to_rad >= -128.0F) {
-          reset = (int8_T)deg_to_rad;
+      q = floorf(rty_alpha[0] / 1.57079637F);
+      if (q < 128.0F) {
+        if (q >= -128.0F) {
+          reset = (int8_T)q;
         } else {
           reset = MIN_int8_T;
         }
@@ -355,10 +401,10 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   rtb_pos_meas[1] = rtb_pos_meas[1] * 6.28318548F + deg_to_rad;
 
   /* '<S9>:1:9' if sect(pos_old(k)) == int8(3) && sect(rad(k)) == int8(0) */
-  deg_to_rad = floorf(slow_DW.Delay_DSTATE[1] / 1.57079637F);
-  if (deg_to_rad < 128.0F) {
-    if (deg_to_rad >= -128.0F) {
-      reset = (int8_T)deg_to_rad;
+  q = floorf(slow_DW.Delay_DSTATE[1] / 1.57079637F);
+  if (q < 128.0F) {
+    if (q >= -128.0F) {
+      reset = (int8_T)q;
     } else {
       reset = MIN_int8_T;
     }
@@ -368,10 +414,10 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
 
   guard1 = false;
   if ((int8_T)(reset - ((reset >> 2) << 2)) == 3) {
-    q = floorf(rty_alpha[1] / 1.57079637F);
-    if (q < 128.0F) {
-      if (q >= -128.0F) {
-        reset = (int8_T)q;
+    deg_to_rad = floorf(rty_alpha[1] / 1.57079637F);
+    if (deg_to_rad < 128.0F) {
+      if (deg_to_rad >= -128.0F) {
+        reset = (int8_T)deg_to_rad;
       } else {
         reset = MIN_int8_T;
       }
@@ -390,9 +436,9 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   }
 
   if (guard1) {
-    if (deg_to_rad < 128.0F) {
-      if (deg_to_rad >= -128.0F) {
-        reset = (int8_T)deg_to_rad;
+    if (q < 128.0F) {
+      if (q >= -128.0F) {
+        reset = (int8_T)q;
       } else {
         reset = MIN_int8_T;
       }
@@ -401,10 +447,10 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
     }
 
     if ((int8_T)(reset - ((reset >> 2) << 2)) == 0) {
-      deg_to_rad = floorf(rty_alpha[1] / 1.57079637F);
-      if (deg_to_rad < 128.0F) {
-        if (deg_to_rad >= -128.0F) {
-          reset = (int8_T)deg_to_rad;
+      q = floorf(rty_alpha[1] / 1.57079637F);
+      if (q < 128.0F) {
+        if (q >= -128.0F) {
+          reset = (int8_T)q;
         } else {
           reset = MIN_int8_T;
         }
@@ -459,15 +505,37 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
     slow_DW.is_active_c5_slow = 1U;
 
     /* Entry Internal: Controller/Hybrid_controller */
-    /* Transition: '<S4>:142' */
-    slow_DW.is_c5_slow = slow_IN_Sliding_mode_controller;
+    /* Transition: '<S4>:156' */
+    slow_DW.is_c5_slow = slow_IN_PD_controller_down;
 
-    /* Entry 'Sliding_mode_controller': '<S4>:138' */
-    /* Entry Internal 'Sliding_mode_controller': '<S4>:138' */
-    /* Transition: '<S4>:109' */
-    slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
+    /* Entry 'PD_controller_down': '<S4>:4' */
+    /* '<S4>:4:3' ref_gen(alpha_ref,q(1),int8(1)); */
+    /* Simulink Function 'ref_gen': '<S4>:153' */
+    alpha_ref = deg_to_rad;
+    alpha = rtb_pos_meas[0];
+    reset = 1;
 
-    /* Entry 'Idle': '<S4>:28' */
+    /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
+    slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &slow_DW.ref_gen_c,
+                 &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
+
+    /* End of Outputs for SubSystem: '<S4>/ref_gen' */
+    /* '<S4>:4:5' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
+    slow_DW.theta_ref = (roundf(rtb_pos_meas[1] / 6.28318548F + 0.5F) - 0.5F) *
+      6.28318548F;
+
+    /* '<S4>:4:6' K = [par_ctrl.down_kp_alpha,... */
+    /* '<S4>:4:7'     single(0),... */
+    /* '<S4>:4:8'     par_ctrl.down_kd_alpha,... */
+    /* '<S4>:4:9'     single(0)]; */
+    slow_DW.K[0] = par_ctrl.down_kp_alpha;
+    slow_DW.K[1] = 0.0F;
+    slow_DW.K[2] = par_ctrl.down_kd_alpha;
+    slow_DW.K[3] = 0.0F;
+
+    /* '<S4>:4:10' contr_pd; */
+    slow_contr_pd(&q, &deg_to_rad, TmpSignalConversionAtSFunctionI, &alpha_ref,
+                  &alpha, &reset);
   } else {
     switch (slow_DW.is_c5_slow) {
      case slow_IN_PD_controller_down:
@@ -480,9 +548,11 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         /* Entry 'Sliding_mode_controller': '<S4>:138' */
         /* Entry Internal 'Sliding_mode_controller': '<S4>:138' */
         /* Transition: '<S4>:109' */
-        slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
+        slow_DW.is_Sliding_mode_controller = slow_IN_Soft_controller;
 
-        /* Entry 'Idle': '<S4>:28' */
+        /* Entry 'Soft_controller': '<S4>:28' */
+        /* '<S4>:28:3' contr_su_soft; */
+        slow_contr_su_soft(&q, TmpSignalConversionAtSFunctionI);
       } else {
         /* '<S4>:4:5' theta_ref = (round(q(2)/single(2*pi)+0.5)-0.5)*single(2*pi); */
         slow_DW.theta_ref = (roundf(rtb_pos_meas[1] / 6.28318548F + 0.5F) - 0.5F)
@@ -498,8 +568,8 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         slow_DW.K[3] = 0.0F;
 
         /* '<S4>:4:10' contr_pd; */
-        slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
-                      &reset, &DiscreteTransferFcn);
+        slow_contr_pd(&q, &deg_to_rad, TmpSignalConversionAtSFunctionI,
+                      &alpha_ref, &alpha, &reset);
       }
       break;
 
@@ -508,16 +578,18 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
       /* '<S4>:16:1' sf_internal_predicateOutput = swingup == 0 ||... */
       /* '<S4>:16:2' abs(q(2)-round(q(2)/(2*pi))*2*pi) > th_lim; */
       if ((rtu_swingup == 0) || (fabsf(rtb_pos_meas[1] - roundf(rtb_pos_meas[1] /
-             6.28318548F) * 2.0F * 3.14159274F) > 0.52359879F)) {
+             6.28318548F) * 2.0F * 3.14159274F) > 0.610865235F)) {
         /* Transition: '<S4>:16' */
         slow_DW.is_c5_slow = slow_IN_Sliding_mode_controller;
 
         /* Entry 'Sliding_mode_controller': '<S4>:138' */
         /* Entry Internal 'Sliding_mode_controller': '<S4>:138' */
         /* Transition: '<S4>:109' */
-        slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
+        slow_DW.is_Sliding_mode_controller = slow_IN_Soft_controller;
 
-        /* Entry 'Idle': '<S4>:28' */
+        /* Entry 'Soft_controller': '<S4>:28' */
+        /* '<S4>:28:3' contr_su_soft; */
+        slow_contr_su_soft(&q, TmpSignalConversionAtSFunctionI);
       } else {
         /* '<S4>:5:6' K = [par_ctrl.up_kp_alpha,... */
         /* '<S4>:5:7'     par_ctrl.up_kp_theta,... */
@@ -529,8 +601,8 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         slow_DW.K[3] = par_ctrl.up_kd_theta;
 
         /* '<S4>:5:10' contr_pd; */
-        slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
-                      &reset, &DiscreteTransferFcn);
+        slow_contr_pd(&q, &deg_to_rad, TmpSignalConversionAtSFunctionI,
+                      &alpha_ref, &alpha, &reset);
       }
       break;
 
@@ -540,7 +612,7 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
       /* '<S4>:96:2' abs(q(2)-round(q(2)/(2*pi))*2*pi) <= th_lim; */
       q = roundf(rtb_pos_meas[1] / 6.28318548F);
       if ((rtu_swingup == 1) && (fabsf(rtb_pos_meas[1] - q * 2.0F * 3.14159274F)
-           <= 0.52359879F)) {
+           <= 0.610865235F)) {
         /* Transition: '<S4>:96' */
         /* Exit Internal 'Sliding_mode_controller': '<S4>:138' */
         slow_DW.is_Sliding_mode_controller = slow_IN_NO_ACTIVE_CHILD;
@@ -549,12 +621,12 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         /* Entry 'PD_controller_up': '<S4>:5' */
         /* '<S4>:5:3' ref_gen(alpha_ref,q(1),int8(1)); */
         /* Simulink Function 'ref_gen': '<S4>:153' */
-        q = deg_to_rad;
+        alpha_ref = deg_to_rad;
         alpha = rtb_pos_meas[0];
         reset = 1;
 
         /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
-        slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &DiscreteTransferFcn,
+        slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &slow_DW.ref_gen_c,
                      &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
 
         /* End of Outputs for SubSystem: '<S4>/ref_gen' */
@@ -571,8 +643,8 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
         slow_DW.K[3] = par_ctrl.up_kd_theta;
 
         /* '<S4>:5:10' contr_pd; */
-        slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
-                      &reset, &DiscreteTransferFcn);
+        slow_contr_pd(&q, &deg_to_rad, TmpSignalConversionAtSFunctionI,
+                      &alpha_ref, &alpha, &reset);
       } else {
         /* '<S4>:29:1' sf_internal_predicateOutput = swingup == 0; */
         if (rtu_swingup == 0) {
@@ -584,12 +656,12 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
           /* Entry 'PD_controller_down': '<S4>:4' */
           /* '<S4>:4:3' ref_gen(alpha_ref,q(1),int8(1)); */
           /* Simulink Function 'ref_gen': '<S4>:153' */
-          q = deg_to_rad;
+          alpha_ref = deg_to_rad;
           alpha = rtb_pos_meas[0];
           reset = 1;
 
           /* Outputs for Function Call SubSystem: '<S4>/ref_gen' */
-          slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &DiscreteTransferFcn,
+          slow_ref_gen(deg_to_rad, rtb_pos_meas[0], 1, &slow_DW.ref_gen_c,
                        &slow_DW.ref_gen, &slow_PrevZCX.ref_gen);
 
           /* End of Outputs for SubSystem: '<S4>/ref_gen' */
@@ -607,36 +679,38 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
           slow_DW.K[3] = 0.0F;
 
           /* '<S4>:4:10' contr_pd; */
-          slow_contr_pd(&deg_to_rad, TmpSignalConversionAtSFunctionI, &q, &alpha,
-                        &reset, &DiscreteTransferFcn);
+          slow_contr_pd(&q, &deg_to_rad, TmpSignalConversionAtSFunctionI,
+                        &alpha_ref, &alpha, &reset);
         } else {
           /* '<S4>:138:3' theta_ref = round(q(2)/single(2*pi))*single(2*pi); */
           slow_DW.theta_ref = q * 6.28318548F;
-          if (slow_DW.is_Sliding_mode_controller == slow_IN_Idle) {
-            /* During 'Idle': '<S4>:28' */
-            /* '<S4>:95:1' sf_internal_predicateOutput = energy(q) < 0; */
-            if (slow_energy(TmpSignalConversionAtSFunctionI) < 0.0F) {
-              /* Transition: '<S4>:95' */
-              slow_DW.is_Sliding_mode_controller = slow_IN_Swing_up;
-
-              /* Entry 'Swing_up': '<S4>:1' */
-              /* '<S4>:1:3' contr_su; */
-              slow_contr_su(TmpSignalConversionAtSFunctionI);
-            } else {
-              /* '<S4>:28:3' volt = 0; */
-              slow_DW.volt = 0.0F;
-            }
-          } else {
-            /* During 'Swing_up': '<S4>:1' */
+          if (slow_DW.is_Sliding_mode_controller == slow_IN_Hard_controller) {
+            /* During 'Hard_controller': '<S4>:1' */
             /* '<S4>:17:1' sf_internal_predicateOutput = energy(q) >= 0; */
             if (slow_energy(TmpSignalConversionAtSFunctionI) >= 0.0F) {
               /* Transition: '<S4>:17' */
-              slow_DW.is_Sliding_mode_controller = slow_IN_Idle;
+              slow_DW.is_Sliding_mode_controller = slow_IN_Soft_controller;
 
-              /* Entry 'Idle': '<S4>:28' */
+              /* Entry 'Soft_controller': '<S4>:28' */
+              /* '<S4>:28:3' contr_su_soft; */
+              slow_contr_su_soft(&q, TmpSignalConversionAtSFunctionI);
             } else {
-              /* '<S4>:1:3' contr_su; */
-              slow_contr_su(TmpSignalConversionAtSFunctionI);
+              /* '<S4>:1:3' contr_su_hard; */
+              slow_contr_su_hard(&q, TmpSignalConversionAtSFunctionI);
+            }
+          } else {
+            /* During 'Soft_controller': '<S4>:28' */
+            /* '<S4>:95:1' sf_internal_predicateOutput = energy(q) < 0; */
+            if (slow_energy(TmpSignalConversionAtSFunctionI) < 0.0F) {
+              /* Transition: '<S4>:95' */
+              slow_DW.is_Sliding_mode_controller = slow_IN_Hard_controller;
+
+              /* Entry 'Hard_controller': '<S4>:1' */
+              /* '<S4>:1:3' contr_su_hard; */
+              slow_contr_su_hard(&q, TmpSignalConversionAtSFunctionI);
+            } else {
+              /* '<S4>:28:3' contr_su_soft; */
+              slow_contr_su_soft(&q, TmpSignalConversionAtSFunctionI);
             }
           }
         }
@@ -649,12 +723,12 @@ void controller(real32_T rtu_alpha_ref, uint8_T rtu_swingup, uint16_T
   *rty_theta_ref = 57.2957802F * slow_DW.theta_ref;
 
   /* Saturate: '<S1>/Saturation' */
-  if (slow_DW.volt > 6.0F) {
+  if (q > 6.0F) {
     *rty_voltage = 6.0F;
-  } else if (slow_DW.volt < -6.0F) {
+  } else if (q < -6.0F) {
     *rty_voltage = -6.0F;
   } else {
-    *rty_voltage = slow_DW.volt;
+    *rty_voltage = q;
   }
 
   /* End of Saturate: '<S1>/Saturation' */

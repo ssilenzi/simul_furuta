@@ -74,11 +74,11 @@ pthread_mutex_t 	mux_ref_buffer = PTHREAD_MUTEX_INITIALIZER;			// mutual exclusi
 
 //----------- Variabili locali
 ref_t ref= {ALPHA_REF, THETA_REF, SWINGUP_DEF};
-real32_T rtb_rad_to_deg1[2];	// variabile locale che condiene il valore di alpha e theta in gradi.
+real32_T rtb_rad_to_deg1[2]; // variabile locale che condiene il valore di alpha e theta in gradi.
 real32_T voltage;
 par_ctrl_t par_ctrl;
-dn_t dn_su;		// dn locale nel task state_update
-dn_t dn_ctrl;	// dn locale nel task control
+dn_t dn_su;
+dn_t dn_ctrl;
 
 DW_fast_T fast_DW;
 DW_slow_T slow_DW;

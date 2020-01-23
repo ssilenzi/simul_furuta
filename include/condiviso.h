@@ -7,7 +7,7 @@
 #include "zero_crossing_types.h"
 
 
-#define EXTIME //opzione di debug per leggere info aggiuntive sui task
+#define EXTIME //opzione di debug per leggere i tempi di esecuzione dei task
 
 
 //----------- costanti, definizioni
@@ -50,10 +50,10 @@
 #define COL_RIF				makecol(128, 128, 128)	// colore riferimenti
 
 // par_control	
-#define KP_UP_ALPHA_DEF 	-2.23606801F 	// Valori di default delle costanti per i controllori
-#define KP_UP_THETA_DEF 	-20.0269184F 	// UP = controllore per pendolo su, DOWN = controllore per pendolo giu`
-#define KD_UP_ALPHA_DEF 	-2.08667636F 	// P = proporzionale, D = derivativo
-#define KD_UP_THETA_DEF 	-2.67355F
+#define KP_UP_ALPHA_DEF 	-1.4142F 	// Valori di default delle costanti per i controllori
+#define KP_UP_THETA_DEF 	-24.9140F 	// UP = controllore per pendolo su, DOWN = controllore per pendolo giu`
+#define KD_UP_ALPHA_DEF 	-1.9693F 	// P = proporzionale, D = derivativo
+#define KD_UP_THETA_DEF 	-2.7022F
 #define KP_DOWN_ALPHA_DEF	0.9F
 #define KD_DOWN_ALPHA_DEF	0.0F
 #define POLE_REF_DEF		2.0F
@@ -98,15 +98,15 @@
 #define PRIO_COMBOARD		30
 #define PERIOD_COMBOARD		5
 
-// keys
-#define ID_KEYS				200
-#define PRIO_KEYS			20
-#define PERIOD_KEYS			20
-
 // gui
 #define ID_GUI				100
-#define PRIO_GUI			10
-#define FPS					25 //period 40
+#define PRIO_GUI			20
+#define FPS					25
+
+// keys
+#define ID_KEYS				200
+#define PRIO_KEYS			10
+#define PERIOD_KEYS			20
 
 //----------- parametri scheda
 #define CCR_MAX				5250 //PWM CCR 0-5250, 0 corrisponde a -6 Volt, 5250 a +6 Volt
@@ -151,7 +151,7 @@ typedef struct {
 typedef struct {
     real32_T dist_amp;
     uint16_T noise_amp;
-} par_dn_t; // struttura per i parametri del disturbo e del rumore
+} par_dn_t;
 
 typedef struct {
     real32_T alpha;
@@ -176,28 +176,28 @@ typedef struct {
 
 /* Block signals and states (default storage) for system '<S4>/ref_gen' */
 typedef struct {
-    real32_T DiscreteTransferFcn_states; /* '<S7>/Discrete Transfer Fcn' */
-    uint8_T DiscreteTransferFcn_icLoad;  /* '<S7>/Discrete Transfer Fcn' */
+    real32_T ref_gen_states;             /* '<S7>/ref_gen' */
+    uint8_T ref_gen_icLoad;              /* '<S7>/ref_gen' */
 } DW_ref_gen_slow_T;
 
 /* Zero-crossing (trigger) state for system '<S4>/ref_gen' */
 typedef struct {
-    ZCSigState DiscreteTransferFcn_Reset_ZCE;/* '<S7>/Discrete Transfer Fcn' */
+    ZCSigState ref_gen_Reset_ZCE;        /* '<S7>/ref_gen' */
 } ZCE_ref_gen_slow_T;
 
 /* Block signals and states (default storage) for system '<Root>' */
 typedef struct {
     DW_ref_gen_slow_T ref_gen;           /* '<S4>/ref_gen' */
-    real_T Noise_generator_NextOutput;   /* '<S10>/Noise_generator' */
-    real_T Noise_generator1_NextOutput;  /* '<S10>/Noise_generator1' */
+    real_T Noise_generator_NextOutput;   /* '<S11>/Noise_generator' */
+    real_T Noise_generator1_NextOutput;  /* '<S11>/Noise_generator1' */
     real32_T Delay_DSTATE[2];            /* '<S5>/Delay' */
     real32_T vel_estim_DSTATE[2];        /* '<S5>/vel_estim' */
     real32_T K[4];                       /* '<S1>/Hybrid_controller' */
     real32_T dist;                       /* '<S2>/Disturbance_generator' */
-    real32_T volt;                       /* '<S1>/Hybrid_controller' */
     real32_T theta_ref;                  /* '<S1>/Hybrid_controller' */
-    uint32_T RandSeed;                   /* '<S10>/Noise_generator' */
-    uint32_T RandSeed_b;                 /* '<S10>/Noise_generator1' */
+    real32_T ref_gen_c;                  /* '<S7>/ref_gen' */
+    uint32_T RandSeed;                   /* '<S11>/Noise_generator' */
+    uint32_T RandSeed_b;                 /* '<S11>/Noise_generator1' */
     uint16_T Delay_DSTATE_n[255];        /* '<S1>/Delay' */
     uint8_T is_active_c7_slow;           /* '<S2>/Disturbance_generator' */
     uint8_T is_c7_slow;                  /* '<S2>/Disturbance_generator' */

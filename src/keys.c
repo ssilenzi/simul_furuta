@@ -66,7 +66,7 @@ void* keys(void* arg){
 	return 0;
 }
 
-// key_action, secondo il tasto premuto compie un'azione
+// key_action, a seconda del tasto premuto compie un'azione
 void key_action(){
 
     // ESC, end Threads e conseguente chiusura del programma
@@ -185,7 +185,6 @@ void key_action(){
     }
 }
 
-// key_par_control, parte dei tasti che vanno a modificare i parametri del controllore
 void key_par_control(){
 	/*
 	* Par_control

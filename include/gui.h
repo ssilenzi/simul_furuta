@@ -35,16 +35,16 @@ typedef struct {
 
 
 
-//inizializzazione di gui
+// inizializza gui
 int gui_init();
 
-// task gui
+// GUI
 void* gui(void* arg);
 
 // rad
 float rad(float ang);
 
-// ThickLine: disegna una linea spessa
+// ThickLine
 void thick_line(BITMAP *bmp, float x, float y, float x_, float y_, float thickness, int color);
 
 // Circle_rifalpha: disegno un arco di circonf in prospettiva per visualizzare alpha
@@ -63,7 +63,7 @@ Point proiez_asson(Vect P, AngleSinCos Lon, AngleSinCos Lat);
 // disegna griglia in assonometria
 void grid(Vect P1, Vect P2, int q, int posx, int posy, AngleSinCos Lon, AngleSinCos Lat, int col);
 
-// disegni delle viste
+// disegno le viste
 void vista_asson(float alpha, float refalpha, float theta, float reftheta, float lon, float lat);
 void vista_lato(float theta, float reftheta);
 void vista_alto(float alpha, float refalpha);

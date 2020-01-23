@@ -30,7 +30,7 @@ OAa = pAa(1:2)
 %  -l1*sin(alpharad)
 %  -l1*cos(alpharad)
 
-%% Assonometria isometrica
+%% Assonometria ortogonale
 % assi assonometrici indicati con la lettera "s"
 syms longrad latrad x y z real
 Rs0 = (Rz(longrad) * Ry(-latrad) * [    0  0 -1;
