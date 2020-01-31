@@ -66,7 +66,6 @@ void* gui(void* arg){
 	set_activation(id);
 	
 	// init
-	//gui_init();
 
 	// variabili
 	static state_t state_loc = {0};
