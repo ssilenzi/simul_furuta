@@ -31,29 +31,24 @@
  * 
  */
 
-unsigned int period_control = PERIOD_CONTROL;
+unsigned int period_ctrl = PERIOD_CONTROL;
+pthread_mutex_t mux_period = PTHREAD_MUTEX_INITIALIZER;
 
-state_pc_t state_pc=
-{	ALPHA_0,
+state_t state_pc={
+	ALPHA_0,
 	THETA_0,
-	VOLTAGE_0
-}; 
-pthread_mutex_t 	mux_state_pc = PTHREAD_MUTEX_INITIALIZER;
+	VOLTAGE_0};
+pthread_mutex_t mux_state_pc = PTHREAD_MUTEX_INITIALIZER;
+state_t state_board={
+	ALPHA_0,
+	THETA_0,
+	VOLTAGE_0};
+pthread_mutex_t mux_state_board = PTHREAD_MUTEX_INITIALIZER;
 
 	
 //----------- par_control
-par_ctrl_t par_control_pc =
-{KP_UP_ALPHA_DEF,
-	KP_UP_THETA_DEF,
-	KD_UP_ALPHA_DEF,
-	KD_UP_THETA_DEF,
-	KP_DOWN_ALPHA_DEF,
-	KD_DOWN_ALPHA_DEF,
-	DPOLE_REF_DEF,
-	REF_GEN_NUM_DEF,
-	REF_GEN_DEN_DEF};// struct con parametri del controllore di default
-par_ctrl_t par_control_reset =
-{KP_UP_ALPHA_DEF,
+par_ctrl_t par_ctrl_reset = {
+	KP_UP_ALPHA_DEF,
 	KP_UP_THETA_DEF,
 	KD_UP_ALPHA_DEF,
 	KD_UP_THETA_DEF,
@@ -62,26 +57,40 @@ par_ctrl_t par_control_reset =
 	DPOLE_REF_DEF,
 	REF_GEN_NUM_DEF,
 	REF_GEN_DEN_DEF};
-pthread_mutex_t 	mux_parcontr_pc = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
+par_ctrl_t par_ctrl_pc = {
+	KP_UP_ALPHA_DEF,
+	KP_UP_THETA_DEF,
+	KD_UP_ALPHA_DEF,
+	KD_UP_THETA_DEF,
+	KP_DOWN_ALPHA_DEF,
+	KD_DOWN_ALPHA_DEF,
+	DPOLE_REF_DEF,
+	REF_GEN_NUM_DEF,
+	REF_GEN_DEN_DEF};
 float pole_ref = POLE_REF_DEF;
+pthread_mutex_t mux_par_ctrl_pc = PTHREAD_MUTEX_INITIALIZER;	// mutual exclusion per par_control
 
 //----------- disturbance and noise
-par_dn_t par_dn = {
-  DIST_AMP_DEF,
-  NOISE_AMP_DEF
-} ; // parametri disturbance and noise
+par_dn_t par_dn_pc = {
+	DIST_AMP_DEF,
+  	NOISE_AMP_DEF}; // parametri disturbance and noise
+pthread_mutex_t	mux_par_dn = PTHREAD_MUTEX_INITIALIZER;
 dn_t dn= {KICK_DEF, DIST_DEF, NOISE_DEF, DELAY_DEF};
-pthread_mutex_t		mux_dn = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per dn
+pthread_mutex_t	mux_dn = PTHREAD_MUTEX_INITIALIZER;		// mutual exclusion per dn
 	
 //----------- miscellanee
 int end = 0;			// regola chiusura threads
 
 //----------- variabili lato pc	
-ref_t ref_pc = {ALPHA_REF, THETA_REF, SWINGUP_DEF};		// struct riferimento 
-pthread_mutex_t 	mux_ref_pc = PTHREAD_MUTEX_INITIALIZER;
-ref_t ref_reset = {ALPHA_REF, THETA_REF, SWINGUP_DEF};	// struct riferimento per il reset
-view_t view = {LON_0, LAT_0};			// struct vista
-pthread_mutex_t 	mux_view = PTHREAD_MUTEX_INITIALIZER;
+ref_t ref_pc = {
+	ALPHA_REF,
+	THETA_REF,
+	SWINGUP_DEF};		// struct riferimento 
+pthread_mutex_t mux_ref_pc = PTHREAD_MUTEX_INITIALIZER;
+view_t view = {
+	LON_0,
+	LAT_0};			// struct vista
+pthread_mutex_t mux_view = PTHREAD_MUTEX_INITIALIZER;
 
 //----------- counter deadline miss
 int dl_miss_gui = 0;

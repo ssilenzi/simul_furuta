@@ -117,13 +117,13 @@ par_dn.DataType = 'Bus: par_dn_t';
 par_ctrl.StorageClass = 'ImportedExtern';
 par_dn.StorageClass = 'ImportedExtern';
 
-state_pc_init.alpha = q_init(1);
-state_pc_init.theta = q_init(2);
-state_pc_init.voltage = 0;
+state_init.alpha = q_init(1);
+state_init.theta = q_init(2);
+state_init.voltage = 0;
 
-state_board_init.CNT_alpha = CNT_init(1);
-state_board_init.CNT_theta = CNT_init(2);
-state_board_init.CCR = CCR_init;
+inout_init.CNT_alpha = CNT_init(1);
+inout_init.CNT_theta = CNT_init(2);
+inout_init.CCR = CCR_init;
 
 ref_init.alpha = 0;
 ref_init.theta = q_init(2);
@@ -136,12 +136,12 @@ dn_init.delay = delay_input;
 
 clear q_init CCR_init CNT_init delay_input
 
-Simulink.Bus.createObject(state_pc_init);
-state_pc_t = copy(slBus1);
+Simulink.Bus.createObject(state_init);
+state_t = copy(slBus1);
 clear slBus1
 
-Simulink.Bus.createObject(state_board_init);
-state_board_t = copy(slBus1);
+Simulink.Bus.createObject(inout_init);
+inout_t = copy(slBus1);
 clear slBus1
 
 Simulink.Bus.createObject(ref_init);
@@ -152,17 +152,17 @@ Simulink.Bus.createObject(dn_init);
 dn_t = copy(slBus1);
 clear slBus1
 
-state_pc_t.DataScope = 'Exported';
-state_board_t.DataScope = 'Exported';
+state_t.DataScope = 'Exported';
+inout_t.DataScope = 'Exported';
 ref_t.DataScope = 'Exported';
 dn_t.DataScope = 'Exported';
 
-for k=1:size(state_pc_t.Elements,1)
-    state_pc_t.Elements(k).DataType = 'single';
+for k=1:size(state_t.Elements,1)
+    state_t.Elements(k).DataType = 'single';
 end
 
-for k=1:size(state_board_t.Elements,1)
-    state_board_t.Elements(k).DataType = 'uint16';
+for k=1:size(inout_t.Elements,1)
+    inout_t.Elements(k).DataType = 'uint16';
 end
 
 ref_t.Elements(1).DataType = 'single';
@@ -177,18 +177,18 @@ dn_t.Elements(3).DataType = 'single';
 dn_t.Elements(4).DataType = 'uint8';
 clear k
 
-state_pc = Simulink.Signal;
-state_pc.DataType = 'Bus: state_pc_t';
-state_pc.Dimensions = 1;
-state_pc.Complexity = 'real';
-state_pc.InitialValue = 'state_pc_init';
-state_pc.CoderInfo.StorageClass = 'ImportedExtern';
+state = Simulink.Signal;
+state.DataType = 'Bus: state_t';
+state.Dimensions = 1;
+state.Complexity = 'real';
+state.InitialValue = 'state_init';
+state.CoderInfo.StorageClass = 'ImportedExtern';
 
-state_board = Simulink.Signal;
-state_board.DataType = 'Bus: state_board_t';
-state_board.Dimensions = 1;
-state_board.Complexity = 'real';
-state_board.CoderInfo.StorageClass = 'ImportedExtern';
+inout = Simulink.Signal;
+inout.DataType = 'Bus: inout_t';
+inout.Dimensions = 1;
+inout.Complexity = 'real';
+inout.CoderInfo.StorageClass = 'ImportedExtern';
 
 ref = Simulink.Signal;
 ref.DataType = 'Bus: ref_t';

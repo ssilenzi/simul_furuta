@@ -1,5 +1,6 @@
 #ifndef SIMUL_FURUTA_GUI_H
 #define SIMUL_FURUTA_GUI_H
+#define ALLEGRO_STATICLINK
 
 #include <stdio.h>
 #include <math.h>
@@ -69,10 +70,10 @@ void vista_lato(float theta, float reftheta);
 void vista_alto(float alpha, float refalpha);
 
 // disegna le scritte
-void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control);
+void scritte_draw(state_t state,ref_t ref, par_ctrl_t par_control);
 
 // disegna l'interfaccia
-void gui_draw(state_pc_t state,ref_t ref, view_t view, par_ctrl_t par_control);
+void gui_draw(state_t state,ref_t ref, view_t view, par_ctrl_t par_control);
 
 
 #endif //SIMUL_FURUTA_GUI_H

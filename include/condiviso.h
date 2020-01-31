@@ -120,14 +120,14 @@ typedef struct
     uint16_T CNT_alpha;
     uint16_T CNT_theta;
     uint16_T CCR;
-} state_board_t; // struttura dello stato lato scheda
+} inout_t; // struttura dello stato lato scheda
 
 
 typedef struct {
     real32_T alpha;
     real32_T theta;
     real32_T voltage;
-} state_pc_t; // struttura dello stato lato pc
+} state_t; // struttura dello stato lato pc
 
 typedef struct {
     real32_T up_kp_alpha;
@@ -171,7 +171,7 @@ typedef struct {
     real32_T DiscreteTimeIntegrator_DSTATE[4];/* '<S6>/Discrete-Time Integrator' */
     real32_T Delay_DSTATE_j;             /* '<S3>/Delay' */
     real32_T Delay_DSTATE_c;             /* '<S2>/Delay' */
-    real32_T DiscreteStateSpace_DSTATE;  /* '<S2>/Discrete State-Space' */
+    real32_T LR_circuit_states;		 /* '<S2>/Discrete State-Space' */
 } DW_fast_T;
 
 /* Block signals and states (default storage) for system '<S4>/ref_gen' */

@@ -17,7 +17,7 @@ void* state_update(void* arg); 	// task che aggiorna lo state leggendo ccr
 
 void* control(void* arg);		// task che legge lo stato, il riferimento e setta ccr
 
-void* compc(void* arg);			// task di comunicazione da pc, scrive ref_pc e par_control_pc su buffer, legge state da buffer
+void* compc(void* arg);			// task di comunicazione da pc, scrive ref_pc e par_ctrl_pc su buffer, legge state da buffer
 
 void* comboard(void* arg);		// task di comunicazione dalla scheda, scrive su buffer 
 

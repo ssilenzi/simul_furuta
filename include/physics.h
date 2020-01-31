@@ -42,8 +42,6 @@ extern DW_fast_T fast_DW;
  * states and exports their symbols.
  *
  */
-extern dn_t dn;                        /* Simulink.Signal object 'dn' */
-extern state_board_t state_board;     /* Simulink.Signal object 'state_board' */
 
 extern void physics_Init(void);
 extern void physics(uint16_T rtu_CCR, real32_T rtu_dist, const real32_T

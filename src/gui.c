@@ -2,20 +2,21 @@
 
 
 //----------- variabili extern
-extern unsigned int         period_control;
 extern ref_t 				ref_pc;
 extern pthread_mutex_t 		mux_ref_pc;
-extern state_pc_t 			state_pc;
+extern state_t 				state_pc;
 extern pthread_mutex_t 		mux_state_pc;
 extern view_t 				view;
 extern pthread_mutex_t 		mux_view;
-extern par_ctrl_t 			par_control_pc;
-extern par_ctrl_t			par_control_reset;
-extern pthread_mutex_t 		mux_parcontr_pc;
+extern par_ctrl_t 			par_ctrl_pc;
 extern float                pole_ref;
+extern pthread_mutex_t 		mux_par_ctrl_pc;
 extern dn_t 				dn;
 extern pthread_mutex_t		mux_dn;
-extern par_dn_t 			par_dn;
+extern par_dn_t 			par_dn_pc;
+extern pthread_mutex_t		mux_par_dn;
+extern unsigned int         period_ctrl;
+extern pthread_mutex_t		mux_period;
 extern int 					dl_miss_gui;
 extern int 					dl_miss_keys;
 extern int 					dl_miss_compc;
@@ -23,8 +24,6 @@ extern int 					dl_miss_control;
 extern int 					dl_miss_state_update;
 extern int 					dl_miss_comboard;
 extern int 					end;
-
-
 #ifdef EXTIME
 extern int ex_time[6];
 extern int wc_extime[6];
@@ -70,10 +69,10 @@ void* gui(void* arg){
 	//gui_init();
 
 	// variabili
-	static state_pc_t state_loc = {0};
+	static state_t state_loc = {0};
 	static ref_t ref_loc = {0};
 	static view_t view_loc = {0};
-	static par_ctrl_t par_control_loc = {0};
+	static par_ctrl_t par_ctrl_loc = {0};
 	
 	while(!end){
 #ifdef EXTIME
@@ -85,14 +84,14 @@ void* gui(void* arg){
 		pthread_mutex_lock(&mux_ref_pc);
 			ref_loc = ref_pc;
 		pthread_mutex_unlock(&mux_ref_pc);
-		pthread_mutex_lock(&mux_state_pc);
+		pthread_mutex_lock(&mux_view);
 			view_loc = view;
-		pthread_mutex_unlock(&mux_state_pc);
-		pthread_mutex_lock(&mux_parcontr_pc);
-			par_control_loc = par_control_pc;
-		pthread_mutex_unlock(&mux_parcontr_pc);
+		pthread_mutex_unlock(&mux_view);
+		pthread_mutex_lock(&mux_par_ctrl_pc);
+			par_ctrl_loc = par_ctrl_pc;
+		pthread_mutex_unlock(&mux_par_ctrl_pc);
 		
-		gui_draw(state_loc, ref_loc, view_loc, par_control_loc);
+		gui_draw(state_loc, ref_loc, view_loc, par_ctrl_loc);
 		
 		//--------- end task
 		if(deadline_miss(id)){
@@ -544,7 +543,19 @@ int gui_init(){
 	return 0;
 }
 
-void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
+void scritte_draw(state_t state,ref_t ref, par_ctrl_t par_control){
+	static dn_t dn_loc = {0};
+	static par_dn_t par_dn_loc = {0};
+	static unsigned int period_ctrl_loc = 0;
+	pthread_mutex_lock(&mux_dn);
+		dn_loc = dn;
+	pthread_mutex_unlock(&mux_dn);
+	pthread_mutex_lock(&mux_par_dn);
+		par_dn_loc = par_dn_pc;
+	pthread_mutex_unlock(&mux_par_dn);
+	pthread_mutex_lock(&mux_period);
+		period_ctrl_loc = period_ctrl;
+	pthread_mutex_unlock(&mux_period);
 	// ref
 	textout_ex(scrbuf, font, "Riferimento:", scritte.x, scritte.y[1], col.scr, col.bck);
 	sprintf(refalphastr, "alpha = %5.2f, a/s -+%d  ", ref.alpha, INCR_ANG);
@@ -567,13 +578,13 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 	textout_ex(scrbuf, font, parcontrstralphadown,scritte.x, scritte.y[12], col.scr, col.bck);
 	// par_dn e dn
 	textout_ex(scrbuf, font, "Disturbo, rumore e ritardi:", scritte.x, scritte.y[13], col.scr, col.bck);
-	sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2hu x/c, Rit: %2hhu w/e ", par_dn.dist_amp, par_dn.noise_amp, dn.delay);
+	sprintf(pardnstr, "Dist:%5.2f N f/g, Rumore: %2u x/c, Rit: %2u w/e ", par_dn_loc.dist_amp, par_dn_loc.noise_amp, dn_loc.delay);
 	textout_ex(scrbuf, font, pardnstr, scritte.x, scritte.y[14], col.scr, col.bck);
 	// pole gen ref_loc
 	sprintf(pole_ref_str, "Polo generatore di riferimento: %5.1f i/o  ", pole_ref);
 	textout_ex(scrbuf, font, pole_ref_str, scritte.x, scritte.y[15], col.scr, col.bck);
 	// tempo di esecuzione del task di controllo
-	sprintf(control_period_str, "Periodo di control: %2u 9/0, def = 5  ", period_control);
+	sprintf(control_period_str, "Periodo di control: %2u 9/0, def = 5  ", period_ctrl_loc);
 	textout_ex(scrbuf, font, control_period_str, scritte.x, scritte.y[16], col.scr, col.bck);
 	
 	// swingup
@@ -626,7 +637,7 @@ void scritte_draw(state_pc_t state,ref_t ref, par_ctrl_t par_control){
 
 
 //----------- gui_draw
-void gui_draw(state_pc_t state,ref_t ref, view_t view, par_ctrl_t par_control){
+void gui_draw(state_t state,ref_t ref, view_t view, par_ctrl_t par_control){
 	
 	vista_alto(state.alpha, ref.alpha);
 	vista_lato(state.theta, ref.theta);

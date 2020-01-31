@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'slow'.
  *
- * Model version                  : 1.281
+ * Model version                  : 1.282
  * Simulink Coder version         : 9.2 (R2019b) 18-Jul-2019
- * C/C++ source code generated on : Sun Jan 19 21:44:51 2020
+ * C/C++ source code generated on : Fri Jan 31 08:57:55 2020
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -31,7 +31,7 @@
 #define slow_IN_Soft_controller        ((uint8_T)2U)
 
 /* Forward declaration for local functions */
-static real32_T slow_energy(const real32_T state[4]);
+static real32_T slow_energy(const real32_T state_0[4]);
 static void slow_contr_su_soft(real32_T *volt, const real32_T
   TmpSignalConversionAtSFunctionI[4]);
 static void slow_contr_pd(real32_T *volt, const real32_T *deg_to_rad, const
@@ -85,7 +85,7 @@ void slow_ref_gen(real32_T rtu_alpha_ref, real32_T rtu_alpha, int8_T rtu_reset,
  * Function for Chart: '<S1>/Hybrid_controller'
  * function ME = energy(state)
  */
-static real32_T slow_energy(const real32_T state[4])
+static real32_T slow_energy(const real32_T state_0[4])
 {
   /* MATLAB Function 'energy': '<S4>:86' */
   /*  Mechanical energy calculation (kinetic + potential) */
@@ -93,8 +93,8 @@ static real32_T slow_energy(const real32_T state[4])
   /* '<S4>:86:6' al_d = state(3); */
   /* '<S4>:86:7' th_d = state(4); */
   /* '<S4>:86:9' ME = (Jp*th_d^2)/2 - g*lp*mp + g*lp*mp*cos(th); */
-  return (state[3] * state[3] * 0.00429067202F / 2.0F - 0.194355741F) +
-    0.194355741F * cosf(state[1]);
+  return (state_0[3] * state_0[3] * 0.00429067202F / 2.0F - 0.194355741F) +
+    0.194355741F * cosf(state_0[1]);
 }
 
 /*
