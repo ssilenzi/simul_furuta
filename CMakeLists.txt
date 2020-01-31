@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 project(simul_furuta)
 
@@ -16,5 +16,6 @@ include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/inclu
 file(GLOB SRC "${PROJECT_SOURCE_DIR}/src/*.c" "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(${PROJECT_NAME} ${SRC})
 target_compile_options(${PROJECT_NAME} PUBLIC -Werror -Wall -Wextra)
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc")
 target_link_libraries(${PROJECT_NAME} Threads::Threads "${ALLEGRO_LIBRARY}" m rt)
 install(TARGETS ${PROJECT_NAME} DESTINATION "${PROJECT_SOURCE_DIR}/bin")
